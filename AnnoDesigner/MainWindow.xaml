@@ -26,7 +26,7 @@
                 </DockPanel>
                 <DockPanel Name="dockPanel1" LastChildFill="False">
                     <Label Content="Label" Height="28" Name="label8" />
-                    <TextBox Height="23" Name="textBox8" Width="120" DockPanel.Dock="Right" IsEnabled="False" />
+                    <TextBox Height="23" Name="textBoxLabel" Width="120" DockPanel.Dock="Right" IsEnabled="True" Text="Depot" />
                 </DockPanel>
                 <DockPanel LastChildFill="False" Name="dockPanel3">
                     <Label Content="Icon" Height="28" Name="label10" />
