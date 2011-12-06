@@ -46,7 +46,8 @@ namespace AnnoDesigner
                 _currentObject = new AnnoObject
                 {
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
-                    Color = colorPicker.SelectedColor
+                    Color = colorPicker.SelectedColor,
+                    Label = textBoxLabel.Text
                 };
                 annoCanvas.SetCurrentObject(_currentObject);
             }

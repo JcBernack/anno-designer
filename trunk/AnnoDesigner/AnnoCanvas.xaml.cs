@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -152,7 +153,19 @@ namespace AnnoDesigner
         private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
         {
             var brush = new SolidColorBrush(obj.Color);
-            drawingContext.DrawRectangle(brush, pen, GetObjectScreenRect(obj));
+            var rect = GetObjectScreenRect(obj);
+            var textPoint = rect.TopLeft;
+            textPoint.Y += rect.Height/2;
+            drawingContext.DrawRectangle(brush, pen, rect);
+            var text = new FormattedText(obj.Label, Thread.CurrentThread.CurrentCulture, FlowDirection.LeftToRight,
+                                         new Typeface("Verdana"), 12, Brushes.Black)
+            {
+                TextAlignment = TextAlignment.Center,
+                MaxTextWidth = rect.Width,
+                MaxTextHeight = rect.Height
+            };
+            textPoint.Y -= text.Height / 2;
+            drawingContext.DrawText(text, textPoint);
         }
 
         #endregion
