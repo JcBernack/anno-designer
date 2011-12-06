@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -192,6 +193,11 @@ namespace AnnoDesigner
             return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
         }
 
+        private Rect GetObjectCollisionRect(AnnoObject obj)
+        {
+            return new Rect(obj.Position, new Size(obj.Size.Width - 0.5, obj.Size.Height - 0.5));
+        }
+
         private Size Rotate(Size size)
         {
             return new Size(size.Height, size.Width);
@@ -201,13 +207,7 @@ namespace AnnoDesigner
 
         #region Event handling
 
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            _mousePosition = e.GetPosition(this);
-            InvalidateVisual();
-        }
-
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+        private void HandleMouseClick(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -215,19 +215,26 @@ namespace AnnoDesigner
                 {
                     case DesignMode.New:
                         // place new object
-                        if (_currentObject != null)
-                        {
-                            _placedObjects.Add(new AnnoObject(_currentObject));
-                        }
+                        PlaceCurrentObject();
                         break;
                     case DesignMode.Remove:
                         // remove clicked object
                         _placedObjects.Remove(_placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this))));
                         break;
-                    default:
-                    throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            _mousePosition = e.GetPosition(this);
+            HandleMouseClick(e);
+            InvalidateVisual();
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            HandleMouseClick(e);
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 _currentObject = null;
@@ -240,6 +247,24 @@ namespace AnnoDesigner
         }
 
         #endregion
+
+        private bool IntersectionExists(AnnoObject a, AnnoObject b)
+        {
+            return GetObjectCollisionRect(a).IntersectsWith(GetObjectCollisionRect(b));
+        }
+
+        private bool IntersectionTest(AnnoObject obj)
+        {
+            return _placedObjects.Exists(_ => IntersectionExists(obj, _));
+        }
+
+        private void PlaceCurrentObject()
+        {
+            if (_currentObject != null && !IntersectionTest(_currentObject))
+            {
+                _placedObjects.Add(new AnnoObject(_currentObject));
+            }
+        }
 
         #region API
 
