@@ -20,6 +20,8 @@ namespace AnnoDesigner
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "red"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(171, 232, 107), "green"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(76, 106, 222), "blue"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 150, 70), "orange"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 0, 0), "black"));
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
