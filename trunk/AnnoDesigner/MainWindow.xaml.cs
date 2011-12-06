@@ -17,9 +17,9 @@ namespace AnnoDesigner
         {
             InitializeComponent();
             colorPicker.StandardColors.Clear();
-            colorPicker.StandardColors.Add(new ColorItem(new Color { A = 255, R = 214, G = 49, B = 49 }, "red"));
-            colorPicker.StandardColors.Add(new ColorItem(new Color { A = 255, R = 171, G = 232, B = 107 }, "green"));
-            colorPicker.StandardColors.Add(new ColorItem(new Color { A = 255, R = 76, G = 106, B = 222 }, "blue"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "red"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(171, 232, 107), "green"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(76, 106, 222), "blue"));
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -88,6 +88,16 @@ namespace AnnoDesigner
         private void MenuItemSaveAsClick(object sender, RoutedEventArgs e)
         {
             annoCanvas.SaveToFile();
+        }
+
+        private void MenuItemOpenClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.OpenFile();
+        }
+
+        private void MenuItemExportImageClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.ExportImage();
         }
     }
 }

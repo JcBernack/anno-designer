@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +15,8 @@ namespace AnnoDesigner
     public partial class AnnoCanvas
         : UserControl
     {
+        #region Properties
+
         private int _gridStep = 20;
         public int GridSize
         {
@@ -67,8 +68,10 @@ namespace AnnoDesigner
             }
         }
 
+        #endregion
+
         private Point _mousePosition;
-        private readonly List<AnnoObject> _placedObjects;
+        private List<AnnoObject> _placedObjects;
         private AnnoObject _currentObject;
 
         public AnnoCanvas()
@@ -76,6 +79,8 @@ namespace AnnoDesigner
             InitializeComponent();
             _placedObjects = new List<AnnoObject>();
         }
+
+        #region Rendering
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -122,28 +127,38 @@ namespace AnnoDesigner
             switch (_designMode)
             {
                 case DesignMode.New:
-                    // draw current object
-                    if (_currentObject != null)
-                    {
-                        _currentObject.Position = mouseGridPos;
-                        _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
-                        _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
-                        RenderObject(drawingContext, _currentObject, pen);
-                    }
-                    break;
+                // draw current object
+                if (_currentObject != null)
+                {
+                    _currentObject.Position = mouseGridPos;
+                    _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
+                    _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
+                    RenderObject(drawingContext, _currentObject, pen);
+                }
+                break;
                 case DesignMode.Remove:
-                    break;
+                break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException();
             }
 
             // pop back guidlines set
             drawingContext.Pop();
         }
 
+        private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
+        {
+            var brush = new SolidColorBrush(obj.Color);
+            drawingContext.DrawRectangle(brush, pen, GetObjectScreenRect(obj));
+        }
+
+        #endregion
+
+        #region Coordinate conversions
+
         private Point ScreenToGrid(Point screenPoint)
         {
-            return new Point(Math.Floor(screenPoint.X / _gridStep), Math.Floor(screenPoint.Y /_gridStep));
+            return new Point(Math.Floor(screenPoint.X / _gridStep), Math.Floor(screenPoint.Y / _gridStep));
         }
 
         private Point GridToScreen(Point gridPoint)
@@ -156,6 +171,15 @@ namespace AnnoDesigner
             return new Size(gridSize.Width * _gridStep, gridSize.Height * _gridStep);
         }
 
+        private Rect GetObjectScreenRect(AnnoObject obj)
+        {
+            return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
+        }
+
+        #endregion
+
+        #region Event handling
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             _mousePosition = e.GetPosition(this);
@@ -167,20 +191,20 @@ namespace AnnoDesigner
             switch (_designMode)
             {
                 case DesignMode.New:
-                    // place new object
-                    if (_currentObject != null)
-                    {
-                        _placedObjects.Add(new AnnoObject(_currentObject));
-                        InvalidateVisual();
-                    }
-                    break;
-                case DesignMode.Remove:
-                    // remove clicked object
-                    _placedObjects.RemoveAll(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this)));
+                // place new object
+                if (_currentObject != null)
+                {
+                    _placedObjects.Add(new AnnoObject(_currentObject));
                     InvalidateVisual();
-                    break;
+                }
+                break;
+                case DesignMode.Remove:
+                // remove clicked object
+                _placedObjects.RemoveAll(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this)));
+                InvalidateVisual();
+                break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -190,16 +214,9 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
-        private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
-        {
-            var brush = new SolidColorBrush(obj.Color);
-            drawingContext.DrawRectangle(brush, pen, GetObjectScreenRect(obj));
-        }
+        #endregion
 
-        private Rect GetObjectScreenRect(AnnoObject obj)
-        {
-            return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
-        }
+        #region API
 
         public void SetCurrentObject(AnnoObject obj)
         {
@@ -211,16 +228,52 @@ namespace AnnoDesigner
         public void ClearPlacedObjects()
         {
             _placedObjects.Clear();
+            InvalidateVisual();
         }
+
+        #endregion
+
+        #region Save/Load/Export methods
 
         public void SaveToFile()
         {
-            var dialog = new SaveFileDialog();
-            dialog.ShowDialog();
-            var file = dialog.OpenFile();
-            var formatter = new BinaryFormatter();
-            formatter.Serialize(file, _placedObjects);
-            file.Close();
+            var dialog = new SaveFileDialog
+            {
+                DefaultExt = ".ad",
+                Filter = "Anno Designer Files (*.ad)|*.ad|All Files (*.*)|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                DataIO.SaveToFile(_placedObjects, dialog.FileName);
+            }
         }
+
+        public void OpenFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                DefaultExt = ".ad",
+                Filter = "Anno Designer Files (*.ad)|*.ad|All Files (*.*)|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
+            }
+        }
+
+        public void ExportImage()
+        {
+            var dialog = new SaveFileDialog
+            {
+                DefaultExt = ".png",
+                Filter = "PNG (*.png)|*.png|All Files (*.*)|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                DataIO.RenderToFile(this, dialog.FileName);
+            }
+        }
+
+        #endregion
     }
 }
