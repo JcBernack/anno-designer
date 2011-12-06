@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 
 namespace AnnoDesigner
@@ -48,6 +49,40 @@ namespace AnnoDesigner
                     InvalidateVisual();
                 }
                 _renderGrid = value;
+            }
+        }
+
+        private bool _renderLabel;
+        public bool RenderLabel
+        {
+            get
+            {
+                return _renderLabel;
+            }
+            set
+            {
+                if (_renderLabel != value)
+                {
+                    InvalidateVisual();
+                }
+                _renderLabel = value;
+            }
+        }
+
+        private bool _renderIcon;
+        public bool RenderIcon
+        {
+            get
+            {
+                return _renderIcon;
+            }
+            set
+            {
+                if (_renderIcon != value)
+                {
+                    InvalidateVisual();
+                }
+                _renderIcon = value;
             }
         }
 
@@ -127,20 +162,20 @@ namespace AnnoDesigner
 
             switch (_designMode)
             {
-                case DesignMode.New:
-                // draw current object
-                if (_currentObject != null)
-                {
-                    _currentObject.Position = mouseGridPos;
-                    _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
-                    _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
-                    _currentObject.Color.A = 192;
-                    RenderObject(drawingContext, _currentObject, pen);
-                    _currentObject.Color.A = 255;
-                }
-                break;
-                case DesignMode.Remove:
-                break;
+                case DesignMode.Edit:
+                    // draw current object
+                    if (_currentObject != null)
+                    {
+                        _currentObject.Position = mouseGridPos;
+                        _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
+                        _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
+                        _currentObject.Color.A = 128;
+                        RenderObject(drawingContext, _currentObject, pen);
+                        _currentObject.Color.A = 255;
+                    }
+                    break;  
+                case DesignMode.Select:
+                    break;
                 default:
                 throw new ArgumentOutOfRangeException();
             }
@@ -151,20 +186,30 @@ namespace AnnoDesigner
 
         private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
         {
-            var brush = new SolidColorBrush(obj.Color);
-            var rect = GetObjectScreenRect(obj);
-            var textPoint = rect.TopLeft;
-            textPoint.Y += rect.Height/2;
-            drawingContext.DrawRectangle(brush, pen, rect);
-            var text = new FormattedText(obj.Label, Thread.CurrentThread.CurrentCulture, FlowDirection.LeftToRight,
-                                         new Typeface("Verdana"), 12, Brushes.Black)
+            // draw object rectangle
+            var objRect = GetObjectScreenRect(obj);
+            drawingContext.DrawRectangle(new SolidColorBrush(obj.Color), pen, objRect);
+            // draw object icon
+            if (_renderIcon)
             {
-                TextAlignment = TextAlignment.Center,
-                MaxTextWidth = rect.Width,
-                MaxTextHeight = rect.Height
-            };
-            textPoint.Y -= text.Height / 2;
-            drawingContext.DrawText(text, textPoint);
+                var imageRect = objRect;
+                drawingContext.DrawImage(new BitmapImage(new Uri(@"images\Liquor.png", UriKind.Relative)), imageRect);
+            }
+            // draw object label
+            if (_renderLabel)
+            {
+                var textPoint = objRect.TopLeft;
+                textPoint.Y += objRect.Height / 2;
+                var text = new FormattedText(obj.Label, Thread.CurrentThread.CurrentCulture, FlowDirection.LeftToRight,
+                                             new Typeface("Verdana"), 12, Brushes.Black)
+                {
+                    TextAlignment = TextAlignment.Center,
+                    MaxTextWidth = objRect.Width,
+                    MaxTextHeight = objRect.Height
+                };
+                textPoint.Y -= text.Height / 2;
+                drawingContext.DrawText(text, textPoint);
+            }
         }
 
         #endregion
@@ -211,15 +256,20 @@ namespace AnnoDesigner
             {
                 switch (_designMode)
                 {
-                    case DesignMode.New:
+                    case DesignMode.Edit:
                         // place new object
                         PlaceCurrentObject();
                         break;
-                    case DesignMode.Remove:
-                        // remove clicked object
-                        _placedObjects.Remove(_placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this))));
+                    case DesignMode.Select:
                         break;
                 }
+            }
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                // remove current object
+                //_currentObject = null;
+                // remove clicked object
+                _placedObjects.Remove(_placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this))));
             }
         }
 
@@ -233,10 +283,7 @@ namespace AnnoDesigner
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             HandleMouseClick(e);
-            if (e.RightButton == MouseButtonState.Pressed)
-            {
-                _currentObject = null;
-            }
+            // rotate current object
             if (e.MiddleButton == MouseButtonState.Pressed && _currentObject != null)
             {
                 _currentObject.Size = Rotate(_currentObject.Size);

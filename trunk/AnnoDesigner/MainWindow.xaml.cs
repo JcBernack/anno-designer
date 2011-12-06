@@ -26,17 +26,12 @@ namespace AnnoDesigner
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            Button2Click(null, null);
+            ButtonEditClick(null, null);
         }
 
         private void MenuItemClick(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-
-        private void MenuItemGridClick(object sender, RoutedEventArgs e)
-        {
-            annoCanvas.RenderGrid = !annoCanvas.RenderGrid;
         }
 
         private void Button1Click(object sender, RoutedEventArgs e)
@@ -59,28 +54,21 @@ namespace AnnoDesigner
 
         private void SetModeButtons(Button activeButton)
         {
-            button2.IsEnabled = true;
-            //button3.IsEnabled = true;
-            button4.IsEnabled = true;
+            buttonEdit.IsEnabled = true;
+            buttonSelect.IsEnabled = false;
             activeButton.IsEnabled = false;
         }
 
-        private void Button3Click(object sender, RoutedEventArgs e)
+        private void ButtonEditClick(object sender, RoutedEventArgs e)
         {
-            //SetModeButtons(button3);
-            //annoCanvas.DesignMode = DesignMode.Select;
+            SetModeButtons(buttonEdit);
+            annoCanvas.DesignMode = DesignMode.Edit;
         }
 
-        private void Button2Click(object sender, RoutedEventArgs e)
+        private void ButtonSelectClick(object sender, RoutedEventArgs e)
         {
-            SetModeButtons(button2);
-            annoCanvas.DesignMode = DesignMode.New;
-        }
-
-        private void Button4Click(object sender, RoutedEventArgs e)
-        {
-            SetModeButtons(button4);
-            annoCanvas.DesignMode = DesignMode.Remove;
+            SetModeButtons(buttonSelect);
+            annoCanvas.DesignMode = DesignMode.Select;
         }
 
         private void MenuItemNewClick(object sender, RoutedEventArgs e)
@@ -101,6 +89,21 @@ namespace AnnoDesigner
         private void MenuItemExportImageClick(object sender, RoutedEventArgs e)
         {
             annoCanvas.ExportImage();
+        }
+
+        private void MenuItemGridClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.RenderGrid = !annoCanvas.RenderGrid;
+        }
+
+        private void MenuItemLabelClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.RenderLabel = !annoCanvas.RenderLabel;
+        }
+
+        private void MenuItemIconClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.RenderIcon = !annoCanvas.RenderIcon;
         }
     }
 }
