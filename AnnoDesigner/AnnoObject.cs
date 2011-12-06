@@ -1,6 +1,5 @@
 using System;
 using System.Windows;
-using System.Windows.Media;
 
 namespace AnnoDesigner
 {
@@ -8,7 +7,7 @@ namespace AnnoDesigner
     public class AnnoObject
     {
         public Size Size;
-        public Color Color;
+        public SerializableColor Color;
         public Point Position;
 
         public string Label;

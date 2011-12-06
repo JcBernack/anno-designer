@@ -58,9 +58,11 @@
         <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" />
         <Menu Height="23" Name="menu1" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <MenuItem Header="File">
-                <MenuItem Header="New" Command="ApplicationCommands.New" Click="MenuItemNewClick" />
-                <MenuItem Header="Open" Command="ApplicationCommands.Open" />
+                <MenuItem Header="New" Click="MenuItemNewClick" />
+                <MenuItem Header="Open" Click="MenuItemOpenClick" />
                 <MenuItem Header="Save as" Click="MenuItemSaveAsClick" />
+                <Separator />
+                <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
                 <Separator />
                 <MenuItem Header="Exit" Click="MenuItemClick" />
             </MenuItem>
