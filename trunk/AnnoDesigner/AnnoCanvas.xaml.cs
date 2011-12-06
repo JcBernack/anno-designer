@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
-using Brushes = System.Windows.Media.Brushes;
 
 namespace AnnoDesigner
 {
@@ -171,7 +169,7 @@ namespace AnnoDesigner
 
         #endregion
 
-        #region Coordinate conversions
+        #region Coordinate and rectangle conversions
 
         private Point ScreenToGrid(Point screenPoint)
         {
@@ -193,12 +191,12 @@ namespace AnnoDesigner
             return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
         }
 
-        private Rect GetObjectCollisionRect(AnnoObject obj)
+        private static Rect GetObjectCollisionRect(AnnoObject obj)
         {
             return new Rect(obj.Position, new Size(obj.Size.Width - 0.5, obj.Size.Height - 0.5));
         }
 
-        private Size Rotate(Size size)
+        private static Size Rotate(Size size)
         {
             return new Size(size.Height, size.Width);
         }
@@ -248,6 +246,8 @@ namespace AnnoDesigner
 
         #endregion
 
+        #region Collision handling
+
         private bool IntersectionExists(AnnoObject a, AnnoObject b)
         {
             return GetObjectCollisionRect(a).IntersectsWith(GetObjectCollisionRect(b));
@@ -265,6 +265,8 @@ namespace AnnoDesigner
                 _placedObjects.Add(new AnnoObject(_currentObject));
             }
         }
+
+        #endregion
 
         #region API
 
