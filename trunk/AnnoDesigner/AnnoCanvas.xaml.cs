@@ -89,6 +89,7 @@ namespace AnnoDesigner
             var pen = new Pen(Brushes.Black, 1 * dpiFactor);
 
             // assure pixel perfect drawing
+            //BUG: doesn't work when exporting
             var halfPenWidth = pen.Thickness / 2;
             var guidelines = new GuidelineSet();
             guidelines.GuidelinesX.Add(halfPenWidth);
@@ -133,7 +134,9 @@ namespace AnnoDesigner
                     _currentObject.Position = mouseGridPos;
                     _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
                     _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
+                    _currentObject.Color.A = 192;
                     RenderObject(drawingContext, _currentObject, pen);
+                    _currentObject.Color.A = 255;
                 }
                 break;
                 case DesignMode.Remove:
@@ -176,6 +179,11 @@ namespace AnnoDesigner
             return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
         }
 
+        private Size Rotate(Size size)
+        {
+            return new Size(size.Height, size.Width);
+        }
+
         #endregion
 
         #region Event handling
@@ -186,31 +194,35 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            switch (_designMode)
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                case DesignMode.New:
-                // place new object
-                if (_currentObject != null)
+                switch (_designMode)
                 {
-                    _placedObjects.Add(new AnnoObject(_currentObject));
-                    InvalidateVisual();
+                    case DesignMode.New:
+                        // place new object
+                        if (_currentObject != null)
+                        {
+                            _placedObjects.Add(new AnnoObject(_currentObject));
+                        }
+                        break;
+                    case DesignMode.Remove:
+                        // remove clicked object
+                        _placedObjects.Remove(_placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this))));
+                        break;
+                    default:
+                    throw new ArgumentOutOfRangeException();
                 }
-                break;
-                case DesignMode.Remove:
-                // remove clicked object
-                _placedObjects.RemoveAll(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this)));
-                InvalidateVisual();
-                break;
-                default:
-                throw new ArgumentOutOfRangeException();
             }
-        }
-
-        protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
-        {
-            _currentObject = null;
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                _currentObject = null;
+            }
+            if (e.MiddleButton == MouseButtonState.Pressed && _currentObject != null)
+            {
+                _currentObject.Size = Rotate(_currentObject.Size);
+            }
             InvalidateVisual();
         }
 
