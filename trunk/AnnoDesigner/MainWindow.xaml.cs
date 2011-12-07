@@ -36,14 +36,17 @@ namespace AnnoDesigner
         {
             try
             {
+                // parse user inputs and create new object
                 _currentObject = new AnnoObject
                 {
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                     Color = colorPicker.SelectedColor,
                     Label = textBoxLabel.Text,
-                    Icon = comboBoxIcon.SelectedIndex > 0 ? @"images\Liquor.png" : null
+                    Icon = comboBoxIcon.SelectedIndex > 0 ? @"images\Liquor.png" : null,
+                    Radius = int.Parse(textBoxRadius.Text)
                 };
-                if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0)
+                // do some sanity checks
+                if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
                 {
                     annoCanvas.SetCurrentObject(_currentObject);
                 }
