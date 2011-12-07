@@ -91,6 +91,9 @@ namespace AnnoDesigner
 
         private Point _mousePosition;
         private bool _mouseWithinControl;
+        private bool _mouseIsDragging;
+        private Point _selectionStartPoint;
+        private Rect _selectionRect;
         
         private List<AnnoObject> _placedObjects;
         private readonly List<AnnoObject> _selectedObjects; 
@@ -98,6 +101,8 @@ namespace AnnoDesigner
 
         private readonly Pen _linePen;
         private readonly Pen _highlightPen;
+        private readonly Pen _influenceCircle;
+        private readonly Brush _lightBrush;
 
         public AnnoCanvas()
         {
@@ -106,6 +111,10 @@ namespace AnnoDesigner
             _selectedObjects = new List<AnnoObject>();
             _linePen = new Pen(Brushes.Black, 1);
             _highlightPen = new Pen(Brushes.Yellow, 1);
+            _influenceCircle = new Pen(Brushes.Black, 1);
+            var color = Colors.LightYellow;
+            color.A = 92;
+            _lightBrush = new SolidColorBrush(color);
         }
 
         #region Rendering
@@ -116,6 +125,7 @@ namespace AnnoDesigner
             var dpiFactor = 1 / m.M11;
             _linePen.Thickness = dpiFactor * 1;
             _highlightPen.Thickness = dpiFactor * 2;
+            _influenceCircle.Thickness = dpiFactor * 2;
 
             // assure pixel perfect drawing
             //BUG: doesn't work when exporting
@@ -148,9 +158,17 @@ namespace AnnoDesigner
             //drawingContext.DrawRectangle(Brushes.LightYellow, linePen, new Rect(GridToScreen(ScreenToGrid(_mousePosition)), new Size(_gridStep, _gridStep)));
 
             // draw placed objects
+            foreach (var obj in _selectedObjects)
+            {
+                RenderObjectInfluence(drawingContext, obj);
+            }
             foreach (var obj in _placedObjects)
             {
-                RenderObject(drawingContext, obj, _selectedObjects.Contains(obj) ? _highlightPen : _linePen);
+                RenderObject(drawingContext, obj);
+            }
+            foreach (var obj in _selectedObjects)
+            {
+                RenderObjectSelection(drawingContext, obj);
             }
 
             if (_currentObject == null)
@@ -167,22 +185,30 @@ namespace AnnoDesigner
                 // draw current object
                 if (_mouseWithinControl)
                 {
-                    RepositionCurrentObject();
+                    MoveCurrentObjectToMouse();
                     // draw influence radius
                     RenderObjectInfluence(drawingContext, _currentObject);
                     // draw with transparency
                     _currentObject.Color.A = 128;
-                    RenderObject(drawingContext, _currentObject, _linePen);
+                    RenderObject(drawingContext, _currentObject);
                     _currentObject.Color.A = 255;
                 }
             }
-
+            // draw selection rect while dragging the mouse
+            if (_mouseIsDragging)
+            {
+                drawingContext.DrawRectangle(_lightBrush, _highlightPen, _selectionRect);
+            }
             // pop back guidlines set
             drawingContext.Pop();
         }
 
-        private void RepositionCurrentObject()
+        private void MoveCurrentObjectToMouse()
         {
+            if (_currentObject == null)
+            {
+                return;
+            }
             // determine grid position beneath mouse
             var pos = _mousePosition;
             var size = GridToScreen(_currentObject.Size);
@@ -191,11 +217,11 @@ namespace AnnoDesigner
             _currentObject.Position = RoundScreenToGrid(pos);
         }
 
-        private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
+        private void RenderObject(DrawingContext drawingContext, AnnoObject obj)
         {
             // draw object rectangle
             var objRect = GetObjectScreenRect(obj);
-            drawingContext.DrawRectangle(new SolidColorBrush(obj.Color), pen, objRect);
+            drawingContext.DrawRectangle(new SolidColorBrush(obj.Color), _linePen, objRect);
             // draw object icon if it is at least 2x2 cells
             if (_renderIcon && !string.IsNullOrEmpty(obj.Icon) && obj.Size.Width > 1 && obj.Size.Height > 1)
             {
@@ -224,12 +250,17 @@ namespace AnnoDesigner
             }
         }
 
+        private void RenderObjectSelection(DrawingContext drawingContext, AnnoObject obj)
+        {
+            // draw object rectangle
+            var objRect = GetObjectScreenRect(obj);
+            drawingContext.DrawRectangle(null, _highlightPen, objRect);
+        }
+
         private void RenderObjectInfluence(DrawingContext drawingContext, AnnoObject obj)
         {
             var radius = GridToScreen(obj.Radius);
-            var color = Colors.LightYellow;
-            color.A = 128;
-            drawingContext.DrawEllipse(new SolidColorBrush(color), _linePen, GetCenterPoint(GetObjectScreenRect(obj)), radius, radius);
+            drawingContext.DrawEllipse(_lightBrush, _influenceCircle, GetCenterPoint(GetObjectScreenRect(obj)), radius, radius);
         }
 
         #endregion
@@ -359,79 +390,129 @@ namespace AnnoDesigner
         {
             // refresh retrieved mouse position
             _mousePosition = e.GetPosition(this);
+            MoveCurrentObjectToMouse();
             // place new object
             if (e.LeftButton == MouseButtonState.Pressed && _currentObject != null)
             {
-                RepositionCurrentObject();
                 TryPlaceCurrentObject();
-            }
-            // remove clicked object
-            if (e.RightButton == MouseButtonState.Pressed && _currentObject == null)
-            {
-                _placedObjects.Remove(GetObjectAt(_mousePosition));
             }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             HandleMouseClick(e);
+            // selection of multiple objects
+            if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null && _mouseIsDragging)
+            {
+                if (IsControlPressed())
+                {
+                    // remove previously selected by the selection rect
+                    _selectedObjects.RemoveAll(_ => GetObjectScreenRect(_).IntersectsWith(_selectionRect));
+                }
+                else
+                {
+                    _selectedObjects.Clear();
+                }
+                // adjust rect
+                _selectionRect = new Rect(_selectionStartPoint, _mousePosition);
+                // select intersecting objects
+                _selectedObjects.AddRange(_placedObjects.FindAll(_ => GetObjectScreenRect(_).IntersectsWith(_selectionRect)));
+            }
             InvalidateVisual();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             HandleMouseClick(e);
-            // select object
             if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null)
             {
-                
-                if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-                {
-                    _selectedObjects.Clear();
-                }
                 var obj = GetObjectAt(_mousePosition);
-                if (obj != null)
+                if (obj == null)
                 {
-                    if (_selectedObjects.Contains(obj))
+                    // user clicked nothing: start dragging the selection rect
+                    _mouseIsDragging = true;
+                    _selectionStartPoint = _mousePosition;
+                    _selectionRect = new Rect();
+                }
+            }
+            InvalidateVisual();
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && _currentObject == null)
+            {
+                if (_mouseIsDragging)
+                {
+                    // cancel dragging
+                    _mouseIsDragging = false;
+                }
+                else
+                {
+                    // clear selection if shift or control is not pressed
+                    if (!IsControlPressed())
                     {
-                        _selectedObjects.Remove(obj);
+                        _selectedObjects.Clear();
                     }
-                    else
+                    var obj = GetObjectAt(_mousePosition);
+                    if (obj != null)
                     {
-                        _selectedObjects.Add(obj);   
+                        // user clicked an object: select or deselect it
+                        if (_selectedObjects.Contains(obj))
+                        {
+                            _selectedObjects.Remove(obj);
+                        }
+                        else
+                        {
+                            _selectedObjects.Add(obj);
+                        }
                     }
                 }
             }
-            // cancel placement of object
-            if (e.RightButton == MouseButtonState.Pressed && _currentObject != null)
+            if (e.ChangedButton == MouseButton.Right)
             {
-                _currentObject = null;
+                if (_currentObject == null)
+                {
+                    // remove clicked object
+                    var obj = GetObjectAt(_mousePosition);
+                    _placedObjects.Remove(obj);
+                    _selectedObjects.Remove(obj);
+                }
+                else
+                {
+                    // cancel placement of object
+                    _currentObject = null;
+                }
             }
             // rotate current object
-            if (e.MiddleButton == MouseButtonState.Pressed && _currentObject != null)
+            if (e.ChangedButton == MouseButton.Middle && _currentObject != null)
             {
                 _currentObject.Size = Rotate(_currentObject.Size);
             }
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Checks whether the user is pressing keys to signal that he wants to select multiple objects
+        /// </summary>
+        /// <returns></returns>
+        private static bool IsControlPressed()
+        {
+            return Keyboard.Modifiers.HasFlag(ModifierKeys.Control) || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+        }
+
         #endregion
 
         #region Collision handling
 
-        private bool IntersectionExists(AnnoObject a, AnnoObject b)
+        private bool ObjectIntersectionExists(AnnoObject a, AnnoObject b)
         {
             return GetObjectCollisionRect(a).IntersectsWith(GetObjectCollisionRect(b));
         }
 
-        private bool IntersectionTest(AnnoObject obj)
-        {
-            return _placedObjects.Exists(_ => IntersectionExists(obj, _));
-        }
-
         private bool TryPlaceCurrentObject()
         {
-            if (_currentObject != null && !IntersectionTest(_currentObject))
+            if (_currentObject != null && !_placedObjects.Exists(_ => ObjectIntersectionExists(_currentObject, _)))
             {
                 _placedObjects.Add(new AnnoObject(_currentObject));
                 return true;
@@ -452,7 +533,6 @@ namespace AnnoDesigner
         {
             obj.Position = _mousePosition;
             _currentObject = obj;
-            _selectedObjects.Clear();
             InvalidateVisual();
         }
 
