@@ -40,7 +40,8 @@ namespace AnnoDesigner
                 {
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                     Color = colorPicker.SelectedColor,
-                    Label = textBoxLabel.Text
+                    Label = textBoxLabel.Text,
+                    Icon = comboBoxIcon.SelectedIndex > 0 ? @"images\Liquor.png" : null
                 };
                 if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0)
                 {

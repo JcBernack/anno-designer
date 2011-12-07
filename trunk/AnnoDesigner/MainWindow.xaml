@@ -14,7 +14,7 @@
             <ColumnDefinition />
             <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
-        <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="False" RenderLabel="True" />
+        <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="True" RenderLabel="True" />
         <Menu Height="23" Name="menu1" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <MenuItem Header="File">
                 <MenuItem Header="New" Click="MenuItemNewClick" />
@@ -28,7 +28,7 @@
             <MenuItem Header="View">
                 <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
                 <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />
-                <MenuItem Header="Show icons" IsCheckable="True" IsChecked="False" Click="MenuItemIconClick" IsEnabled="False" />
+                <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" IsEnabled="True" />
             </MenuItem>
         </Menu>
         <DockPanel Grid.Column="1" Grid.Row="1" Name="dockPanel7" LastChildFill="True">
@@ -50,10 +50,9 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Name="dockPanel3">
                         <Label Content="Icon" Height="28" Name="label10" />
-                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="False" Name="comboBox1" SelectedIndex="1" Width="120">
-                            <ComboBoxItem Content="Nice" />
-                            <ComboBoxItem Content="Icon" />
-                            <ComboBoxItem Content="List" />
+                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" Width="120">
+                            <ComboBoxItem Content="None" IsSelected="True" />
+                            <ComboBoxItem Content="Liquor" />
                         </ComboBox>
                     </DockPanel>
                     <DockPanel LastChildFill="False" Name="dockPanel5">

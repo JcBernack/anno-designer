@@ -183,11 +183,16 @@ namespace AnnoDesigner
             // draw object rectangle
             var objRect = GetObjectScreenRect(obj);
             drawingContext.DrawRectangle(new SolidColorBrush(obj.Color), pen, objRect);
-            // draw object icon
-            if (_renderIcon)
+            // draw object icon if it is at least 2x2 cells
+            if (_renderIcon && !string.IsNullOrEmpty(obj.Icon) && obj.Size.Width > 1 && obj.Size.Height > 1)
             {
-                var imageRect = objRect;
-                drawingContext.DrawImage(new BitmapImage(new Uri(@"images\Liquor.png", UriKind.Relative)), imageRect);
+                // draw icon 2x2 grid cells large
+                var iconSize = GridToScreen(new Size(2,2));
+                // center icon within the object
+                var iconPos = objRect.TopLeft;
+                iconPos.X += objRect.Width/2 - iconSize.Width/2;
+                iconPos.Y += objRect.Height/2 - iconSize.Height/2;
+                drawingContext.DrawImage(new BitmapImage(new Uri(obj.Icon, UriKind.Relative)), new Rect(iconPos, iconSize));
             }
             // draw object label
             if (_renderLabel)
