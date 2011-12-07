@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -86,33 +87,21 @@ namespace AnnoDesigner
             }
         }
 
-        private DesignMode _designMode;
-        public DesignMode DesignMode
-        {
-            get
-            {
-                return _designMode;
-            }
-            set
-            {
-                if (_designMode != value)
-                {
-                    InvalidateVisual();
-                }
-                _designMode = value;
-            }
-        }
-
         #endregion
 
         private Point _mousePosition;
+        private bool _mouseWithinControl;
+        
         private List<AnnoObject> _placedObjects;
+        private readonly List<AnnoObject> _selectedObjects; 
         private AnnoObject _currentObject;
+        
 
         public AnnoCanvas()
         {
             InitializeComponent();
             _placedObjects = new List<AnnoObject>();
+            _selectedObjects = new List<AnnoObject>();
         }
 
         #region Rendering
@@ -121,11 +110,12 @@ namespace AnnoDesigner
         {
             var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
             var dpiFactor = 1 / m.M11;
-            var pen = new Pen(Brushes.Black, 1 * dpiFactor);
+            var linePen = new Pen(Brushes.Black, 1 * dpiFactor);
+            var highlightPen = new Pen(Brushes.Yellow, 2 * dpiFactor);
 
             // assure pixel perfect drawing
             //BUG: doesn't work when exporting
-            var halfPenWidth = pen.Thickness / 2;
+            var halfPenWidth = linePen.Thickness / 2;
             var guidelines = new GuidelineSet();
             guidelines.GuidelinesX.Add(halfPenWidth);
             guidelines.GuidelinesY.Add(halfPenWidth);
@@ -142,42 +132,46 @@ namespace AnnoDesigner
             {
                 for (var i = 0; i < width; i += _gridStep)
                 {
-                    drawingContext.DrawLine(pen, new Point(i, 0), new Point(i, height));
+                    drawingContext.DrawLine(linePen, new Point(i, 0), new Point(i, height));
                 }
                 for (var i = 0; i < height; i += _gridStep)
                 {
-                    drawingContext.DrawLine(pen, new Point(0, i), new Point(width, i));
+                    drawingContext.DrawLine(linePen, new Point(0, i), new Point(width, i));
                 }
             }
 
             // draw mouse grid position highlight
-            var mouseGridPos = ScreenToGrid(_mousePosition);
-            drawingContext.DrawRectangle(Brushes.LightYellow, pen, new Rect(GridToScreen(mouseGridPos), new Size(_gridStep, _gridStep)));
+            //drawingContext.DrawRectangle(Brushes.LightYellow, linePen, new Rect(GridToScreen(ScreenToGrid(_mousePosition)), new Size(_gridStep, _gridStep)));
 
             // draw placed objects
-            foreach (var placedObject in _placedObjects)
+            foreach (var obj in _placedObjects)
             {
-                RenderObject(drawingContext, placedObject, pen);
+                RenderObject(drawingContext, obj, _selectedObjects.Contains(obj) ? highlightPen : linePen);
             }
 
-            switch (_designMode)
+            if (_currentObject == null)
             {
-                case DesignMode.Edit:
+                // highlight object which is currently hovered
+                var hoveredObj = GetObjectAt(_mousePosition);
+                if (hoveredObj != null)
+                {
+                    drawingContext.DrawRectangle(null, highlightPen, GetObjectScreenRect(hoveredObj));
+                }
+            }
+            else
+            {
+                if (_mouseWithinControl)
+                {
                     // draw current object
-                    if (_currentObject != null)
-                    {
-                        _currentObject.Position = mouseGridPos;
-                        _currentObject.Position.X -= Math.Floor(_currentObject.Size.Width / 2);
-                        _currentObject.Position.Y -= Math.Floor(_currentObject.Size.Height / 2);
-                        _currentObject.Color.A = 128;
-                        RenderObject(drawingContext, _currentObject, pen);
-                        _currentObject.Color.A = 255;
-                    }
-                    break;  
-                case DesignMode.Select:
-                    break;
-                default:
-                throw new ArgumentOutOfRangeException();
+                    var pos = _mousePosition;
+                    var size = GridToScreen(_currentObject.Size);
+                    pos.X -= size.Width/2;
+                    pos.Y -= size.Height/2;
+                    _currentObject.Position = RoundScreenToGrid(pos);
+                    _currentObject.Color.A = 128;
+                    RenderObject(drawingContext, _currentObject, linePen);
+                    _currentObject.Color.A = 255;
+                }
             }
 
             // pop back guidlines set
@@ -216,31 +210,79 @@ namespace AnnoDesigner
 
         #region Coordinate and rectangle conversions
 
+        /// <summary>
+        /// Convert a screen coordinate to a grid coordinate by determining in which grid cell the point is contained.
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        [Pure]
         private Point ScreenToGrid(Point screenPoint)
         {
             return new Point(Math.Floor(screenPoint.X / _gridStep), Math.Floor(screenPoint.Y / _gridStep));
         }
 
+        /// <summary>
+        /// Converts a screen coordinate to a grid coordinate by determining which grid cell is nearest.
+        /// </summary>
+        /// <param name="screenPoint"></param>
+        /// <returns></returns>
+        [Pure]
+        private Point RoundScreenToGrid(Point screenPoint)
+        {
+            return new Point(Math.Round(screenPoint.X / _gridStep), Math.Round(screenPoint.Y / _gridStep));
+        }
+
+        /// <summary>
+        /// Convert a grid coordinate to a screen coordinate.
+        /// </summary>
+        /// <param name="gridPoint"></param>
+        /// <returns></returns>
+        [Pure]
         private Point GridToScreen(Point gridPoint)
         {
             return new Point(gridPoint.X * _gridStep, gridPoint.Y * _gridStep);
         }
 
+        /// <summary>
+        /// Converts a size given in grid cells to a size given in (pixel-)units.
+        /// </summary>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
+        [Pure]
         private Size GridToScreen(Size gridSize)
         {
             return new Size(gridSize.Width * _gridStep, gridSize.Height * _gridStep);
         }
 
+        /// <summary>
+        /// Generates the rect to which the given object is rendered.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        [Pure]
         private Rect GetObjectScreenRect(AnnoObject obj)
         {
             return new Rect(GridToScreen(obj.Position), GridToScreen(obj.Size));
         }
 
+        /// <summary>
+        /// Gets the rect which is used for collision detection for the given object.
+        /// Prevents undesired collisions which occur when using GetObjectScreenRect().
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        [Pure]
         private static Rect GetObjectCollisionRect(AnnoObject obj)
         {
             return new Rect(obj.Position, new Size(obj.Size.Width - 0.5, obj.Size.Height - 0.5));
         }
 
+        /// <summary>
+        /// Rotates the given Size object, i.e. switches width and height.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [Pure]
         private static Size Rotate(Size size)
         {
             return new Size(size.Height, size.Width);
@@ -250,32 +292,35 @@ namespace AnnoDesigner
 
         #region Event handling
 
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+            _mouseWithinControl = true;
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            _mouseWithinControl = false;
+            InvalidateVisual();
+        }
+
         private void HandleMouseClick(MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            // refresh retrieved mouse position
+            _mousePosition = e.GetPosition(this);
+            // place new object
+            if (e.LeftButton == MouseButtonState.Pressed && _currentObject != null)
             {
-                switch (_designMode)
-                {
-                    case DesignMode.Edit:
-                        // place new object
-                        PlaceCurrentObject();
-                        break;
-                    case DesignMode.Select:
-                        break;
-                }
+                TryPlaceCurrentObject();
             }
-            if (e.RightButton == MouseButtonState.Pressed)
+            // remove clicked object
+            if (e.RightButton == MouseButtonState.Pressed && _currentObject == null)
             {
-                // remove current object
-                //_currentObject = null;
-                // remove clicked object
-                _placedObjects.Remove(_placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(e.GetPosition(this))));
+                _placedObjects.Remove(GetObjectAt(_mousePosition));
             }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            _mousePosition = e.GetPosition(this);
             HandleMouseClick(e);
             InvalidateVisual();
         }
@@ -283,6 +328,32 @@ namespace AnnoDesigner
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             HandleMouseClick(e);
+            // select object
+            if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null)
+            {
+                
+                if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                {
+                    _selectedObjects.Clear();
+                }
+                var obj = GetObjectAt(_mousePosition);
+                if (obj != null)
+                {
+                    if (_selectedObjects.Contains(obj))
+                    {
+                        _selectedObjects.Remove(obj);
+                    }
+                    else
+                    {
+                        _selectedObjects.Add(obj);   
+                    }
+                }
+            }
+            // cancel placement of object
+            if (e.RightButton == MouseButtonState.Pressed && _currentObject != null)
+            {
+                _currentObject = null;
+            }
             // rotate current object
             if (e.MiddleButton == MouseButtonState.Pressed && _currentObject != null)
             {
@@ -305,12 +376,19 @@ namespace AnnoDesigner
             return _placedObjects.Exists(_ => IntersectionExists(obj, _));
         }
 
-        private void PlaceCurrentObject()
+        private bool TryPlaceCurrentObject()
         {
             if (_currentObject != null && !IntersectionTest(_currentObject))
             {
                 _placedObjects.Add(new AnnoObject(_currentObject));
+                return true;
             }
+            return false;
+        }
+
+        private AnnoObject GetObjectAt(Point position)
+        {
+            return _placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(position));
         }
 
         #endregion
@@ -321,6 +399,7 @@ namespace AnnoDesigner
         {
             obj.Position = _mousePosition;
             _currentObject = obj;
+            _selectedObjects.Clear();
             InvalidateVisual();
         }
 

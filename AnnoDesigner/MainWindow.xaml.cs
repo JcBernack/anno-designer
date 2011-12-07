@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Windows.Controls;
 
@@ -26,7 +25,6 @@ namespace AnnoDesigner
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            ButtonEditClick(null, null);
         }
 
         private void MenuItemClick(object sender, RoutedEventArgs e)
@@ -44,31 +42,15 @@ namespace AnnoDesigner
                     Color = colorPicker.SelectedColor,
                     Label = textBoxLabel.Text
                 };
-                annoCanvas.SetCurrentObject(_currentObject);
+                if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0)
+                {
+                    annoCanvas.SetCurrentObject(_currentObject);
+                }
             }
             catch
             {
                 
             }
-        }
-
-        private void SetModeButtons(Button activeButton)
-        {
-            buttonEdit.IsEnabled = true;
-            buttonSelect.IsEnabled = false;
-            activeButton.IsEnabled = false;
-        }
-
-        private void ButtonEditClick(object sender, RoutedEventArgs e)
-        {
-            SetModeButtons(buttonEdit);
-            annoCanvas.DesignMode = DesignMode.Edit;
-        }
-
-        private void ButtonSelectClick(object sender, RoutedEventArgs e)
-        {
-            SetModeButtons(buttonSelect);
-            annoCanvas.DesignMode = DesignMode.Select;
         }
 
         private void MenuItemNewClick(object sender, RoutedEventArgs e)

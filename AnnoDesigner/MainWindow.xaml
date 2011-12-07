@@ -6,55 +6,14 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="320*" />
+            <RowDefinition Height="430*" />
+            <RowDefinition Height="Auto
+                           " />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Column="1" Header="Current object" HorizontalAlignment="Stretch" Name="groupBox1" VerticalAlignment="Stretch" Grid.Row="1" Margin="0,68,0,106">
-            <StackPanel Name="stackPanel1">
-                <DockPanel LastChildFill="False" Name="dockPanel2">
-                    <Label Content="Size" Height="28" Name="label7" />
-                    <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxHeight" Width="40" Text="4" />
-                    <Label Content="x" Height="28" Name="label9" DockPanel.Dock="Right" />
-                    <TextBox Height="23" Name="textBoxWidth" Width="40" DockPanel.Dock="Right" Text="4" />
-                </DockPanel>
-                <DockPanel LastChildFill="False" Name="dockPanel4">
-                    <Label Content="Color" Height="28" Name="label11" />
-                    <extToolkit:ColorPicker DockPanel.Dock="Right" Width="120" ShowRecentColors="False" DisplayColorAndName="True" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" StandardColorsHeader="Standard Color Presets" />
-                </DockPanel>
-                <DockPanel Name="dockPanel1" LastChildFill="False">
-                    <Label Content="Label" Height="28" Name="label8" />
-                    <TextBox Height="23" Name="textBoxLabel" Width="120" DockPanel.Dock="Right" IsEnabled="True" Text="Depot" />
-                </DockPanel>
-                <DockPanel LastChildFill="False" Name="dockPanel3">
-                    <Label Content="Icon" Height="28" Name="label10" />
-                    <ComboBox Height="23" Name="comboBox1" Width="120" DockPanel.Dock="Right" SelectedIndex="1" IsEnabled="False">
-                        <ComboBoxItem Content="Nice" />
-                        <ComboBoxItem Content="Icon" />
-                        <ComboBoxItem Content="List" />
-                    </ComboBox>
-                </DockPanel>
-                <DockPanel LastChildFill="False" Name="dockPanel5">
-                    <Label Content="Radius" Height="28" Name="label1" />
-                    <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="False" Name="textBox1" Width="120" />
-                </DockPanel>
-                <Button Content="Apply" Height="23" Name="button1" Width="75" Click="Button1Click" />
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Object presets" Name="groupBox2" VerticalAlignment="Bottom" Grid.Column="1" IsEnabled="False" Grid.Row="1" Height="100">
-            <TreeView HorizontalAlignment="Stretch" Margin="0" Name="treeView1" VerticalAlignment="Stretch">
-                <TreeViewItem Header="Street" />
-                <TreeViewItem Header="City">
-                    <TreeViewItem Header="Town Center" />
-                    <TreeViewItem Header="Activity" />
-                </TreeViewItem>
-                <TreeViewItem Header="Production">
-                    <TreeViewItem Header="Tea Farm" />
-                </TreeViewItem>
-            </TreeView>
-        </GroupBox>
         <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="False" RenderLabel="True" />
         <Menu Height="23" Name="menu1" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <MenuItem Header="File">
@@ -67,16 +26,59 @@
                 <MenuItem Header="Exit" Click="MenuItemClick" />
             </MenuItem>
             <MenuItem Header="View">
-                <MenuItem Header="Grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
-                <MenuItem Header="Labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />
-                <MenuItem Header="Icons" IsCheckable="True" IsChecked="False" Click="MenuItemIconClick" IsEnabled="False" />
+                <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
+                <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />
+                <MenuItem Header="Show icons" IsCheckable="True" IsChecked="False" Click="MenuItemIconClick" IsEnabled="False" />
             </MenuItem>
         </Menu>
-        <GroupBox Grid.Column="1" Grid.Row="1" Header="Design mode" Name="groupBox3" VerticalAlignment="Top" Height="62">
-            <DockPanel Name="dockPanel6" LastChildFill="False" HorizontalAlignment="Center" VerticalAlignment="Center" Height="30">
-                <Button Content="Edit" Name="buttonEdit" Width="75" Click="ButtonEditClick" />
-                <Button Content="Select" Name="buttonSelect" Width="75" Click="ButtonSelectClick" />
-            </DockPanel>
-        </GroupBox>
+        <DockPanel Grid.Column="1" Grid.Row="1" Name="dockPanel7" LastChildFill="True">
+            <GroupBox Header="Building settings" Name="groupBox1" DockPanel.Dock="Top">
+                <StackPanel Name="stackPanel2">
+                    <DockPanel LastChildFill="False" Name="dockPanel2">
+                        <Label Content="Size" Height="28" Name="label7" />
+                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxHeight" Text="4" Width="40" />
+                        <Label Content="x" DockPanel.Dock="Right" Height="28" Name="label9" />
+                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxWidth" Text="4" Width="40" />
+                    </DockPanel>
+                    <DockPanel LastChildFill="False" Name="dockPanel4">
+                        <Label Content="Color" Height="28" Name="label11" />
+                        <extToolkit:ColorPicker DisplayColorAndName="True" DockPanel.Dock="Right" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" ShowRecentColors="False" StandardColorsHeader="Standard Color Presets" Width="120" />
+                    </DockPanel>
+                    <DockPanel LastChildFill="False" Name="dockPanel1">
+                        <Label Content="Label" Height="28" Name="label8" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxLabel" Text="Depot" Width="120" />
+                    </DockPanel>
+                    <DockPanel LastChildFill="False" Name="dockPanel3">
+                        <Label Content="Icon" Height="28" Name="label10" />
+                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="False" Name="comboBox1" SelectedIndex="1" Width="120">
+                            <ComboBoxItem Content="Nice" />
+                            <ComboBoxItem Content="Icon" />
+                            <ComboBoxItem Content="List" />
+                        </ComboBox>
+                    </DockPanel>
+                    <DockPanel LastChildFill="False" Name="dockPanel5">
+                        <Label Content="Radius" Height="28" Name="label1" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="False" Name="textBox1" Width="120" />
+                    </DockPanel>
+                    <Button Click="Button1Click" Content="Place building" Height="23" Name="button1" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Building presets" IsEnabled="False" Name="groupBox2" DockPanel.Dock="Top">
+                <TreeView HorizontalAlignment="Stretch" Margin="0" Name="treeView1" VerticalAlignment="Stretch">
+                    <TreeViewItem Header="Street" />
+                    <TreeViewItem Header="City">
+                        <TreeViewItem Header="Town Center" />
+                        <TreeViewItem Header="Activity" />
+                    </TreeViewItem>
+                    <TreeViewItem Header="Production">
+                        <TreeViewItem Header="Tea Farm" />
+                    </TreeViewItem>
+                </TreeView>
+            </GroupBox>
+        </DockPanel>
+        <StatusBar Grid.Row="2" Name="statusBar1" Grid.ColumnSpan="2" Height="23">
+            <StatusBarItem Content="Middle mouse button rotates the current building." />
+            <StatusBarItem Content="Right click stops building placement and removes highlighted building." />
+        </StatusBar>
     </Grid>
 </Window>
