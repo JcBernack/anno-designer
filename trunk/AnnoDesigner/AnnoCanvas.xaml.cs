@@ -96,8 +96,8 @@ namespace AnnoDesigner
         private readonly List<AnnoObject> _selectedObjects; 
         private AnnoObject _currentObject;
 
-        private Pen _linePen;
-        private Pen _highlightPen;
+        private readonly Pen _linePen;
+        private readonly Pen _highlightPen;
 
         public AnnoCanvas()
         {
@@ -167,12 +167,7 @@ namespace AnnoDesigner
                 // draw current object
                 if (_mouseWithinControl)
                 {
-                    // determine grid position beneath mouse
-                    var pos = _mousePosition;
-                    var size = GridToScreen(_currentObject.Size);
-                    pos.X -= size.Width/2;
-                    pos.Y -= size.Height/2;
-                    _currentObject.Position = RoundScreenToGrid(pos);
+                    RepositionCurrentObject();
                     // draw influence radius
                     RenderObjectInfluence(drawingContext, _currentObject);
                     // draw with transparency
@@ -184,6 +179,16 @@ namespace AnnoDesigner
 
             // pop back guidlines set
             drawingContext.Pop();
+        }
+
+        private void RepositionCurrentObject()
+        {
+            // determine grid position beneath mouse
+            var pos = _mousePosition;
+            var size = GridToScreen(_currentObject.Size);
+            pos.X -= size.Width / 2;
+            pos.Y -= size.Height / 2;
+            _currentObject.Position = RoundScreenToGrid(pos);
         }
 
         private void RenderObject(DrawingContext drawingContext, AnnoObject obj, Pen pen)
@@ -357,6 +362,7 @@ namespace AnnoDesigner
             // place new object
             if (e.LeftButton == MouseButtonState.Pressed && _currentObject != null)
             {
+                RepositionCurrentObject();
                 TryPlaceCurrentObject();
             }
             // remove clicked object
@@ -469,7 +475,14 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                DataIO.SaveToFile(_placedObjects, dialog.FileName);
+                try
+                {
+                    DataIO.SaveToFile(_placedObjects, dialog.FileName);
+                }
+                catch (Exception)
+                {
+                    IOErrorMessageBox();
+                }
             }
         }
 
@@ -482,7 +495,14 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
+                try
+                {
+                    DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
+                }
+                catch (Exception)
+                {
+                    IOErrorMessageBox();
+                }
             }
         }
 
@@ -495,8 +515,20 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                DataIO.RenderToFile(this, dialog.FileName);
+                try
+                {
+                    DataIO.RenderToFile(this, dialog.FileName);
+                }
+                catch (Exception)
+                {
+                    IOErrorMessageBox();
+                }
             }
+        }
+
+        private void IOErrorMessageBox()
+        {
+            MessageBox.Show("Something went wrong while saving/loading file.");
         }
 
         #endregion
