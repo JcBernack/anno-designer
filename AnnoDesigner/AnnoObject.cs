@@ -11,6 +11,7 @@ namespace AnnoDesigner
         public Point Position;
         public string Icon;
         public string Label;
+        public int Radius;
 
         public AnnoObject()
         {
@@ -23,6 +24,7 @@ namespace AnnoDesigner
             Position = obj.Position;
             Label = obj.Label;
             Icon = obj.Icon;
+            Radius = obj.Radius;
         }
     }
 }

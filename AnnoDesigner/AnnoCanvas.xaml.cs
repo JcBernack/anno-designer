@@ -95,13 +95,17 @@ namespace AnnoDesigner
         private List<AnnoObject> _placedObjects;
         private readonly List<AnnoObject> _selectedObjects; 
         private AnnoObject _currentObject;
-        
+
+        private Pen _linePen;
+        private Pen _highlightPen;
 
         public AnnoCanvas()
         {
             InitializeComponent();
             _placedObjects = new List<AnnoObject>();
             _selectedObjects = new List<AnnoObject>();
+            _linePen = new Pen(Brushes.Black, 1);
+            _highlightPen = new Pen(Brushes.Yellow, 1);
         }
 
         #region Rendering
@@ -110,12 +114,12 @@ namespace AnnoDesigner
         {
             var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
             var dpiFactor = 1 / m.M11;
-            var linePen = new Pen(Brushes.Black, 1 * dpiFactor);
-            var highlightPen = new Pen(Brushes.Yellow, 2 * dpiFactor);
+            _linePen.Thickness = dpiFactor * 1;
+            _highlightPen.Thickness = dpiFactor * 2;
 
             // assure pixel perfect drawing
             //BUG: doesn't work when exporting
-            var halfPenWidth = linePen.Thickness / 2;
+            var halfPenWidth = _linePen.Thickness / 2;
             var guidelines = new GuidelineSet();
             guidelines.GuidelinesX.Add(halfPenWidth);
             guidelines.GuidelinesY.Add(halfPenWidth);
@@ -132,11 +136,11 @@ namespace AnnoDesigner
             {
                 for (var i = 0; i < width; i += _gridStep)
                 {
-                    drawingContext.DrawLine(linePen, new Point(i, 0), new Point(i, height));
+                    drawingContext.DrawLine(_linePen, new Point(i, 0), new Point(i, height));
                 }
                 for (var i = 0; i < height; i += _gridStep)
                 {
-                    drawingContext.DrawLine(linePen, new Point(0, i), new Point(width, i));
+                    drawingContext.DrawLine(_linePen, new Point(0, i), new Point(width, i));
                 }
             }
 
@@ -146,7 +150,7 @@ namespace AnnoDesigner
             // draw placed objects
             foreach (var obj in _placedObjects)
             {
-                RenderObject(drawingContext, obj, _selectedObjects.Contains(obj) ? highlightPen : linePen);
+                RenderObject(drawingContext, obj, _selectedObjects.Contains(obj) ? _highlightPen : _linePen);
             }
 
             if (_currentObject == null)
@@ -155,21 +159,25 @@ namespace AnnoDesigner
                 var hoveredObj = GetObjectAt(_mousePosition);
                 if (hoveredObj != null)
                 {
-                    drawingContext.DrawRectangle(null, highlightPen, GetObjectScreenRect(hoveredObj));
+                    drawingContext.DrawRectangle(null, _highlightPen, GetObjectScreenRect(hoveredObj));
                 }
             }
             else
             {
+                // draw current object
                 if (_mouseWithinControl)
                 {
-                    // draw current object
+                    // determine grid position beneath mouse
                     var pos = _mousePosition;
                     var size = GridToScreen(_currentObject.Size);
                     pos.X -= size.Width/2;
                     pos.Y -= size.Height/2;
                     _currentObject.Position = RoundScreenToGrid(pos);
+                    // draw influence radius
+                    RenderObjectInfluence(drawingContext, _currentObject);
+                    // draw with transparency
                     _currentObject.Color.A = 128;
-                    RenderObject(drawingContext, _currentObject, linePen);
+                    RenderObject(drawingContext, _currentObject, _linePen);
                     _currentObject.Color.A = 255;
                 }
             }
@@ -209,6 +217,14 @@ namespace AnnoDesigner
                 textPoint.Y -= text.Height / 2;
                 drawingContext.DrawText(text, textPoint);
             }
+        }
+
+        private void RenderObjectInfluence(DrawingContext drawingContext, AnnoObject obj)
+        {
+            var radius = GridToScreen(obj.Radius);
+            var color = Colors.LightYellow;
+            color.A = 128;
+            drawingContext.DrawEllipse(new SolidColorBrush(color), _linePen, GetCenterPoint(GetObjectScreenRect(obj)), radius, radius);
         }
 
         #endregion
@@ -257,6 +273,32 @@ namespace AnnoDesigner
         private Size GridToScreen(Size gridSize)
         {
             return new Size(gridSize.Width * _gridStep, gridSize.Height * _gridStep);
+        }
+
+        /// <summary>
+        /// Converts a length given in grid cells to a size given in (pixel-)units.
+        /// </summary>
+        /// <param name="gridLength"></param>
+        /// <returns></returns>
+        [Pure]
+        private double GridToScreen(double gridLength)
+        {
+            return gridLength * _gridStep;
+        }
+
+        /// <summary>
+        /// Calculates the exact center point of a given rect
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        [Pure]
+        private static Point GetCenterPoint(Rect rect)
+        {
+            var pos = rect.Location;
+            var size = rect.Size;
+            pos.X += size.Width / 2;
+            pos.Y += size.Height / 2;
+            return pos;
         }
 
         /// <summary>

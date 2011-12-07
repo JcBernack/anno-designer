@@ -57,7 +57,7 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Name="dockPanel5">
                         <Label Content="Radius" Height="28" Name="label1" />
-                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="False" Name="textBox1" Width="120" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="12" />
                     </DockPanel>
                     <Button Click="Button1Click" Content="Place building" Height="23" Name="button1" />
                 </StackPanel>
