@@ -9,7 +9,7 @@ namespace AnnoDesigner
         public Size Size;
         public SerializableColor Color;
         public Point Position;
-
+        public string Icon;
         public string Label;
 
         public AnnoObject()
@@ -22,6 +22,7 @@ namespace AnnoDesigner
             Color = obj.Color;
             Position = obj.Position;
             Label = obj.Label;
+            Icon = obj.Icon;
         }
     }
 }
