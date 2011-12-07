@@ -1,5 +1,5 @@
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization.Json;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,8 +11,8 @@ namespace AnnoDesigner
         public static void SaveToFile<T>(T obj, string filename)
         {
             var stream = File.Open(filename, FileMode.Create);
-            var bFormatter = new BinaryFormatter();
-            bFormatter.Serialize(stream, obj);
+            var serializer = new DataContractJsonSerializer(typeof(T));
+            serializer.WriteObject(stream, obj);
             stream.Close();
         }
 
@@ -26,8 +26,8 @@ namespace AnnoDesigner
         public static void LoadFromFile<T>(out T obj, string filename)
         {
             var stream = File.Open(filename, FileMode.Open);
-            var bFormatter = new BinaryFormatter();
-            obj = (T)bFormatter.Deserialize(stream);
+            var serializer = new DataContractJsonSerializer(typeof(T));
+            obj = (T)serializer.ReadObject(stream);
             stream.Close();
         }
 
