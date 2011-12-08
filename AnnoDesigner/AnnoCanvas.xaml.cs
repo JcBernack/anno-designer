@@ -274,7 +274,10 @@ namespace AnnoDesigner
         private void RenderObjectInfluence(DrawingContext drawingContext, AnnoObject obj)
         {
             var radius = GridToScreen(obj.Radius);
-            drawingContext.DrawEllipse(_lightBrush, _influenceCircle, GetCenterPoint(GetObjectScreenRect(obj)), radius, radius);
+            if (radius >= 0.5)
+            {
+                drawingContext.DrawEllipse(_lightBrush, _influenceCircle, GetCenterPoint(GetObjectScreenRect(obj)), radius, radius);
+            }
         }
 
         #endregion
