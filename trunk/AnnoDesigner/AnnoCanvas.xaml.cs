@@ -91,8 +91,14 @@ namespace AnnoDesigner
 
         private enum MouseMode
         {
+            // used if not dragging
             Standard,
+            // used to drag the selection rect
+            SelectionRectStart,
             SelectionRect,
+            // used to drag objects around
+            DragSelectionStart,
+            DragSingleStart,
             DragSelection
         }
 
@@ -420,21 +426,23 @@ namespace AnnoDesigner
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             HandleMouseClick(e);
+            _mouseDragStart = _mousePosition;
             if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null)
             {
                 var obj = GetObjectAt(_mousePosition);
                 if (obj == null)
                 {
                     // user clicked nothing: start dragging the selection rect
-                    _mouseMode = MouseMode.SelectionRect;
-                    _mouseDragStart = _mousePosition;
-                    _selectionRect = new Rect();
+                    _mouseMode = MouseMode.SelectionRectStart;
                 }
-                else if (_selectedObjects.Contains(obj))
+                else if (_selectedObjects.Contains(obj) && !IsControlPressed())
                 {
                     // user clicked a selected object: start moving all selected objects
-                    _mouseMode = MouseMode.DragSelection;
-                    _mouseDragStart = _mousePosition;
+                    _mouseMode = MouseMode.DragSelectionStart;
+                }
+                else
+                {
+                    _mouseMode = MouseMode.DragSingleStart;
                 }
             }
             InvalidateVisual();
@@ -443,13 +451,30 @@ namespace AnnoDesigner
         protected override void OnMouseMove(MouseEventArgs e)
         {
             HandleMouseClick(e);
+            // check if user begins to drag
+            if (Math.Abs(_mouseDragStart.X - _mousePosition.X) > 1 || Math.Abs(_mouseDragStart.Y - _mousePosition.Y) > 1)
+            {
+                switch (_mouseMode)
+                {
+                    case MouseMode.SelectionRectStart:
+                        _mouseMode = MouseMode.SelectionRect;
+                        _selectionRect = new Rect();
+                        break;
+                    case MouseMode.DragSelectionStart:
+                        _mouseMode = MouseMode.DragSelection;
+                        break;
+                    case MouseMode.DragSingleStart:
+                        _selectedObjects.Clear();
+                        _selectedObjects.Add(GetObjectAt(_mouseDragStart));
+                        _mouseMode = MouseMode.DragSelection;
+                        break;
+                }
+            }
             // selection of multiple objects
             if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null)
             {
                 switch (_mouseMode)
                 {
-                    case MouseMode.Standard:
-                        break;
                     case MouseMode.SelectionRect:
                         if (IsControlPressed())
                          {
@@ -517,7 +542,7 @@ namespace AnnoDesigner
             {
                 switch (_mouseMode)
                 {
-                    case MouseMode.Standard:
+                    default:
                         // clear selection if no key is pressed
                         if (!IsControlPressed())
                         {
@@ -536,6 +561,8 @@ namespace AnnoDesigner
                                 _selectedObjects.Add(obj);
                             }
                         }
+                        // return to standard mode, i.e. clear any drag-start modes
+                        _mouseMode = MouseMode.Standard;
                         break;
                     case MouseMode.SelectionRect:
                         // cancel dragging of selection rect
