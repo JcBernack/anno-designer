@@ -435,14 +435,9 @@ namespace AnnoDesigner
                     // user clicked nothing: start dragging the selection rect
                     _mouseMode = MouseMode.SelectionRectStart;
                 }
-                else if (_selectedObjects.Contains(obj) && !IsControlPressed())
+                else if (!IsControlPressed())
                 {
-                    // user clicked a selected object: start moving all selected objects
-                    _mouseMode = MouseMode.DragSelectionStart;
-                }
-                else
-                {
-                    _mouseMode = MouseMode.DragSingleStart;
+                    _mouseMode = _selectedObjects.Contains(obj) ? MouseMode.DragSelectionStart : MouseMode.DragSingleStart;
                 }
             }
             InvalidateVisual();
