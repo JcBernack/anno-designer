@@ -39,6 +39,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML" />
@@ -84,7 +85,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy $(ProjectDir)icons\* $(TargetDir)icons\* /Y</PostBuildEvent>
+    <PostBuildEvent>del $(TargetDir)icons /Q
+del $(TargetDir)layouts /Q
+xcopy $(ProjectDir)icons\* $(TargetDir)icons\* /Y
+xcopy $(ProjectDir)layouts\* $(TargetDir)layouts\* /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
