@@ -44,7 +44,7 @@ namespace AnnoDesigner
         /// Influence radius in grid units
         /// </summary>
         [DataMember]
-        public int Radius;
+        public double Radius;
 
         /// <summary>
         /// Empty constructor needed for deserialization
