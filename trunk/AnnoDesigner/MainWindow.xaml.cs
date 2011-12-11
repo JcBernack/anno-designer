@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,14 +17,21 @@ namespace AnnoDesigner
         : Window
     {
         private AnnoObject _currentObject;
-        private List<string> _icons;
+        private readonly List<string> _icons;
+        private const int CurrentVersion = 4;
+        private readonly WebClient _webClient;
+
+        #region Initialization
 
         public MainWindow()
         {
             InitializeComponent();
+            // initialize web client
+            _webClient = new WebClient();
+            _webClient.DownloadStringCompleted += WebClientDownloadStringCompleted;
             // add event handlers
             annoCanvas.OnCurrentObjectChange += AnnoCanvasOnCurrentObjectChange;
-            annoCanvas.OnShowStatusMessage += AnnoCanvasOnShowStatusMessage;
+            annoCanvas.OnShowStatusMessage += ShowStatusMessage;
             // add color presets
             colorPicker.StandardColors.Clear();
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "Scheme 1 - depot"));
@@ -37,7 +46,6 @@ namespace AnnoDesigner
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 209, 123), "Scheme 2 - field B"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - factory"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - path"));
-            
             // add icons
             _icons = new List<string>(Directory.GetFiles(@"icons\", "*.png"));
         }
@@ -49,8 +57,48 @@ namespace AnnoDesigner
             comboBoxIcon.Items.Add(new ComboBoxItem { Content = "None" });
             _icons.ForEach(_ => comboBoxIcon.Items.Add(new ComboBoxItem { Content = Path.GetFileNameWithoutExtension(_) }));
             comboBoxIcon.SelectedIndex = 0;
-            annoCanvas.Focus();
+            // check for updates on startup
+            MenuItemVersion.Header = "Current version: " + CurrentVersion;
+            CheckForUpdates(false);
         }
+
+        #endregion
+
+        #region Version check
+
+        private void CheckForUpdates(bool forcedCheck)
+        {
+            _webClient.DownloadStringAsync(new Uri("http://anno-designer.googlecode.com/svn/trunk/version.txt"), forcedCheck);
+        }
+
+        private void WebClientDownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                MessageBox.Show(e.Error.Message, "Version check failed");
+                return;
+            }
+            if (int.Parse(e.Result) > CurrentVersion)
+            {
+                // new version found
+                if (MessageBox.Show("A newer version was found, do you want to visit the project page?\nhttp://anno-designer.googlecode.com/", "Update available", MessageBoxButton.YesNo, MessageBoxImage.Asterisk, MessageBoxResult.OK) == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start("http://code.google.com/p/anno-designer/downloads/list");
+                }
+            }
+            else
+            {
+                ShowStatusMessage("Version is up to date.");
+                if ((bool)e.UserState)
+                {
+                    MessageBox.Show("This version is up to date.", "No updates found");
+                }
+            }
+        }
+
+        #endregion
+
+        #region Anno canvas events
 
         private void AnnoCanvasOnCurrentObjectChange(AnnoObject obj)
         {
@@ -62,18 +110,22 @@ namespace AnnoDesigner
             textBoxRadius.Text = obj.Radius.ToString();
         }
 
-        private void AnnoCanvasOnShowStatusMessage(string message)
+        private void ShowStatusMessage(string message)
         {
             StatusBarItemStatus.Content = message;
             System.Diagnostics.Debug.WriteLine(message);
         }
+
+        #endregion
+
+        #region UI events
 
         private void MenuItemClick(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void Button1Click(object sender, RoutedEventArgs e)
+        private void ButtonPlaceBuildingClick(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -83,7 +135,7 @@ namespace AnnoDesigner
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                     Color = colorPicker.SelectedColor,
                     Label = textBoxLabel.Text,
-                    Icon = comboBoxIcon.SelectedIndex == 0 ? null : _icons[comboBoxIcon.SelectedIndex-1],
+                    Icon = comboBoxIcon.SelectedIndex == 0 ? null : _icons[comboBoxIcon.SelectedIndex - 1],
                     Radius = string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
                 };
                 // do some sanity checks
@@ -132,5 +184,12 @@ namespace AnnoDesigner
         {
             annoCanvas.RenderIcon = !annoCanvas.RenderIcon;
         }
+
+        private void MenuItemVersionCheckImageClick(object sender, RoutedEventArgs e)
+        {
+            CheckForUpdates(true);
+        }
+
+        #endregion
     }
 }
