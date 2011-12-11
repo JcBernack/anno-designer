@@ -1,6 +1,7 @@
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -33,22 +34,14 @@ namespace AnnoDesigner
 
         public static void RenderToFile(FrameworkElement controlToRender, string filename)
         {
-            var rtb = new RenderTargetBitmap((int)controlToRender.ActualWidth, (int)controlToRender.ActualHeight, 90, 90, PixelFormats.Default);
-
-            Visual vis = controlToRender;
-            rtb.Render(vis);
-
-            var img = new System.Windows.Controls.Image { Source = rtb, Stretch = Stretch.None };
-            img.Measure(new Size((int)controlToRender.ActualWidth,(int)controlToRender.ActualHeight));
-            var sizeImage = img.DesiredSize;
-            img.Arrange(new Rect(new Point(0, 0), sizeImage));
-
-            var rtb2 = new RenderTargetBitmap((int)rtb.Width, (int)rtb.Height, 90, 90, PixelFormats.Default);
-            rtb2.Render(img);
-
+            // render control
+            const int dpi = 96;
+            var rtb = new RenderTargetBitmap((int)controlToRender.ActualWidth, (int)controlToRender.ActualHeight, dpi, dpi, PixelFormats.Default);
+            rtb.Render(controlToRender);
+            // encode to png
             var png = new PngBitmapEncoder();
-            png.Frames.Add(BitmapFrame.Create(rtb2));
-
+            png.Frames.Add(BitmapFrame.Create(rtb));
+            // save file
             Stream file = File.Open(filename, FileMode.Create);
             png.Save(file);
             file.Close();
