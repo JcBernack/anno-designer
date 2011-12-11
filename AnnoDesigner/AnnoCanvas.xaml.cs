@@ -130,7 +130,7 @@ namespace AnnoDesigner
             set
             {
                 _currentMode = value;
-                FireOnShowStatusMessage(_currentMode.ToString());
+                FireOnShowStatusMessage("Mode: " + _currentMode);
             }
         }
         private Point _mouseDragStart;

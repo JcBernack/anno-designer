@@ -7,8 +7,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="430*" />
-            <RowDefinition Height="Auto
-                           " />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -24,6 +23,13 @@
                 <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
                 <Separator />
                 <MenuItem Header="Exit" Click="MenuItemClick" />
+            </MenuItem>
+            <MenuItem Header="Extras" Padding="27,2,28,3">
+                <!--<MenuItem Header="Prefer local presets" IsCheckable="True" IsEnabled="False" />
+                <MenuItem Header="Apply automatic color scheme" IsEnabled="False" />
+                <Separator />-->
+                <MenuItem Header="Check for updates" Click="MenuItemVersionCheckImageClick" />
+                <MenuItem Header="Current version: x" Name="MenuItemVersion" IsEnabled="False" />
             </MenuItem>
             <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
             <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />
@@ -57,7 +63,7 @@
                         <Label Content="Radius" Height="28" Name="label1" />
                         <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="0" />
                     </DockPanel>
-                    <Button Click="Button1Click" Content="Place building" Height="23" Name="button1" />
+                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" Name="buttonPlaceBuilding" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Building presets" IsEnabled="False" Name="groupBox2" DockPanel.Dock="Top">
