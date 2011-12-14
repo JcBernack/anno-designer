@@ -31,7 +31,13 @@
                 <MenuItem Header="Check for updates" Click="MenuItemVersionCheckImageClick" />
                 <MenuItem Header="Current version: x" Name="MenuItemVersion" IsEnabled="False" />
             </MenuItem>
-            <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
+            <MenuItem Header="Export">
+                <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
+                <Separator />
+                <MenuItem Header="Use current zoom on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportZoom" />
+                <MenuItem Header="Render selection highlights on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportSelection" />
+            </MenuItem>
+            
             <Separator />
             <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
             <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />

@@ -114,7 +114,7 @@ namespace AnnoDesigner
             textBoxHeight.Text = obj.Size.Height.ToString();
             colorPicker.SelectedColor = obj.Color;
             textBoxLabel.Text = obj.Label;
-            comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => _.EndsWith(obj.Icon)) + 1;
+            comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => !string.IsNullOrEmpty(obj.Icon) && _.EndsWith(obj.Icon)) + 1;
             textBoxRadius.Text = obj.Radius.ToString();
         }
 
@@ -180,7 +180,7 @@ namespace AnnoDesigner
 
         private void MenuItemExportImageClick(object sender, RoutedEventArgs e)
         {
-            annoCanvas.ExportImage();
+            annoCanvas.ExportImage(MenuItemExportZoom.IsChecked, MenuItemExportSelection.IsChecked);
         }
 
         private void MenuItemGridClick(object sender, RoutedEventArgs e)
