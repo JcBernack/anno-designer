@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,7 +24,8 @@ namespace AnnoDesigner
 
         private const int GridStepMin = 8;
         private const int GridStepMax = 100;
-        private int _gridStep = 20;
+        private const int GridStepDefault = 20;
+        private int _gridStep = GridStepDefault;
         public int GridSize
         {
             get
@@ -181,15 +183,15 @@ namespace AnnoDesigner
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
-            var dpiFactor = 1 / m.M11;
+            //var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+            //var dpiFactor = 1 / m.M11;
+            var dpiFactor = 1;
             _linePen.Thickness = dpiFactor * 1;
             _highlightPen.Thickness = dpiFactor * 2;
             _radiusPen.Thickness = dpiFactor * 2;
             _influencedPen.Thickness = dpiFactor * 2;
 
             // assure pixel perfect drawing
-            //BUG: doesn't work when exporting
             var halfPenWidth = _linePen.Thickness / 2;
             var guidelines = new GuidelineSet();
             guidelines.GuidelinesX.Add(halfPenWidth);
@@ -219,15 +221,9 @@ namespace AnnoDesigner
             //drawingContext.DrawRectangle(Brushes.LightYellow, linePen, new Rect(GridToScreen(ScreenToGrid(_mousePosition)), new Size(_gridStep, _gridStep)));
 
             // draw placed objects
-            foreach (var obj in _placedObjects)
-            {
-                RenderObject(drawingContext, obj);
-            }
-            foreach (var obj in _selectedObjects)
-            {
-                RenderObjectInfluence(drawingContext, obj);
-                RenderObjectSelection(drawingContext, obj);
-            }
+            _placedObjects.ForEach(_ => RenderObject(drawingContext, _));
+            _selectedObjects.ForEach(_ => RenderObjectInfluence(drawingContext, _));
+            _selectedObjects.ForEach(_ => RenderObjectSelection(drawingContext, _));
 
             if (_currentObject == null)
             {
@@ -825,6 +821,25 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
+        public void ResetZoom()
+        {
+            GridSize = GridStepDefault;
+        }
+
+        public void Normalize()
+        {
+            Normalize(0);
+        }
+
+        public void Normalize(int border)
+        {
+            var dx = _placedObjects.Min(_ => _.Position.X) - border;
+            var dy = _placedObjects.Min(_ => _.Position.Y) - border;
+            _placedObjects.ForEach(_ => _.Position.X -= dx);
+            _placedObjects.ForEach(_ => _.Position.Y -= dy);
+            InvalidateVisual();
+        }
+
         #endregion
 
         #region Save/Load/Export methods
@@ -840,6 +855,7 @@ namespace AnnoDesigner
             {
                 try
                 {
+                    Normalize(1);
                     DataIO.SaveToFile(_placedObjects, dialog.FileName);
                 }
                 catch (Exception)
@@ -860,9 +876,9 @@ namespace AnnoDesigner
             {
                 try
                 {
-                    DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
                     _selectedObjects.Clear();
-                    InvalidateVisual();
+                    DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
+                    Normalize(1);
                 }
                 catch (Exception)
                 {
@@ -882,13 +898,38 @@ namespace AnnoDesigner
             {
                 try
                 {
-                    DataIO.RenderToFile(this, dialog.FileName);
+                    RenderToFile(dialog.FileName, 1);
                 }
                 catch (Exception)
                 {
                     IOErrorMessageBox();
                 }
             }
+        }
+
+        public void RenderToFile(string filename, int border)
+        {
+            //TODO: copy objects to output target before normalization
+            Normalize(border);
+            // calculate correct size
+            var width = GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
+            var height = GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) +  border) + 1;
+            // initialize output canvas
+            var target = new AnnoCanvas
+            {
+                Width = width,
+                Height = height,
+                _placedObjects = _placedObjects,
+                RenderGrid = RenderGrid,
+                RenderIcon = RenderIcon,
+                RenderLabel = RenderLabel,
+                GridSize = GridSize
+            };
+            // render to file
+            var outputSize = new Size(width, height);
+            target.Measure(outputSize);
+            target.Arrange(new Rect(outputSize));
+            DataIO.RenderToFile(target, filename);
         }
 
         private static void IOErrorMessageBox()

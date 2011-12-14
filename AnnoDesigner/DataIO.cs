@@ -1,7 +1,6 @@
 using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -32,17 +31,17 @@ namespace AnnoDesigner
             stream.Close();
         }
 
-        public static void RenderToFile(FrameworkElement controlToRender, string filename)
+        public static void RenderToFile(FrameworkElement target, string filename)
         {
             // render control
             const int dpi = 96;
-            var rtb = new RenderTargetBitmap((int)controlToRender.ActualWidth, (int)controlToRender.ActualHeight, dpi, dpi, PixelFormats.Default);
-            rtb.Render(controlToRender);
+            var rtb = new RenderTargetBitmap((int)target.ActualWidth, (int)target.ActualHeight, dpi, dpi, PixelFormats.Default);
+            rtb.Render(target);
             // encode to png
             var png = new PngBitmapEncoder();
             png.Frames.Add(BitmapFrame.Create(rtb));
             // save file
-            Stream file = File.Open(filename, FileMode.Create);
+            var file = new FileStream(filename, FileMode.Create);
             png.Save(file);
             file.Close();
         }

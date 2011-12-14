@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BuildingInfo.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
     <Page Include="AnnoCanvas.xaml">
@@ -91,7 +92,8 @@
     <PostBuildEvent>del $(TargetDir)icons /Q
 del $(TargetDir)layouts /Q
 xcopy $(ProjectDir)icons\* $(TargetDir)icons\* /Y
-xcopy $(ProjectDir)layouts\* $(TargetDir)layouts\* /Y</PostBuildEvent>
+xcopy $(ProjectDir)layouts\* $(TargetDir)layouts\* /Y
+copy $(ProjectDir)presets.json $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
