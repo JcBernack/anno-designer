@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,9 +17,10 @@ namespace AnnoDesigner
     public partial class MainWindow
         : Window
     {
+        private List<BuildingInfo> _presets;
         private AnnoObject _currentObject;
         private readonly List<string> _icons;
-        private const int CurrentVersion = 4;
+        private const int CurrentVersion = 5;
         private readonly WebClient _webClient;
 
         #region Initialization
@@ -30,7 +32,7 @@ namespace AnnoDesigner
             _webClient = new WebClient();
             _webClient.DownloadStringCompleted += WebClientDownloadStringCompleted;
             // add event handlers
-            annoCanvas.OnCurrentObjectChange += AnnoCanvasOnCurrentObjectChange;
+            annoCanvas.OnCurrentObjectChange += ChangeCurrentObject;
             annoCanvas.OnShowStatusMessage += ShowStatusMessage;
             // add color presets
             colorPicker.StandardColors.Clear();
@@ -47,7 +49,8 @@ namespace AnnoDesigner
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - factory"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - path"));
             // add icons
-            _icons = new List<string>(Directory.GetFiles(@"icons\", "*.png"));
+            _icons = Directory.GetFiles(@"icons\", "*.png").ToList();
+            _icons.Sort();
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -60,6 +63,11 @@ namespace AnnoDesigner
             // check for updates on startup
             MenuItemVersion.Header = "Current version: " + CurrentVersion;
             CheckForUpdates(false);
+            // load presets
+            _presets = DataIO.LoadFromFile<List<BuildingInfo>>("presets.json");
+            listViewPresets.Items.Clear();
+            var excludedTemplates = new[] { "Ark", "ThirdPartyWarehouse", "ThirdpartyMilitaryBuilding" };
+            _presets.Where(_ => !excludedTemplates.Contains(_.Template)).OrderBy(_ => _.GetDisplayValue()).ToList().ForEach(_ => listViewPresets.Items.Add(_.GetDisplayValue()));
         }
 
         #endregion
@@ -100,32 +108,17 @@ namespace AnnoDesigner
 
         #region Anno canvas events
 
-        private void AnnoCanvasOnCurrentObjectChange(AnnoObject obj)
+        private void ChangeCurrentObject(AnnoObject obj)
         {
             textBoxWidth.Text = obj.Size.Width.ToString();
             textBoxHeight.Text = obj.Size.Height.ToString();
             colorPicker.SelectedColor = obj.Color;
             textBoxLabel.Text = obj.Label;
-            comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => _ == obj.Icon) + 1;
+            comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => _.EndsWith(obj.Icon)) + 1;
             textBoxRadius.Text = obj.Radius.ToString();
         }
 
-        private void ShowStatusMessage(string message)
-        {
-            StatusBarItemStatus.Content = message;
-            System.Diagnostics.Debug.WriteLine(message);
-        }
-
-        #endregion
-
-        #region UI events
-
-        private void MenuItemClick(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void ButtonPlaceBuildingClick(object sender, RoutedEventArgs e)
+        private void ApplyCurrentObject()
         {
             try
             {
@@ -148,6 +141,26 @@ namespace AnnoDesigner
             {
                 MessageBox.Show("Error: Please check configuration.");
             }
+        }
+
+        private void ShowStatusMessage(string message)
+        {
+            StatusBarItemStatus.Content = message;
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        #endregion
+
+        #region UI events
+
+        private void MenuItemClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void ButtonPlaceBuildingClick(object sender, RoutedEventArgs e)
+        {
+            ApplyCurrentObject();
         }
 
         private void MenuItemNewClick(object sender, RoutedEventArgs e)
@@ -188,6 +201,24 @@ namespace AnnoDesigner
         private void MenuItemVersionCheckImageClick(object sender, RoutedEventArgs e)
         {
             CheckForUpdates(true);
+        }
+        
+        private void ListViewPresetsMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var obj = _presets.Find(_ => _.GetDisplayValue() == (string) listViewPresets.SelectedItem).ToAnnoObject();
+            obj.Color = colorPicker.SelectedColor;
+            ChangeCurrentObject(obj);
+            ApplyCurrentObject();
+        }
+
+        private void MenuItemResetZoomClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.ResetZoom();
+        }
+
+        private void MenuItemNormalizeClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.Normalize(1);
         }
 
         #endregion

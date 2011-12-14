@@ -1,0 +1,2434 @@
+[
+	 {
+				".ifo": "tycoons\\residence\\Worker_Residence_tycoons_01\\Worker_Residence_tycoons_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Worker Barracks", 
+				"GUID": 10021, 
+				"IconFileName": "icon_27_72.png", 
+				"Name": "tycoon_worker_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\residence\\Citizen_Residence_tycoons_01\\Citizen_Residence_tycoons_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Employee House", 
+				"GUID": 10076, 
+				"IconFileName": "icon_27_72.png", 
+				"Name": "tycoon_citizen_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\residence\\Executive_Residence_tycoons_01\\executive_residence_tycoons_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Engineer Apartments", 
+				"GUID": 10116, 
+				"IconFileName": "icon_27_72.png", 
+				"Name": "tycoon_executive_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\residence\\Leader_Residence_tycoons_01\\leader_residence_tycoons_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Executive Mansion", 
+				"GUID": 10118, 
+				"IconFileName": "icon_27_72.png", 
+				"Name": "tycoon_leader_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\residence\\Destroyed_residences_tycoons\\destroyed_residence_01_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Residence ruins", 
+				"GUID": 10221, 
+				"IconFileName": "icon_27_72.png", 
+				"Name": "tycoon_ruin_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\public\\town_center_tycoons\\town_center_tycoons.ifo", 
+				"BuildBlocker": [
+						8, 
+						6
+				], 
+				"Eng1": "City Center", 
+				"GUID": 10257, 
+				"IconFileName": "icon_27_217.png", 
+				"InfluenceRadius": 25, 
+				"Name": "town_center_tycoons", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\public\\casino_tycoons\\casino_tycoons.ifo", 
+				"BuildBlocker": [
+						5, 
+						6
+				], 
+				"Eng1": "Casino", 
+				"GUID": 10147, 
+				"IconFileName": "icon_27_169.png", 
+				"InfluenceRadius": 20, 
+				"Name": "casino", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\special\\ministry_of_truth\\ministry_of_truth_tycoons.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Ministry of Truth", 
+				"GUID": 10051, 
+				"IconFileName": "icon_27_28.png", 
+				"InfluenceRadius": 26, 
+				"Name": "ministry_of_truth", 
+				"Template": "PropagandaBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\public\\corporate_headquarter_tycoons\\corporate_headquarter_tycoons.ifo", 
+				"BuildBlocker": [
+						9, 
+						7
+				], 
+				"Eng1": "Financial center", 
+				"GUID": 10026, 
+				"IconFileName": "icon_27_76.png", 
+				"InfluenceRadius": 24, 
+				"Name": "corporate headquarter", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\public\\monument_tycoons\\monument_unfinished_01_tycoons.ifo", 
+				"BuildBlocker": [
+						18, 
+						13
+				], 
+				"Eng1": "Corporate headquarters foundation", 
+				"GUID": 10214, 
+				"IconFileName": "icon_27_215.png", 
+				"InfluenceRadius": 42, 
+				"Name": "monument_unfinished1_tycoons", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "tycoons\\public\\monument_tycoons\\monument_unfinished_02_tycoons.ifo", 
+				"BuildBlocker": [
+						18, 
+						13
+				], 
+				"Eng1": "Corporate headquarter Construction phase 1", 
+				"GUID": 10215, 
+				"IconFileName": "icon_27_215.png", 
+				"InfluenceRadius": 42, 
+				"Name": "monument_unfinished2_tycoons", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "tycoons\\public\\monument_tycoons\\monument_unfinished_03_tycoons.ifo", 
+				"BuildBlocker": [
+						18, 
+						13
+				], 
+				"Eng1": "Corporate Headquarters Construction phase 2", 
+				"GUID": 10216, 
+				"IconFileName": "icon_27_215.png", 
+				"InfluenceRadius": 42, 
+				"Name": "monument_unfinished3_tycoons", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "tycoons\\public\\monument_tycoons\\monument_tycoons.ifo", 
+				"BuildBlocker": [
+						18, 
+						13
+				], 
+				"Eng1": "Corporate headquarters", 
+				"GUID": 10217, 
+				"IconFileName": "icon_27_215.png", 
+				"InfluenceRadius": 42, 
+				"Name": "monument_tycoons", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "tycoons\\production\\flavor_lab_tycoons\\flavor_lab_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Flavor lab", 
+				"GUID": 10150, 
+				"IconFileName": "icon_27_154.png", 
+				"InfluenceRadius": 6, 
+				"Name": "flavor_lab", 
+				"ProductEng1": "Super flavor", 
+				"ProductGUID": 2500042, 
+				"ProductName": "SuperFlavor", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\meat_factory_tycoons\\meat_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Meat factory", 
+				"GUID": 10022, 
+				"IconFileName": "icon_27_4.png", 
+				"InfluenceRadius": 6, 
+				"Name": "meatfactory", 
+				"ProductEng1": "Meat", 
+				"ProductGUID": 2500003, 
+				"ProductName": "Meat", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\food_supply_factory_tycoons\\food_supply_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Food supply factory", 
+				"GUID": 10152, 
+				"IconFileName": "icon_27_204.png", 
+				"InfluenceRadius": 20, 
+				"Name": "food_supply_factory", 
+				"ProductEng1": "Convenience Food", 
+				"ProductGUID": 2500020, 
+				"ProductName": "TVDinner", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\lobster_farm_tycoons\\lobster_farm_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Lobster farm", 
+				"GUID": 10153, 
+				"IconFileName": "icon_27_155.png", 
+				"InfluenceRadius": 0, 
+				"Name": "lobster_farm", 
+				"ProductEng1": "Lobster", 
+				"ProductGUID": 2500045, 
+				"ProductName": "Lobster", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\truffle_farm_tycoons\\truffel_farm_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Truffle farm", 
+				"GUID": 10154, 
+				"IconFileName": "icon_27_156.png", 
+				"InfluenceRadius": 7, 
+				"Name": "truffle_farm", 
+				"ProductEng1": "Truffle", 
+				"ProductGUID": 2500046, 
+				"ProductName": "Truffles", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\gourmet_factory_tycoons\\gourmet_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Gourmet factory", 
+				"GUID": 10156, 
+				"IconFileName": "icon_27_157.png", 
+				"InfluenceRadius": 20, 
+				"Name": "gourmet_factory", 
+				"ProductEng1": "Luxury meal", 
+				"ProductGUID": 2500021, 
+				"ProductName": "LuxuryMeal", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\distillery_tycoons\\distillery_tycoon.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Distillery", 
+				"GUID": 10046, 
+				"IconFileName": "icon_27_21.png", 
+				"InfluenceRadius": 6, 
+				"Name": "distillery", 
+				"ProductEng1": "Liquor", 
+				"ProductGUID": 2500007, 
+				"ProductName": "Liquor", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\champagne_cellar_tycoons\\champagne_cellar_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Champagne cellar", 
+				"GUID": 10158, 
+				"IconFileName": "icon_27_159.png", 
+				"InfluenceRadius": 20, 
+				"Name": "champagne_cellar", 
+				"ProductEng1": "Champagne", 
+				"ProductGUID": 2500024, 
+				"ProductName": "Champagne", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\vineyard_tycoon\\vineyard_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Vineyard", 
+				"GUID": 10157, 
+				"IconFileName": "icon_27_158.png", 
+				"InfluenceRadius": 9, 
+				"Name": "vineyard", 
+				"ProductEng1": "Grapes", 
+				"ProductGUID": 2500047, 
+				"ProductName": "Grapes", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\oil_driller_tycoons\\oil_driller_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Oil driller", 
+				"GUID": 10149, 
+				"IconFileName": "icon_27_125.png", 
+				"InfluenceRadius": 0, 
+				"Name": "oil_driller", 
+				"ProductEng1": "Crude oil", 
+				"ProductGUID": 2500035, 
+				"ProductName": "RawOil", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\plastic_factory_tycoons\\plastic_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Plastic factory", 
+				"GUID": 10159, 
+				"IconFileName": "icon_27_161.png", 
+				"InfluenceRadius": 20, 
+				"Name": "plastic_factory", 
+				"ProductEng1": "Plastics", 
+				"ProductGUID": 2500026, 
+				"ProductName": "Toys", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\gold_refinery_tycoons\\gold_refinery_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						7
+				], 
+				"Eng1": "Gold refinery", 
+				"GUID": 10161, 
+				"IconFileName": "icon_27_162.png", 
+				"InfluenceRadius": 0, 
+				"Name": "gold_refinery", 
+				"ProductEng1": "Gold nuggets", 
+				"ProductGUID": 2500048, 
+				"ProductName": "GoldNuggets", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\gold_smeltery_tycoons\\gold_smeltery_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Gold smeltery", 
+				"GUID": 10162, 
+				"IconFileName": "icon_27_163.png", 
+				"InfluenceRadius": 20, 
+				"Name": "gold_smeltery", 
+				"ProductEng1": "Gold", 
+				"ProductGUID": 2500049, 
+				"ProductName": "Gold", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\jewelry_manufactory_tycoons\\jewelry_manufactory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Jewelry manufactory", 
+				"GUID": 10163, 
+				"IconFileName": "icon_27_164.png", 
+				"InfluenceRadius": 20, 
+				"Name": "jewelry_manufactory", 
+				"ProductEng1": "Jewelery", 
+				"ProductGUID": 2500027, 
+				"ProductName": "Jewelry", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\fat_factory_tycoons\\fat_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Fat factory", 
+				"GUID": 10164, 
+				"IconFileName": "icon_27_165.png", 
+				"InfluenceRadius": 6, 
+				"Name": "fat_factory", 
+				"ProductEng1": "Omega acids", 
+				"ProductGUID": 2500050, 
+				"ProductName": "OmegaAcids", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\chemical_plant_tycoons\\chemical_plant_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Chemical plant", 
+				"GUID": 10166, 
+				"IconFileName": "icon_27_166.png", 
+				"InfluenceRadius": 20, 
+				"Name": "chemical_plant", 
+				"ProductEng1": "Secret ingredients", 
+				"ProductGUID": 2500051, 
+				"ProductName": "SecretIngredient", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\healthcare_office_tycoons\\healthcare_office_tycoons.ifo", 
+				"BuildBlocker": [
+						5, 
+						4
+				], 
+				"Eng1": "Healthcare office", 
+				"GUID": 10168, 
+				"IconFileName": "icon_27_168.png", 
+				"InfluenceRadius": 20, 
+				"Name": "pharmaceutical_factory", 
+				"ProductEng1": "Pharmaceuticals", 
+				"ProductGUID": 2500028, 
+				"ProductName": "Pharmaceuticals", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\excavator_tycoons\\excavator_tycoons.ifo", 
+				"BuildBlocker": [
+						5, 
+						8
+				], 
+				"Eng1": "Rotary excavator", 
+				"GUID": 10024, 
+				"IconFileName": "icon_27_6.png", 
+				"InfluenceRadius": 0, 
+				"Name": "excavator", 
+				"ProductEng1": "Coal", 
+				"ProductGUID": 2500005, 
+				"ProductName": "Coal", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\steel_works\\steel_works.ifo", 
+				"BuildBlocker": [
+						5, 
+						3
+				], 
+				"Eng1": "Steelworks", 
+				"GUID": 10057, 
+				"IconFileName": "icon_27_35.png", 
+				"InfluenceRadius": 20, 
+				"Name": "steelwork", 
+				"ProductEng1": "Steel", 
+				"ProductGUID": 2500010, 
+				"ProductName": "Steel", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\heavy_arsenal_tycoons\\heavy_arsenal_tycoons.ifo", 
+				"BuildBlocker": [
+						5, 
+						6
+				], 
+				"Eng1": "Arsenal", 
+				"GUID": 10081, 
+				"IconFileName": "icon_27_56.png", 
+				"InfluenceRadius": 20, 
+				"Name": "heavy_arsenal", 
+				"ProductEng1": "Heavy weapons", 
+				"ProductGUID": 2500063, 
+				"ProductName": "HeavyWeapons", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\explosive_factory_tycoons\\tycoons_explosive_factory.ifo", 
+				"BuildBlocker": [
+						6, 
+						4
+				], 
+				"Eng1": "Explosives factory", 
+				"GUID": 10093, 
+				"IconFileName": "icon_27_57.png", 
+				"InfluenceRadius": 20, 
+				"Name": "explosive_factory", 
+				"ProductEng1": "Explosives", 
+				"ProductGUID": 2500044, 
+				"ProductName": "Explosives", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\concrete_factory_tycoons\\concrete_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Concrete factory", 
+				"GUID": 10148, 
+				"IconFileName": "icon_27_152.png", 
+				"InfluenceRadius": 20, 
+				"Name": "concrete_factory", 
+				"ProductEng1": "Concrete", 
+				"ProductGUID": 2500016, 
+				"ProductName": "Concrete", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\fuel_assembly_factory_tycoons\\fuel_assembly_factory_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Fuel element factory", 
+				"GUID": 10053, 
+				"IconFileName": "icon_27_31.png", 
+				"InfluenceRadius": 20, 
+				"Name": "fuel_assembly_factory", 
+				"ProductEng1": "Fuel rods", 
+				"ProductGUID": 2500012, 
+				"ProductName": "FuleRod", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\basalt_crusher_others\\basalt_crusher_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Basalt crusher", 
+				"GUID": 10261, 
+				"IconFileName": "icon_27_213.png", 
+				"InfluenceRadius": 0, 
+				"Name": "basalt_crusher", 
+				"ProductEng1": "Granules", 
+				"ProductGUID": 2500066, 
+				"ProductName": "Granulate", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\coal_fired_power_plant_tycoons\\coal_fired_power_plant_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Coal power station", 
+				"GUID": 10025, 
+				"IconFileName": "icon_27_13.png", 
+				"InfluenceRadius": 20, 
+				"Name": "coalpowerplant", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\nuclear_power_plant_tycoons\\nuclear_power_plant_tycoons.ifo", 
+				"BuildBlocker": [
+						8, 
+						8
+				], 
+				"Eng1": "Nuclear power plant", 
+				"GUID": 10050, 
+				"IconFileName": "icon_27_22.png", 
+				"InfluenceRadius": 20, 
+				"Name": "nuclearpowerplant", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\nuclear_power_plant_tycoons\\nuclear_power_plant_destroyed_tycoons.ifo", 
+				"BuildBlocker": [
+						8, 
+						8
+				], 
+				"Eng1": "Destroyed Nuclear power plant", 
+				"GUID": 10270, 
+				"IconFileName": "icon_27_22.png", 
+				"InfluenceRadius": 20, 
+				"Name": "nuclearpowerplant_destroyed", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\special\\ark_tycoons\\ark_tycoons.ifo", 
+				"BuildBlocker": [
+						35, 
+						35
+				], 
+				"Eng1": "Haven", 
+				"GUID": 10084, 
+				"IconFileName": "icon_27_36.png", 
+				"Name": "ark_tycoons", 
+				"Template": "Ark"
+		}, 
+		{
+				".ifo": "tycoons\\special\\shipyard_tycoons\\shipyard_tycoons.ifo", 
+				"BuildBlocker": [
+						6, 
+						8
+				], 
+				"Eng1": "Tycoon shipyard", 
+				"GUID": 10096, 
+				"IconFileName": "icon_27_59.png", 
+				"Name": "shipyard_tycoons", 
+				"Template": "TaskBasedProductionBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\special\\missile_launching_platform_tycoons\\missile_launching_platform_tycoons.ifo", 
+				"BuildBlocker": [
+						5, 
+						5
+				], 
+				"Eng1": "Missile launch pad", 
+				"GUID": 10113, 
+				"IconFileName": "icon_27_89.png", 
+				"InfluenceRadius": 0, 
+				"Name": "missile_launching_platform", 
+				"Template": "SpecialActionBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\special\\final_storage_tycoons\\final_storage_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "CO2 reservoir", 
+				"GUID": 10169, 
+				"IconFileName": "icon_27_170.png", 
+				"InfluenceRadius": 0, 
+				"Name": "final_storage", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\production\\waste_incinerator_tycoons\\waste_incinerator_tycoons.ifo", 
+				"BuildBlocker": [
+						3, 
+						6
+				], 
+				"Eng1": "Waste compactor", 
+				"GUID": 10170, 
+				"IconFileName": "icon_27_171.png", 
+				"InfluenceRadius": 12, 
+				"Name": "waste_incinerator", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "tycoons\\special\\deacidification_station_tycoons\\deacidification_station_tycoons.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Deacidification station", 
+				"GUID": 10267, 
+				"IconFileName": "icon_27_12.png", 
+				"InfluenceRadius": 30, 
+				"Name": "deacidification_station", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\residence\\pioneer_residence_ecos_01\\pioneer_residence_ecos_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Worker Barracks", 
+				"GUID": 10011, 
+				"IconFileName": "icon_27_71.png", 
+				"Name": "ecos_pioneer_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "ecos\\residence\\villager_residence_ecos_01\\villager_residence_ecos_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Employee House", 
+				"GUID": 10013, 
+				"IconFileName": "icon_27_71.png", 
+				"Name": "ecos_villager_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "ecos\\residence\\builder residence_ecos_01\\builder_residence_ecos_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Engineer Apartments", 
+				"GUID": 10119, 
+				"IconFileName": "icon_27_71.png", 
+				"Name": "ecos_builder_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "ecos\\residence\\creator_residence_ecos_01\\creator_residence_ecos_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Executive Mansion", 
+				"GUID": 10117, 
+				"IconFileName": "icon_27_71.png", 
+				"Name": "ecos_creator_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "ecos\\residence\\destroyed_residences_ecos\\destroyed_residence_01_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Residence ruins", 
+				"GUID": 10222, 
+				"IconFileName": "icon_27_71.png", 
+				"Name": "ecos_ruin_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "ecos\\public\\town_center_ecos\\town_center_ecos.ifo", 
+				"BuildBlocker": [
+						8, 
+						6
+				], 
+				"Eng1": "City Center", 
+				"GUID": 10229, 
+				"IconFileName": "icon_27_27.png", 
+				"InfluenceRadius": 25, 
+				"Name": "town_center_ecos", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "ecos\\public\\concert_hall_ecos\\concert_hall_ecos.ifo", 
+				"BuildBlocker": [
+						5, 
+						6
+				], 
+				"Eng1": "Concert hall", 
+				"GUID": 10171, 
+				"IconFileName": "icon_27_147.png", 
+				"InfluenceRadius": 20, 
+				"Name": "concert_hall", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\education_network\\education_network_ecos.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Education Network", 
+				"GUID": 10121, 
+				"IconFileName": "icon_27_117.png", 
+				"InfluenceRadius": 26, 
+				"Name": "education_network", 
+				"Template": "PropagandaBuilding"
+		}, 
+		{
+				".ifo": "ecos\\public\\congress_center_ecos\\congress_center_ecos.ifo", 
+				"BuildBlocker": [
+						9, 
+						7
+				], 
+				"Eng1": "Congress center", 
+				"GUID": 10172, 
+				"IconFileName": "icon_27_149.png", 
+				"InfluenceRadius": 24, 
+				"Name": "congress_center", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "ecos\\public\\monument_ecos\\monument_unfinished01_ecos.ifo", 
+				"BuildBlocker": [
+						16, 
+						12
+				], 
+				"Eng1": "Leisure center foundation", 
+				"GUID": 10210, 
+				"IconFileName": "icon_27_214.png", 
+				"InfluenceRadius": 40, 
+				"Name": "monument_unfinished1_ecos", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "ecos\\public\\monument_ecos\\monument_unfinished02_ecos.ifo", 
+				"BuildBlocker": [
+						16, 
+						12
+				], 
+				"Eng1": "Leisure center Construction Phase 1", 
+				"GUID": 10211, 
+				"IconFileName": "icon_27_214.png", 
+				"InfluenceRadius": 40, 
+				"Name": "monument_unfinished2_ecos", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "ecos\\public\\monument_ecos\\monument_unfinished03_ecos.ifo", 
+				"BuildBlocker": [
+						16, 
+						12
+				], 
+				"Eng1": "Leisure center Construction Phase 2", 
+				"GUID": 10212, 
+				"IconFileName": "icon_27_214.png", 
+				"InfluenceRadius": 40, 
+				"Name": "monument_unfinished3_ecos", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "ecos\\public\\monument_ecos\\monument_ecos.ifo", 
+				"BuildBlocker": [
+						16, 
+						12
+				], 
+				"Eng1": "Leisure center", 
+				"GUID": 10213, 
+				"IconFileName": "icon_27_214.png", 
+				"InfluenceRadius": 40, 
+				"Name": "monument_ecos", 
+				"Template": "Monument"
+		}, 
+		{
+				".ifo": "ecos\\production\\vegetable_farm_ecos\\vegetable_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Farmhouse", 
+				"GUID": 10012, 
+				"IconFileName": "icon_27_3.png", 
+				"InfluenceRadius": 7, 
+				"Name": "vegetable_farm", 
+				"ProductEng1": "Vegetables", 
+				"ProductGUID": 2500002, 
+				"ProductName": "Vegetables", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\soy_farm_ecos\\soy_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Rice farm", 
+				"GUID": 10174, 
+				"IconFileName": "icon_27_195.png", 
+				"InfluenceRadius": 7, 
+				"Name": "rice_farm", 
+				"ProductEng1": "Rice", 
+				"ProductGUID": 2500053, 
+				"ProductName": "Soy", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\health_food_factory_ecos\\health_food_factory_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Health food factory", 
+				"GUID": 10176, 
+				"IconFileName": "icon_27_135.png", 
+				"InfluenceRadius": 20, 
+				"Name": "health_food_factory", 
+				"ProductEng1": "Health food", 
+				"ProductGUID": 2500019, 
+				"ProductName": "HealthFood", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\grain_farm_ecos\\grain_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Grain farm", 
+				"GUID": 10177, 
+				"IconFileName": "icon_27_136.png", 
+				"InfluenceRadius": 9, 
+				"Name": "grain_farm", 
+				"ProductEng1": "Durum wheat", 
+				"ProductGUID": 2500056, 
+				"ProductName": "Grain", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\water_mill_ecos\\water_mill_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						2
+				], 
+				"Eng1": "Flour mill", 
+				"GUID": 10179, 
+				"IconFileName": "icon_27_137.png", 
+				"InfluenceRadius": 20, 
+				"Name": "water_mill", 
+				"ProductEng1": "Pasta", 
+				"ProductGUID": 2500057, 
+				"ProductName": "Flour", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\bakery_ecos\\bakery_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Pasta production", 
+				"GUID": 10180, 
+				"IconFileName": "icon_27_138.png", 
+				"InfluenceRadius": 20, 
+				"Name": "bakery", 
+				"ProductEng1": "Pasta dishes", 
+				"ProductGUID": 2500018, 
+				"ProductName": "ComfortFood", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\tea_plantation\\tea_plantation.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Tea plantation", 
+				"GUID": 10048, 
+				"IconFileName": "icon_27_20.png", 
+				"Name": "tea_plantation", 
+				"ProductEng1": "Tea", 
+				"ProductGUID": 2500006, 
+				"ProductName": "Tea", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\fruit_plantation_ecos\\fruit_plantation_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Fruit plantation", 
+				"GUID": 10181, 
+				"IconFileName": "icon_27_139.png", 
+				"InfluenceRadius": 7, 
+				"Name": "fruit_plantation", 
+				"ProductEng1": "Fruits", 
+				"ProductGUID": 2500054, 
+				"ProductName": "Fruits", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\dairy_farm_ecos\\dairy_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Dairy farm", 
+				"GUID": 10183, 
+				"IconFileName": "icon_27_140.png", 
+				"InfluenceRadius": 10, 
+				"Name": "dairy_farm", 
+				"ProductEng1": "Milk", 
+				"ProductGUID": 2500055, 
+				"ProductName": "Milk", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\health_drink_factory_ecos\\health_drink_factory_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Health drink factory", 
+				"GUID": 10185, 
+				"IconFileName": "icon_27_141.png", 
+				"InfluenceRadius": 20, 
+				"Name": "health_drink_factory", 
+				"ProductEng1": "Bio drinks", 
+				"ProductGUID": 2500023, 
+				"ProductName": "HealthDrink", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\communicator_factory_ecos\\communicator_factory_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Electronics factory", 
+				"GUID": 10186, 
+				"IconFileName": "icon_27_142.png", 
+				"InfluenceRadius": 20, 
+				"Name": "communicator_factory", 
+				"ProductEng1": "Communicator", 
+				"ProductGUID": 2500029, 
+				"ProductName": "Communicator", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\holograph_factory_ecos\\holograph_factory_ecos.ifo", 
+				"BuildBlocker": [
+						5, 
+						4
+				], 
+				"Eng1": "Beamer plant", 
+				"GUID": 10187, 
+				"IconFileName": "icon_27_143.png", 
+				"InfluenceRadius": 20, 
+				"Name": "holograph_factory", 
+				"ProductEng1": "3D Projector", 
+				"ProductGUID": 2500030, 
+				"ProductName": "Holographer", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\corn_farm_ecos\\corn_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Corn farm", 
+				"GUID": 10188, 
+				"IconFileName": "icon_27_144.png", 
+				"InfluenceRadius": 9, 
+				"Name": "corn_farm", 
+				"ProductEng1": "Corn", 
+				"ProductGUID": 2500058, 
+				"ProductName": "Corn", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\biopolymer_factory_ecos\\biopolymer_factory_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Biopolymer factory", 
+				"GUID": 10190, 
+				"IconFileName": "icon_27_145.png", 
+				"InfluenceRadius": 20, 
+				"Name": "biopolymer_factory", 
+				"ProductEng1": "Biopolymers", 
+				"ProductGUID": 2500059, 
+				"ProductName": "Biopolymer", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\robot_factory_ecos\\robot_factory_ecos.ifo", 
+				"BuildBlocker": [
+						6, 
+						4
+				], 
+				"Eng1": "Robot factory", 
+				"GUID": 10191, 
+				"IconFileName": "icon_27_146.png", 
+				"InfluenceRadius": 20, 
+				"Name": "robot_factory", 
+				"ProductEng1": "Service bots", 
+				"ProductGUID": 2500031, 
+				"ProductName": "HomeRobot", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\tree_farm_ecos\\tree_farm_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Tree nursery", 
+				"GUID": 10027, 
+				"IconFileName": "icon_27_10.png", 
+				"Name": "treefarm", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\saw_mill_others\\saw_mill_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Sawmill", 
+				"GUID": 10037, 
+				"IconFileName": "icon_27_1.png", 
+				"InfluenceRadius": 6, 
+				"Name": "saw_mill", 
+				"ProductEng1": "Wood", 
+				"ProductGUID": 2500000, 
+				"ProductName": "Wood", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\glassworks_ecos\\glassworks_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Glassworks", 
+				"GUID": 10114, 
+				"IconFileName": "icon_27_90.png", 
+				"InfluenceRadius": 20, 
+				"Name": "glassworks", 
+				"ProductEng1": "Glass", 
+				"ProductGUID": 2500015, 
+				"ProductName": "Glass", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\debris_recycler_ecos\\debris_recycler_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Basalt\u00a0extraction", 
+				"GUID": 10102, 
+				"IconFileName": "icon_27_213.png", 
+				"Name": "rubble_recycler", 
+				"ProductEng1": "Granules", 
+				"ProductGUID": 2500066, 
+				"ProductName": "Granulate", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\windpark_ecos\\windpark_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Wind park", 
+				"GUID": 10029, 
+				"IconFileName": "icon_27_84.png", 
+				"InfluenceRadius": 21, 
+				"Name": "wind_park", 
+				"Template": "LinkedObjectProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\offshore_windpark_ecos\\offshore_windpark_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Offshore wind park", 
+				"GUID": 10082, 
+				"IconFileName": "icon_27_53.png", 
+				"InfluenceRadius": 10, 
+				"Name": "offshore_wind_park", 
+				"Template": "LinkedObjectProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\cogeneration_power_station_ecos\\cogeneration_power_station_ecos.ifo", 
+				"BuildBlocker": [
+						4, 
+						6
+				], 
+				"Eng1": "Thermal power station", 
+				"GUID": 10173, 
+				"IconFileName": "icon_27_75.png", 
+				"InfluenceRadius": 10, 
+				"Name": "cogeneration_power_station", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\solar_tower_ecos\\solar_tower_ecos.ifo", 
+				"BuildBlocker": [
+						5, 
+						5
+				], 
+				"Eng1": "Solar tower generator", 
+				"GUID": 10070, 
+				"IconFileName": "icon_27_49.png", 
+				"InfluenceRadius": 14, 
+				"Name": "solar_tower", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\production\\solar_tower_field_ecos\\solar_tower_field_ecos.ifo", 
+				"BuildBlocker": [
+						8, 
+						8
+				], 
+				"Eng1": "Solar mirrors", 
+				"GUID": 10071, 
+				"IconFileName": "icon_27_49.png", 
+				"Name": "solar_tower_field", 
+				"Template": "FarmfieldLinkedObject"
+		}, 
+		{
+				".ifo": "ecos\\special\\monitoring_station_ecos\\monitoring_station_ecos.ifo", 
+				"Eng1": "Monitoring station", 
+				"GUID": 10192, 
+				"IconFileName": "icon_27_150.png", 
+				"InfluenceRadius": 0, 
+				"Name": "monitoring_station", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\weather_control_base_ecos\\weather_control_base_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Weather control station", 
+				"GUID": 10193, 
+				"IconFileName": "icon_27_151.png", 
+				"InfluenceRadius": 30, 
+				"Name": "weather_control_base", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\river_filter_plant_ecos\\river_filter_plant_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						7
+				], 
+				"Eng1": "River sewage treatment plant", 
+				"GUID": 10123, 
+				"IconFileName": "icon_27_116.png", 
+				"InfluenceRadius": 0, 
+				"Name": "river_filter_plant", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\ozone_maker_building_ecos\\ozone_maker_building_ecos.ifo", 
+				"BuildBlocker": [
+						7, 
+						4
+				], 
+				"Eng1": "Ozone Maker station", 
+				"GUID": 10061, 
+				"IconFileName": "icon_27_45.png", 
+				"InfluenceRadius": 12, 
+				"Name": "ozone_maker_base", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\shield_generator_ecos\\shield_generator_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Shield generator", 
+				"GUID": 10089, 
+				"IconFileName": "icon_27_88.png", 
+				"InfluenceRadius": 20, 
+				"Name": "mobile_shield_generator", 
+				"Template": "MobilePropagandaBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\shipyard_ecos\\shipyard_ecos.ifo", 
+				"BuildBlocker": [
+						5, 
+						6
+				], 
+				"Eng1": "Shipyard", 
+				"GUID": 10094, 
+				"IconFileName": "icon_27_60.png", 
+				"Name": "shipyard_ecos", 
+				"Template": "TaskBasedProductionBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\ark_base_ecos\\ark_base_ecos.ifo", 
+				"BuildBlocker": [
+						35, 
+						35
+				], 
+				"Eng1": "Biosphere", 
+				"GUID": 10095, 
+				"IconFileName": "icon_27_36.png", 
+				"Name": "ark_ecos", 
+				"Template": "Ark"
+		}, 
+		{
+				".ifo": "ecos\\special\\anti_aircraft_site_ecos\\anti_aircraft_site_ecos.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Flak", 
+				"GUID": 10099, 
+				"IconFileName": "icon_27_115.png", 
+				"Name": "anti_aircraft_site", 
+				"Template": "MobileMilitaryTurret"
+		}, 
+		{
+				".ifo": "techs\\residence\\scientist_residence_techs_01\\scientist_residence_techs_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Assitants' domicile", 
+				"GUID": 10088, 
+				"IconFileName": "icon_27_73.png", 
+				"Name": "techs_scientist_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "techs\\residence\\genius_residence_techs_01\\genius_residence_techs_01.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Researchers' apartment", 
+				"GUID": 10209, 
+				"IconFileName": "icon_27_73.png", 
+				"Name": "techs_genius_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "techs\\residence\\destroyed_residences_techs\\scientist_residence_01_destroyed_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Residence ruins", 
+				"GUID": 10223, 
+				"IconFileName": "icon_27_73.png", 
+				"Name": "techs_ruin_residence", 
+				"Template": "ResidenceBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\laboratory_techs\\tech_laboratory.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Laboratory", 
+				"GUID": 10077, 
+				"IconFileName": "icon_27_50.png", 
+				"InfluenceRadius": 14, 
+				"Name": "techs_laboratory", 
+				"Template": "AcademyBuilding"
+		}, 
+		{
+				".ifo": "techs\\public\\town_center_techs\\town_center_techs.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "City Center", 
+				"GUID": 10256, 
+				"IconFileName": "icon_27_218.png", 
+				"InfluenceRadius": 22, 
+				"Name": "town_center_techs", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\broadcasting_station_techs\\broadcasting_station_techs.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "Information center", 
+				"GUID": 10126, 
+				"IconFileName": "icon_27_175.png", 
+				"InfluenceRadius": 26, 
+				"Name": "broadcasting_station", 
+				"Template": "PropagandaBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\algae_farm_techs\\algae_farm_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Aquafarm", 
+				"GUID": 10031, 
+				"IconFileName": "icon_27_32.png", 
+				"InfluenceRadius": 7, 
+				"Name": "algae_farm", 
+				"ProductEng1": "Algae", 
+				"ProductGUID": 2500013, 
+				"ProductName": "Algae", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\functional_food_factory_techs\\functional_food_factory_techs.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Functional food factory", 
+				"GUID": 10194, 
+				"IconFileName": "icon_27_172.png", 
+				"InfluenceRadius": 15, 
+				"Name": "functional_food_factory", 
+				"ProductEng1": "Functional food", 
+				"ProductGUID": 2500022, 
+				"ProductName": "FunctionalFood", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\coffee_plantation_techs\\coffee_plantation_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Coffee plantation", 
+				"GUID": 10195, 
+				"IconFileName": "icon_27_173.png", 
+				"Name": "coffee_plantation", 
+				"ProductEng1": "Caffeine", 
+				"ProductGUID": 2500060, 
+				"ProductName": "Caffeine", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\energy_drink_factory_techs\\energy_drink_factory_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						5
+				], 
+				"Eng1": "Energy drink factory", 
+				"GUID": 10197, 
+				"IconFileName": "icon_27_174.png", 
+				"InfluenceRadius": 20, 
+				"Name": "energy_drink_factory", 
+				"ProductEng1": "Functional drinks", 
+				"ProductGUID": 2500025, 
+				"ProductName": "EnergyDrink", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\fuel_factory_techs\\techs_fuel_factory.ifo", 
+				"BuildBlocker": [
+						5, 
+						4
+				], 
+				"Eng1": "Fuel factory", 
+				"GUID": 10086, 
+				"IconFileName": "icon_27_48.png", 
+				"InfluenceRadius": 20, 
+				"Name": "fuel_factory", 
+				"ProductEng1": "Kerosene", 
+				"ProductGUID": 2500061, 
+				"ProductName": "Kerosene", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\advanced_arsenal_techs\\advanced_arsenal_techs.ifo", 
+				"BuildBlocker": [
+						5, 
+						4
+				], 
+				"Eng1": "High-tech weapons factory", 
+				"GUID": 10100, 
+				"IconFileName": "icon_27_55.png", 
+				"InfluenceRadius": 20, 
+				"Name": "advanced_arsenal", 
+				"ProductEng1": "High-tech weapons", 
+				"ProductGUID": 2500064, 
+				"ProductName": "AdvancedWeapons", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\debris_extractor_techs\\debris_extractor_techs.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Underwater Recycling Station", 
+				"GUID": 10108, 
+				"IconFileName": "icon_27_212.png", 
+				"InfluenceRadius": 0, 
+				"Name": "recycling_station", 
+				"ProductEng1": "Building modules", 
+				"ProductGUID": 2500014, 
+				"ProductName": "BuildingModules", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\carbon_factory_techs\\carbon_factory_techs.ifo", 
+				"BuildBlocker": [
+						4, 
+						5
+				], 
+				"Eng1": "Carbon factory", 
+				"GUID": 10112, 
+				"IconFileName": "icon_27_74.png", 
+				"InfluenceRadius": 20, 
+				"Name": "carbon_factory", 
+				"ProductEng1": "Carbon", 
+				"ProductGUID": 2500017, 
+				"ProductName": "Carbon", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\sea_current_turbine_techs\\sea_current_turbine_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Marine current power plant", 
+				"GUID": 10010, 
+				"IconFileName": "icon_27_86.png", 
+				"InfluenceRadius": 0, 
+				"Name": "sea_current_turbine", 
+				"Template": "LinkedObjectProductionBuilding"
+		}, 
+		{
+				".ifo": "techs\\production\\hydroelectric_powerplant_techs\\dam_center.ifo", 
+				"Eng1": "Hydroelectric power plant", 
+				"GUID": 10087, 
+				"IconFileName": "icon_27_63.png", 
+				"InfluenceRadius": 0, 
+				"Name": "hydroelectric_powerplant", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\academy_techs\\academy_techs.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "Academy", 
+				"GUID": 10078, 
+				"IconFileName": "icon_27_51.png", 
+				"InfluenceRadius": 20, 
+				"Name": "techs_academy", 
+				"Template": "AcademyBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\submarine_base_techs\\submarine_base_techs.ifo", 
+				"BuildBlocker": [
+						4, 
+						8
+				], 
+				"Eng1": "Submarine base", 
+				"GUID": 10079, 
+				"IconFileName": "icon_27_61.png", 
+				"Name": "techs_submarine_base", 
+				"Template": "TaskBasedProductionBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\ark_techs\\ark_techs.ifo", 
+				"BuildBlocker": [
+						35, 
+						35
+				], 
+				"Eng1": "Vortex", 
+				"GUID": 10122, 
+				"IconFileName": "icon_27_36.png", 
+				"Name": "ark_techs", 
+				"Template": "Ark"
+		}, 
+		{
+				".ifo": "techs\\special\\ark_father_techs\\ark_father_techs.ifo", 
+				"BuildBlocker": [
+						36, 
+						36
+				], 
+				"Eng1": "F.A.T.H.E.R. 1.0", 
+				"GUID": 10264, 
+				"Name": "ark_father_techs", 
+				"Template": "Ark"
+		}, 
+		{
+				".ifo": "techs\\special\\underwater_defence_battery_techs\\underwater_defence_battery_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Offshore defense", 
+				"GUID": 10125, 
+				"IconFileName": "icon_27_177.png", 
+				"InfluenceRadius": 0, 
+				"Name": "underwater_defence_battery", 
+				"Template": "MilitaryBuilding"
+		}, 
+		{
+				".ifo": "techs\\special\\airport_techs\\airport_techs.ifo", 
+				"BuildBlocker": [
+						14, 
+						6
+				], 
+				"Eng1": "Airport", 
+				"GUID": 10127, 
+				"IconFileName": "icon_27_178.png", 
+				"Name": "airport", 
+				"Template": "AirportBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\fishery_others\\fishery_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						2
+				], 
+				"Eng1": "Fishery", 
+				"GUID": 10045, 
+				"IconFileName": "icon_27_5.png", 
+				"InfluenceRadius": 0, 
+				"Name": "fishery", 
+				"ProductEng1": "Fish", 
+				"ProductGUID": 2500004, 
+				"ProductName": "Fish", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\sugar_beet_plantation_others\\sugar_beet_plantation_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Sugar beet plantation", 
+				"GUID": 10198, 
+				"IconFileName": "icon_27_182.png", 
+				"InfluenceRadius": 7, 
+				"Name": "sugar_beet_plantation", 
+				"ProductEng1": "Sugar", 
+				"ProductGUID": 2500038, 
+				"ProductName": "Sugar", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\iron_mine_others\\iron_mine_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Iron ore mine", 
+				"GUID": 10054, 
+				"IconFileName": "icon_27_18.png", 
+				"InfluenceRadius": 0, 
+				"Name": "iron_mine", 
+				"ProductEng1": "Iron Ore", 
+				"ProductGUID": 2500008, 
+				"ProductName": "IronOre", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\iron_smeltery_others\\iron_smeltery_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Iron smelter", 
+				"GUID": 10055, 
+				"IconFileName": "icon_27_30.png", 
+				"InfluenceRadius": 20, 
+				"Name": "iron_smeltery", 
+				"ProductEng1": "Iron", 
+				"ProductGUID": 2500009, 
+				"ProductName": "Iron", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\tool_factory_others\\tool_factory_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Tools workshop", 
+				"GUID": 10056, 
+				"IconFileName": "icon_27_2.png", 
+				"InfluenceRadius": 20, 
+				"Name": "tool_factory", 
+				"ProductEng1": "Tools", 
+				"ProductGUID": 2500001, 
+				"ProductName": "Tools", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\coal_mine_others\\coal_mine_others.ifo", 
+				"Eng1": "Coal mine", 
+				"GUID": 10098, 
+				"IconFileName": "icon_27_6.png", 
+				"InfluenceRadius": 0, 
+				"Name": "coal_mine", 
+				"ProductEng1": "Coal", 
+				"ProductGUID": 2500005, 
+				"ProductName": "Coal", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\copper_mine_others\\copper_mine_others.ifo", 
+				"Eng1": "Copper mine", 
+				"GUID": 10200, 
+				"IconFileName": "icon_27_183.png", 
+				"InfluenceRadius": 0, 
+				"Name": "copper_mine", 
+				"ProductEng1": "Copper", 
+				"ProductGUID": 2500032, 
+				"ProductName": "Copper", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\uranium_mine_others\\uranium_mine_others.ifo", 
+				"Eng1": "Uranium mine", 
+				"GUID": 10052, 
+				"IconFileName": "icon_27_23.png", 
+				"InfluenceRadius": 0, 
+				"Name": "uranium_mine", 
+				"ProductEng1": "Uranium", 
+				"ProductGUID": 2500011, 
+				"ProductName": "Uranium", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\sand_extractor_others\\sand_extractor_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						7
+				], 
+				"Eng1": "Sand extractor", 
+				"GUID": 10080, 
+				"IconFileName": "icon_27_64.png", 
+				"InfluenceRadius": 0, 
+				"Name": "sand_extractor", 
+				"ProductEng1": "Sand", 
+				"ProductGUID": 2500034, 
+				"ProductName": "Sand", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\limestone_quarry_others\\limestone_quarry_others.ifo", 
+				"BuildBlocker": [
+						2, 
+						2
+				], 
+				"Eng1": "Limestone quarry", 
+				"GUID": 10083, 
+				"IconFileName": "icon_27_62.png", 
+				"InfluenceRadius": 0, 
+				"Name": "limestone_quarry", 
+				"ProductEng1": "Limestone", 
+				"ProductGUID": 2500033, 
+				"ProductName": "Limestone", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\chip_factory_others\\chip_factory_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Chip factory", 
+				"GUID": 10201, 
+				"IconFileName": "icon_27_184.png", 
+				"InfluenceRadius": 20, 
+				"Name": "chip_factory", 
+				"ProductEng1": "Microchips", 
+				"ProductGUID": 2500037, 
+				"ProductName": "Microchips", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\arsenal_others\\arsenal_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Munitions factory", 
+				"GUID": 10120, 
+				"IconFileName": "icon_27_54.png", 
+				"InfluenceRadius": 20, 
+				"Name": "arsenal", 
+				"ProductEng1": "Weapons", 
+				"ProductGUID": 2500062, 
+				"ProductName": "Weapons", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\oil_rig_others\\oil_rig_others.ifo", 
+				"BuildBlocker": [
+						7, 
+						7
+				], 
+				"Eng1": "Oil rig", 
+				"GUID": 10075, 
+				"IconFileName": "icon_27_125.png", 
+				"InfluenceRadius": 0, 
+				"Name": "oilrig", 
+				"ProductEng1": "Crude oil", 
+				"ProductGUID": 2500035, 
+				"ProductName": "RawOil", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\oil_refinery_others\\oil_refinery_others.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "Oil refinery", 
+				"GUID": 10092, 
+				"IconFileName": "icon_27_52.png", 
+				"InfluenceRadius": 20, 
+				"Name": "oil_refinery", 
+				"ProductEng1": "Oil", 
+				"ProductGUID": 2500036, 
+				"ProductName": "Oil", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\manganese_miner_field_others\\manganese_miner_field_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						7
+				], 
+				"Eng1": "Manganese Excavation Robot", 
+				"GUID": 10220, 
+				"IconFileName": "icon_27_211.png", 
+				"InfluenceRadius": 0, 
+				"Name": "manganese_miner", 
+				"ProductEng1": "Manganese nodules", 
+				"ProductGUID": 2500065, 
+				"ProductName": "ManganeseNodules", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\manganese_harvesting_station_others\\manganese_harvesting_station_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Rare-earth borer", 
+				"GUID": 10202, 
+				"IconFileName": "icon_27_185.png", 
+				"InfluenceRadius": 15, 
+				"Name": "manganese_harvesting_station", 
+				"ProductEng1": "Rare-earth elements", 
+				"ProductGUID": 2500039, 
+				"ProductName": "RareEarths", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\diamond_harvesting_station_others\\diamond_harvesting_station_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Diamond harvesting station", 
+				"GUID": 10204, 
+				"IconFileName": "icon_27_187.png", 
+				"Name": "diamond_harvesting_station", 
+				"ProductEng1": "Diamonds", 
+				"ProductGUID": 2500041, 
+				"ProductName": "Diamonds", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\black_smoker_miner_others\\black_smoker_miner_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Metal converter", 
+				"GUID": 10239, 
+				"IconFileName": "icon_27_188.png", 
+				"InfluenceRadius": 0, 
+				"Name": "black_smoker_miner", 
+				"ProductEng1": "Gold nuggets", 
+				"ProductGUID": 2500048, 
+				"ProductName": "GoldNuggets", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\black_smoker_miner_others\\black_smoker_miner_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Gold Metal converter", 
+				"GUID": 10206, 
+				"IconFileName": "icon_27_188.png", 
+				"InfluenceRadius": 0, 
+				"Name": "black_smoker_miner_gold", 
+				"ProductEng1": "Gold nuggets", 
+				"ProductGUID": 2500048, 
+				"ProductName": "GoldNuggets", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\black_smoker_miner_others\\black_smoker_miner_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Copper Metal converter", 
+				"GUID": 10207, 
+				"IconFileName": "icon_27_188.png", 
+				"InfluenceRadius": 0, 
+				"Name": "black_smoker_miner_copper", 
+				"ProductEng1": "Copper", 
+				"ProductGUID": 2500032, 
+				"ProductName": "Copper", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\black_smoker_miner_others\\black_smoker_miner_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Uranium Metal converter", 
+				"GUID": 10208, 
+				"IconFileName": "icon_27_188.png", 
+				"InfluenceRadius": 0, 
+				"Name": "black_smoker_miner_uranium", 
+				"ProductEng1": "Uranium", 
+				"ProductGUID": 2500011, 
+				"ProductName": "Uranium", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\black_smoker_miner_others\\black_smoker_miner_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Iron Metal converter", 
+				"GUID": 10269, 
+				"IconFileName": "icon_27_188.png", 
+				"InfluenceRadius": 0, 
+				"Name": "black_smoker_miner_iron", 
+				"ProductEng1": "Iron Ore", 
+				"ProductGUID": 2500008, 
+				"ProductName": "IronOre", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "others\\production\\smelting_works_others\\smelting_works_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						3
+				], 
+				"Eng1": "Smelter", 
+				"GUID": 10262, 
+				"IconFileName": "icon_27_70.png", 
+				"InfluenceRadius": 20, 
+				"Name": "smelting_works", 
+				"ProductEng1": "Building modules", 
+				"ProductGUID": 2500014, 
+				"ProductName": "BuildingModules", 
+				"Template": "FactoryBuilding"
+		}, 
+		{
+				".ifo": "others\\public\\warehouse_others_01\\warehouse_others_01.ifo", 
+				"BuildBlocker": [
+						6, 
+						2
+				], 
+				"Eng1": "Warehouse", 
+				"GUID": 10035, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 28, 
+				"Name": "warehouse", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\warehouse_others_02\\warehouse_others_02.ifo", 
+				"BuildBlocker": [
+						6, 
+						2
+				], 
+				"Eng1": "Warehouse", 
+				"GUID": 10063, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 28, 
+				"Name": "warehouse2", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\warehouse_others_03\\warehouse_others_03.ifo", 
+				"BuildBlocker": [
+						6, 
+						2
+				], 
+				"Eng1": "Warehouse", 
+				"GUID": 10064, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 28, 
+				"Name": "warehouse3", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\markethouse_01_others\\markethouse_01_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Depot", 
+				"GUID": 10001, 
+				"IconFileName": "icon_27_11.png", 
+				"InfluenceRadius": 20, 
+				"Name": "markethouse", 
+				"Template": "Markethouse"
+		}, 
+		{
+				".ifo": "others\\public\\markethouse_02_others\\markethouse_02_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Depot", 
+				"GUID": 10065, 
+				"IconFileName": "icon_27_11.png", 
+				"InfluenceRadius": 20, 
+				"Name": "markethouse2", 
+				"Template": "Markethouse"
+		}, 
+		{
+				".ifo": "others\\public\\markethouse_03_others\\markethouse_others_03.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Depot", 
+				"GUID": 10066, 
+				"IconFileName": "icon_27_11.png", 
+				"InfluenceRadius": 20, 
+				"Name": "markethouse3", 
+				"Template": "Markethouse"
+		}, 
+		{
+				".ifo": "others\\public\\underwater_warehouse_others_01\\underwater_warehouse_others_01.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Deep sea warehouse", 
+				"GUID": 10033, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 15, 
+				"Name": "underwater warehouse", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\underwater_warehouse_others_02\\underwater_warehouse_others_02.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Deep sea warehouse", 
+				"GUID": 10067, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 15, 
+				"Name": "underwater warehouse2", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\underwater_warehouse_others_03\\underwater_warehouse_others_03.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Deep sea warehouse", 
+				"GUID": 10237, 
+				"IconFileName": "icon_27_26.png", 
+				"InfluenceRadius": 15, 
+				"Name": "underwater warehouse3", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\public\\underwater_markethouse_01_others\\underwater_markethouse_01_others.ifo", 
+				"BuildBlocker": [
+						6, 
+						6
+				], 
+				"Eng1": "Underwater warehouse", 
+				"GUID": 10238, 
+				"IconFileName": "icon_27_25.png", 
+				"InfluenceRadius": 15, 
+				"Name": "underwater markethouse", 
+				"Template": "WarehouseWithGuns"
+		}, 
+		{
+				".ifo": "others\\special\\ark_others\\ark_others.ifo", 
+				"BuildBlocker": [
+						35, 
+						35
+				], 
+				"Eng1": "Standard model", 
+				"GUID": 10034, 
+				"IconFileName": "icon_27_36.png", 
+				"Name": "ark", 
+				"Template": "Ark"
+		}, 
+		{
+				".ifo": "others\\special\\hospital_others\\hospital_others.ifo", 
+				"BuildBlocker": [
+						6, 
+						4
+				], 
+				"Eng1": "Hospital", 
+				"GUID": 10128, 
+				"IconFileName": "icon_27_114.png", 
+				"InfluenceRadius": 22, 
+				"Name": "hospital", 
+				"Template": "SupportBuilding"
+		}, 
+		{
+				".ifo": "others\\special\\police_station_others\\police_station_others.ifo", 
+				"BuildBlocker": [
+						5, 
+						5
+				], 
+				"Eng1": "Police station", 
+				"GUID": 10129, 
+				"IconFileName": "icon_27_113.png", 
+				"InfluenceRadius": 22, 
+				"Name": "police_station", 
+				"Template": "SupportBuilding"
+		}, 
+		{
+				".ifo": "others\\special\\fire_station_others\\fire_station_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						6
+				], 
+				"Eng1": "Fire station", 
+				"GUID": 10130, 
+				"IconFileName": "icon_27_112.png", 
+				"InfluenceRadius": 22, 
+				"Name": "fire_station", 
+				"Template": "SupportBuilding"
+		}, 
+		{
+				".ifo": "others\\special\\port_authority_others\\port_authority_others.ifo", 
+				"BuildBlocker": [
+						4, 
+						6
+				], 
+				"Eng1": "Port authority", 
+				"GUID": 10110, 
+				"IconFileName": "icon_27_92.png", 
+				"InfluenceRadius": 28, 
+				"Name": "port_authority", 
+				"Template": "Warehouse"
+		}, 
+		{
+				".ifo": "others\\special\\harboursystem_others\\harboursystem_others_ground.ifo", 
+				"BuildBlocker": [
+						1, 
+						1
+				], 
+				"Eng1": "Quay wall", 
+				"GUID": 10044, 
+				"IconFileName": "icon_27_46.png", 
+				"Name": "harboursystem", 
+				"Template": "Harbour"
+		}, 
+		{
+				".ifo": "others\\special\\harboursystem_others\\harboursystem_others_large_lift.ifo", 
+				"BuildBlocker": [
+						4, 
+						0
+				], 
+				"Eng1": "Harbour Props", 
+				"GUID": 10074, 
+				"Name": "harbourprops", 
+				"Template": "SimpleBlocking"
+		}, 
+		{
+				".ifo": "ecos\\props\\depot01_ecos\\depot01_ecos.ifo", 
+				"Eng1": "overharbour_props", 
+				"GUID": 300010, 
+				"Name": "overharbour_props", 
+				"Template": "SimpleObject"
+		}, 
+		{
+				".ifo": "others\\special\\harbour_defence_turret_others\\harbour_defence_turret_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Harbor defense turret", 
+				"GUID": 10101, 
+				"IconFileName": "icon_27_69.png", 
+				"Name": "harbour_defence_turret", 
+				"Template": "MobileMilitaryTurret"
+		}, 
+		{
+				".ifo": "techs\\special\\advanced_defence_turret_techs\\advanced_defence_turret_techs.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Mobile Harbor defenses", 
+				"GUID": 10124, 
+				"IconFileName": "icon_27_176.png", 
+				"Name": "advanced_defence_turret", 
+				"Template": "MobileMilitaryTurret"
+		}, 
+		{
+				".ifo": "others\\special\\container_harbour_others\\container_harbour_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						5
+				], 
+				"Eng1": "Clearance terminal", 
+				"GUID": 10109, 
+				"IconFileName": "icon_27_179.png", 
+				"InfluenceRadius": 0, 
+				"Name": "container_harbour", 
+				"Template": "Warehouse"
+		}, 
+		{
+				".ifo": "others\\special\\harbour_depot_others\\harbour_depot_others.ifo", 
+				"BuildBlocker": [
+						3, 
+						4
+				], 
+				"Eng1": "Harbor depot", 
+				"GUID": 10131, 
+				"IconFileName": "icon_27_180.png", 
+				"InfluenceRadius": 0, 
+				"Name": "harbour_depot", 
+				"Template": "WarehouseWithoutTrading"
+		}, 
+		{
+				".ifo": "others\\special\\repair_dock_others\\repair_dock_others_base.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "Repair dock", 
+				"GUID": 10132, 
+				"IconFileName": "icon_27_181.png", 
+				"InfluenceRadius": 25, 
+				"Name": "repair_dock", 
+				"Template": "RepairHarbourBuilding"
+		}, 
+		{
+				".ifo": "third party\\aquanauts\\headquarter_aquanauts\\headquarter_aquanauts.ifo", 
+				"BuildBlocker": [
+						12, 
+						6
+				], 
+				"Eng1": "Deep sea laboratory", 
+				"GUID": 10018, 
+				"Name": "headquarter_aquanauts", 
+				"Template": "ThirdPartyWarehouse"
+		}, 
+		{
+				".ifo": "third party\\aquanauts\\geothermical_powerplant_aquanauts\\geothermical_powerplant_aquanauts.ifo", 
+				"BuildBlocker": [
+						3, 
+						3
+				], 
+				"Eng1": "aquanaut_props", 
+				"GUID": 10146, 
+				"IconFileName": "icon_27_200.png", 
+				"Name": "aquanaut_props", 
+				"Template": "SimpleBlocking"
+		}, 
+		{
+				".ifo": "ecos\\special\\monitoring_station_ecos\\monitoring_station_ecos.ifo", 
+				"Eng1": "Monitoring station", 
+				"GUID": 10111, 
+				"IconFileName": "icon_27_40.png", 
+				"InfluenceRadius": 5, 
+				"Name": "mine_green_offensive", 
+				"Template": "FarmBuilding"
+		}, 
+		{
+				".ifo": "ecos\\special\\ozone_maker_building_ecos\\ozone_maker_building_ecos.ifo", 
+				"BuildBlocker": [
+						7, 
+						4
+				], 
+				"Eng1": "Ozone Generator Station", 
+				"GUID": 10205, 
+				"IconFileName": "icon_27_40.png", 
+				"InfluenceRadius": 30, 
+				"Name": "ozone_maker_green_offensive", 
+				"Template": "SimpleProductionBuilding"
+		}, 
+		{
+				".ifo": "third party\\oil baron\\giant_pumping_station_oil_baron\\giant_pumping_station_oil_baron.ifo", 
+				"BuildBlocker": [
+						5, 
+						2
+				], 
+				"Eng1": "Sokow Transnational pumping station", 
+				"GUID": 10062, 
+				"IconFileName": "icon_27_91.png", 
+				"Name": "giant_pumping_station_oil_baron", 
+				"Template": "SimpleBuilding"
+		}, 
+		{
+				".ifo": "third party\\oil baron\\headquarter_oil_baron\\headquarter_oil_baron.ifo", 
+				"BuildBlocker": [
+						7, 
+						8
+				], 
+				"Eng1": "Sokow Transnational branch office", 
+				"GUID": 10115, 
+				"IconFileName": "icon_27_91.png", 
+				"InfluenceRadius": 25, 
+				"Name": "headquarter_oil_baron", 
+				"Template": "Warehouse"
+		}, 
+		{
+				".ifo": "tycoons\\special\\shipyard_tycoons\\shipyard_tycoons.ifo", 
+				"BuildBlocker": [
+						6, 
+						8
+				], 
+				"Eng1": "Shipyard", 
+				"GUID": 10135, 
+				"IconFileName": "icon_27_110.png", 
+				"Name": "shipyard_tycoons_AI", 
+				"Template": "TaskBasedProductionBuilding"
+		}, 
+		{
+				".ifo": "third party\\oil baron\\props\\chimney_01_prop_oil_baron.ifo", 
+				"Eng1": "oil_baron_props", 
+				"GUID": 10251, 
+				"Name": "oil_baron_props", 
+				"Template": "SimpleBlocking"
+		}, 
+		{
+				".ifo": "third party\\pirates\\harbor_pirates\\harbor_pirates.ifo", 
+				"BuildBlocker": [
+						20, 
+						20
+				], 
+				"Eng1": "Pirate harbor", 
+				"GUID": 10133, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "harbour_pirates", 
+				"Template": "ThirdPartyWarehouse"
+		}, 
+		{
+				".ifo": "third party\\pirates\\cannon_pirates_01\\cannon_pirates_01.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Decrepit Pirate Cannons", 
+				"GUID": 10134, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "cannon_pirates", 
+				"Template": "ThirdpartyMilitaryBuilding"
+		}, 
+		{
+				".ifo": "third party\\pirates\\cannon_pirates_02\\cannon_pirates_02.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "[GUIDNAME 10134]", 
+				"GUID": 10250, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "cannon2_pirates", 
+				"Template": "ThirdpartyMilitaryBuilding"
+		}, 
+		{
+				".ifo": "third party\\pirates\\stair_to_crane_pirates\\stair_to_crane_pirates.ifo", 
+				"Eng1": "pirates_props", 
+				"GUID": 10252, 
+				"Name": "pirates_props", 
+				"Template": "SimpleObject"
+		}, 
+		{
+				".ifo": "third party\\pirates\\buoy_pirates\\buoy_pirates.ifo", 
+				"Eng1": "pirates_flotsam_props", 
+				"GUID": 10253, 
+				"Name": "pirates_flotsam_props", 
+				"Template": "SimpleObject"
+		}, 
+		{
+				".ifo": "third party\\pirates\\harbor_pirates\\harbor_pirates_destroyed.ifo", 
+				"BuildBlocker": [
+						20, 
+						20
+				], 
+				"Eng1": "Destroyed Pirate Base", 
+				"GUID": 10258, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "harbour_pirates_destroyed", 
+				"Template": "ThirdPartyWarehouse"
+		}, 
+		{
+				".ifo": "third party\\pirates\\cannon_pirates_01\\cannon_pirates_destroyed_01.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Destroyed Pirate Cannon", 
+				"GUID": 10259, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "cannon_pirates_destroyed", 
+				"Template": "ThirdpartyMilitaryBuilding"
+		}, 
+		{
+				".ifo": "third party\\pirates\\cannon_pirates_02\\cannon_pirates_destroyed_02.ifo", 
+				"BuildBlocker": [
+						4, 
+						4
+				], 
+				"Eng1": "Destroyed Pirate Cannon", 
+				"GUID": 10260, 
+				"IconFileName": "icon_27_199.png", 
+				"Name": "cannon2_pirates_destroyed", 
+				"Template": "ThirdpartyMilitaryBuilding"
+		}, 
+		{
+				"Eng1": "[GUIDNAME 10077]", 
+				"GUID": 10240, 
+				"IconFileName": "icon_27_230.png", 
+				"Name": "scientist_academy"
+		}, 
+		{
+				".ifo": "third party\\supporters\\town_center_ecos\\town_center_ecos_supporters.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "City Center", 
+				"GUID": 10040, 
+				"IconFileName": "icon_27_229.png", 
+				"InfluenceRadius": 20, 
+				"Name": "town_center_supporter", 
+				"Template": "PublicBuilding"
+		}, 
+		{
+				".ifo": "third party\\rival\\rival_town_center\\rival_town_center.ifo", 
+				"BuildBlocker": [
+						6, 
+						5
+				], 
+				"Eng1": "[GUIDNAME 10040]", 
+				"GUID": 10263, 
+				"IconFileName": "icon_27_223.png", 
+				"InfluenceRadius": 20, 
+				"Name": "town_center_rival", 
+				"Template": "PublicBuilding"
+		}
+]
