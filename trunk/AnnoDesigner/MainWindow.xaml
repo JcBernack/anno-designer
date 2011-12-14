@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="210" />
         </Grid.ColumnDefinitions>
         <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="True" RenderLabel="True" />
         <Menu Height="23" Name="menu1" VerticalAlignment="Top" Grid.ColumnSpan="2">
@@ -75,7 +75,7 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Building presets" IsEnabled="True" Name="groupBox2" DockPanel.Dock="Top">
-                <ListView HorizontalAlignment="Stretch" Margin="0" Name="listViewPresets" VerticalAlignment="Stretch" IsEnabled="True" MouseDoubleClick="ListViewPresetsMouseDoubleClick">
+                <ListView HorizontalAlignment="Stretch" Margin="0" Name="listViewPresets" VerticalAlignment="Stretch" IsEnabled="True" MouseDoubleClick="ListViewPresetsMouseDoubleClick" KeyDown="ListViewPresetsKeyDown">
                     <ListViewItem Content="Not loaded" />
                 </ListView>
             </GroupBox>

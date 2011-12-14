@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Windows.Controls;
 using MessageBox = Microsoft.Windows.Controls.MessageBox;
@@ -143,6 +144,20 @@ namespace AnnoDesigner
             }
         }
 
+        private void ApplyPreset()
+        {
+            try
+            {
+                var obj = _presets.Find(_ => _.GetDisplayValue() == (string)listViewPresets.SelectedItem).ToAnnoObject();
+                obj.Color = colorPicker.SelectedColor;
+                ChangeCurrentObject(obj);
+                ApplyCurrentObject();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         private void ShowStatusMessage(string message)
         {
             StatusBarItemStatus.Content = message;
@@ -205,10 +220,15 @@ namespace AnnoDesigner
         
         private void ListViewPresetsMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var obj = _presets.Find(_ => _.GetDisplayValue() == (string) listViewPresets.SelectedItem).ToAnnoObject();
-            obj.Color = colorPicker.SelectedColor;
-            ChangeCurrentObject(obj);
-            ApplyCurrentObject();
+            ApplyPreset();
+        }
+
+        private void ListViewPresetsKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                ApplyPreset();
+            }
         }
 
         private void MenuItemResetZoomClick(object sender, RoutedEventArgs e)
