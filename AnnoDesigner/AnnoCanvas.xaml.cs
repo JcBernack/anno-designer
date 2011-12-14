@@ -21,6 +21,8 @@ namespace AnnoDesigner
     {
         #region Properties
 
+        private const int GridStepMin = 8;
+        private const int GridStepMax = 100;
         private int _gridStep = 20;
         public int GridSize
         {
@@ -30,11 +32,16 @@ namespace AnnoDesigner
             }
             set
             {
-                if (_gridStep != value)
+                var tmp = value;
+                if (tmp < GridStepMin)
+                    tmp = GridStepMin;
+                if (tmp > GridStepMax)
+                    tmp = GridStepMax;
+                if (_gridStep != tmp)
                 {
                     InvalidateVisual();
                 }
-                _gridStep = value;
+                _gridStep = tmp;
             }
         }
 
@@ -103,6 +110,8 @@ namespace AnnoDesigner
 
         #endregion
 
+        #region Privates and constructor
+
         private enum MouseMode
         {
             // used if not dragging
@@ -137,7 +146,7 @@ namespace AnnoDesigner
         private Rect _selectionRect;
         
         private List<AnnoObject> _placedObjects;
-        private readonly List<AnnoObject> _selectedObjects; 
+        private readonly List<AnnoObject> _selectedObjects;
         private AnnoObject _currentObject;
 
         private readonly Pen _linePen;
@@ -165,6 +174,8 @@ namespace AnnoDesigner
             _influencedBrush = new SolidColorBrush(color);
             Focusable = true;
         }
+
+        #endregion
 
         #region Rendering
 
@@ -484,6 +495,11 @@ namespace AnnoDesigner
         {
             _mouseWithinControl = false;
             InvalidateVisual();
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            GridSize += e.Delta / 100;
         }
 
         private void HandleMouse(MouseEventArgs e)
