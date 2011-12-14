@@ -833,6 +833,10 @@ namespace AnnoDesigner
 
         public void Normalize(int border)
         {
+            if (_placedObjects.Count == 0)
+            {
+                return;
+            }
             var dx = _placedObjects.Min(_ => _.Position.X) - border;
             var dy = _placedObjects.Min(_ => _.Position.Y) - border;
             _placedObjects.ForEach(_ => _.Position.X -= dx);
@@ -887,7 +891,7 @@ namespace AnnoDesigner
             }
         }
 
-        public void ExportImage()
+        public void ExportImage(bool exportZoom, bool exportSelection)
         {
             var dialog = new SaveFileDialog
             {
@@ -898,7 +902,7 @@ namespace AnnoDesigner
             {
                 try
                 {
-                    RenderToFile(dialog.FileName, 1);
+                    RenderToFile(dialog.FileName, 1, exportZoom, exportSelection);
                 }
                 catch (Exception)
                 {
@@ -907,24 +911,31 @@ namespace AnnoDesigner
             }
         }
 
-        public void RenderToFile(string filename, int border)
+        public void RenderToFile(string filename, int border, bool exportZoom, bool exportSelection)
         {
             //TODO: copy objects to output target before normalization
             Normalize(border);
-            // calculate correct size
-            var width = GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
-            var height = GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) +  border) + 1;
             // initialize output canvas
             var target = new AnnoCanvas
             {
-                Width = width,
-                Height = height,
                 _placedObjects = _placedObjects,
                 RenderGrid = RenderGrid,
                 RenderIcon = RenderIcon,
-                RenderLabel = RenderLabel,
-                GridSize = GridSize
+                RenderLabel = RenderLabel
             };
+            if (exportZoom)
+            {
+                target.GridSize = GridSize;
+            }
+            if (exportSelection)
+            {
+                target._selectedObjects.AddRange(_selectedObjects);
+            }
+            // calculate correct size
+            var width = target.GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
+            var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
+            target.Width = width;
+            target.Height = height;
             // render to file
             var outputSize = new Size(width, height);
             target.Measure(outputSize);
