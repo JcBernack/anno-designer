@@ -33,7 +33,7 @@ namespace AnnoDesigner
             _webClient = new WebClient();
             _webClient.DownloadStringCompleted += WebClientDownloadStringCompleted;
             // add event handlers
-            annoCanvas.OnCurrentObjectChange += ChangeCurrentObject;
+            annoCanvas.OnCurrentObjectChange += UpdateUIFromObject;
             annoCanvas.OnShowStatusMessage += ShowStatusMessage;
             // add color presets
             colorPicker.StandardColors.Clear();
@@ -109,7 +109,7 @@ namespace AnnoDesigner
 
         #region Anno canvas events
 
-        private void ChangeCurrentObject(AnnoObject obj)
+        private void UpdateUIFromObject(AnnoObject obj)
         {
             textBoxWidth.Text = obj.Size.Width.ToString();
             textBoxHeight.Text = obj.Size.Height.ToString();
@@ -117,6 +117,11 @@ namespace AnnoDesigner
             textBoxLabel.Text = obj.Label;
             comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => !string.IsNullOrEmpty(obj.Icon) && _.EndsWith(obj.Icon)) + 1;
             textBoxRadius.Text = obj.Radius.ToString();
+        }
+
+        private static bool IsChecked(CheckBox checkBox)
+        {
+            return checkBox.IsChecked ?? false;
         }
 
         private void ApplyCurrentObject()
@@ -128,9 +133,9 @@ namespace AnnoDesigner
                 {
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                     Color = colorPicker.SelectedColor,
-                    Label = textBoxLabel.Text,
-                    Icon = comboBoxIcon.SelectedIndex == 0 ? null : _icons[comboBoxIcon.SelectedIndex - 1],
-                    Radius = string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
+                    Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
+                    Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedIndex == 0 ? null : _icons[comboBoxIcon.SelectedIndex - 1],
+                    Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
                 };
                 // do some sanity checks
                 if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
@@ -150,7 +155,7 @@ namespace AnnoDesigner
             {
                 var obj = _presets.Find(_ => _.GetDisplayValue() == (string)listViewPresets.SelectedItem).ToAnnoObject();
                 obj.Color = colorPicker.SelectedColor;
-                ChangeCurrentObject(obj);
+                UpdateUIFromObject(obj);
                 ApplyCurrentObject();
             }
             catch (Exception)
@@ -218,12 +223,12 @@ namespace AnnoDesigner
             CheckForUpdates(true);
         }
         
-        private void ListViewPresetsMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ListViewPresetsMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ApplyPreset();
         }
 
-        private void ListViewPresetsKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ListViewPresetsKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
             {
