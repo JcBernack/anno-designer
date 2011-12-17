@@ -87,6 +87,9 @@
   <ItemGroup>
     <Resource Include="app_icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="presets.json" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del $(TargetDir)icons /Q
