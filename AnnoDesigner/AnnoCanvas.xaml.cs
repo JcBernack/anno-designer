@@ -9,8 +9,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using MessageBox = Microsoft.Windows.Controls.MessageBox;
 using Microsoft.Win32;
+using MessageBox = Microsoft.Windows.Controls.MessageBox;
 
 namespace AnnoDesigner
 {
@@ -26,6 +26,11 @@ namespace AnnoDesigner
         private const int GridStepMax = 100;
         private const int GridStepDefault = 20;
         private int _gridStep = GridStepDefault;
+
+        /// <summary>
+        /// Gets or sets the width of the grid cells.
+        /// Increasing the grid size results in zooming in and vice versa.
+        /// </summary>
         public int GridSize
         {
             get
@@ -48,6 +53,10 @@ namespace AnnoDesigner
         }
 
         private bool _renderGrid;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the grid should be rendered.
+        /// </summary>
         public bool RenderGrid
         {
             get
@@ -65,6 +74,10 @@ namespace AnnoDesigner
         }
 
         private bool _renderLabel;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the labels of objects should be rendered.
+        /// </summary>
         public bool RenderLabel
         {
             get
@@ -82,6 +95,10 @@ namespace AnnoDesigner
         }
 
         private bool _renderIcon;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the icons of objects should be rendered.
+        /// </summary>
         public bool RenderIcon
         {
             get
@@ -98,9 +115,21 @@ namespace AnnoDesigner
             }
         }
 
-        public delegate void AnnoObjectHandler(AnnoObject annoObject);
-        public event AnnoObjectHandler OnCurrentObjectChange;
+        /// <summary>
+        /// Event which is fired when the current object is changed from within the control, i.e. not by calling SetCurrentObject().
+        /// </summary>
+        public event Action<AnnoObject> OnCurrentObjectChange;
+        private void FireOnShowStatusMessage(AnnoObject obj)
+        {
+            if (OnCurrentObjectChange != null)
+            {
+                OnCurrentObjectChange(obj);
+            }
+        }
 
+        /// <summary>
+        /// Event which is fired when the status message should be changed.
+        /// </summary>
         public event Action<string> OnShowStatusMessage;
         private void FireOnShowStatusMessage(string message)
         {
@@ -129,9 +158,10 @@ namespace AnnoDesigner
             DragAll
         }
 
-        private Point _mousePosition;
-        private bool _mouseWithinControl;
         private MouseMode _currentMode;
+        /// <summary>
+        /// Indicates the current mouse mode.
+        /// </summary>
         private MouseMode CurrentMode
         {
             get
@@ -144,13 +174,43 @@ namespace AnnoDesigner
                 FireOnShowStatusMessage("Mode: " + _currentMode);
             }
         }
+        /// <summary>
+        /// Indicates whether the mouse is within this control.
+        /// </summary>
+        private bool _mouseWithinControl;
+
+        /// <summary>
+        /// The current mouse position.
+        /// </summary>
+        private Point _mousePosition;
+
+        /// <summary>
+        /// The position where the mouse button was pressed.
+        /// </summary>
         private Point _mouseDragStart;
+
+        /// <summary>
+        /// The rectangle used for selection.
+        /// </summary>
         private Rect _selectionRect;
         
+        /// <summary>
+        /// List of all currently placed objects.
+        /// </summary>
         private List<AnnoObject> _placedObjects;
+
+        /// <summary>
+        /// List of all currently selected objects.
+        /// All of them must also be contained in the _placedObjects list.
+        /// </summary>
         private readonly List<AnnoObject> _selectedObjects;
+
+        /// <summary>
+        /// Current object to be placed.
+        /// </summary>
         private AnnoObject _currentObject;
 
+        // pens and brushes
         private readonly Pen _linePen;
         private readonly Pen _highlightPen;
         private readonly Pen _radiusPen;
@@ -181,6 +241,10 @@ namespace AnnoDesigner
 
         #region Rendering
 
+        /// <summary>
+        /// Renders the whole scene including grid, placed objects, current object, selection highlights, influence radii and selection rectangle.
+        /// </summary>
+        /// <param name="drawingContext">context used for rendering</param>
         protected override void OnRender(DrawingContext drawingContext)
         {
             //var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
@@ -257,6 +321,9 @@ namespace AnnoDesigner
             drawingContext.Pop();
         }
 
+        /// <summary>
+        /// Moves the current object to the mouse position.
+        /// </summary>
         private void MoveCurrentObjectToMouse()
         {
             if (_currentObject == null)
@@ -271,6 +338,11 @@ namespace AnnoDesigner
             _currentObject.Position = RoundScreenToGrid(pos);
         }
 
+        /// <summary>
+        /// Renders the given AnnoObject to the given DrawingContext.
+        /// </summary>
+        /// <param name="drawingContext">context used for rendering</param>
+        /// <param name="obj">object to render</param>
         private void RenderObject(DrawingContext drawingContext, AnnoObject obj)
         {
             // draw object rectangle
@@ -325,6 +397,11 @@ namespace AnnoDesigner
             }
         }
 
+        /// <summary>
+        /// Renders a selection highlight on the specified object.
+        /// </summary>
+        /// <param name="drawingContext">context used for rendering</param>
+        /// <param name="obj">object to render as selected</param>
         private void RenderObjectSelection(DrawingContext drawingContext, AnnoObject obj)
         {
             // draw object rectangle
@@ -332,6 +409,11 @@ namespace AnnoDesigner
             drawingContext.DrawRectangle(null, _highlightPen, objRect);
         }
 
+        /// <summary>
+        /// Renders the influence radius of the given object and highlights other objects within range.
+        /// </summary>
+        /// <param name="drawingContext">context used for rendering</param>
+        /// <param name="obj">object which's influence is rendered</param>
         private void RenderObjectInfluence(DrawingContext drawingContext, AnnoObject obj)
         {
             if (obj.Radius >= 0.5)
@@ -493,6 +575,10 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Handles the zoom level
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             GridSize += e.Delta / 100;
@@ -505,6 +591,10 @@ namespace AnnoDesigner
             MoveCurrentObjectToMouse();
         }
 
+        /// <summary>
+        /// Handles pressing of mouse buttons
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             HandleMouse(e);
@@ -547,6 +637,9 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Here be dragons.
+        /// </summary>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             HandleMouse(e);
@@ -663,6 +756,9 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Handles the release of mouse buttons.
+        /// </summary>
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             HandleMouse(e);
@@ -753,20 +849,21 @@ namespace AnnoDesigner
 
         #region Keyboard
 
+        /// <summary>
+        /// Handles key presses
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnKeyDown(KeyEventArgs e)
         {
             switch (e.Key)
             {
                 case Key.Delete:
+                    // remove all currently selected objects from the grid and clear selection
                     _selectedObjects.ForEach(_ => _placedObjects.Remove(_));
                     _selectedObjects.Clear();
                     break;
             }
             InvalidateVisual();
-        }
-
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
         }
 
         /// <summary>
@@ -784,11 +881,22 @@ namespace AnnoDesigner
 
         #region Collision handling
 
-        private bool ObjectIntersectionExists(AnnoObject a, AnnoObject b)
+        /// <summary>
+        /// Checks if there is a collision between given objects a and b.
+        /// </summary>
+        /// <param name="a">first object</param>
+        /// <param name="b">second object</param>
+        /// <returns>true if there is a collision, otherwise false</returns>
+        private static bool ObjectIntersectionExists(AnnoObject a, AnnoObject b)
         {
             return GetObjectCollisionRect(a).IntersectsWith(GetObjectCollisionRect(b));
         }
 
+        /// <summary>
+        /// Tries to place the current object on the grid.
+        /// Fails if there are any collisions.
+        /// </summary>
+        /// <returns>true if placement succeeded, otherwise false</returns>
         private bool TryPlaceCurrentObject()
         {
             if (_currentObject != null && !_placedObjects.Exists(_ => ObjectIntersectionExists(_currentObject, _)))
@@ -799,6 +907,11 @@ namespace AnnoDesigner
             return false;
         }
 
+        /// <summary>
+        /// Retrieves the object at the given position given in screen coordinates.
+        /// </summary>
+        /// <param name="position">position given in screen coordinates</param>
+        /// <returns>object at the position, if there is no object null</returns>
         private AnnoObject GetObjectAt(Point position)
         {
             return _placedObjects.FindLast(_ => GetObjectScreenRect(_).Contains(position));
@@ -808,6 +921,10 @@ namespace AnnoDesigner
 
         #region API
 
+        /// <summary>
+        /// Sets the current object, i.e. the object which the user can place.
+        /// </summary>
+        /// <param name="obj">object to apply</param>
         public void SetCurrentObject(AnnoObject obj)
         {
             obj.Position = _mousePosition;
@@ -815,22 +932,36 @@ namespace AnnoDesigner
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Removes all objects from the grid.
+        /// </summary>
         public void ClearPlacedObjects()
         {
             _placedObjects.Clear();
             InvalidateVisual();
         }
 
+        /// <summary>
+        /// Resets the zoom to the default level.
+        /// </summary>
         public void ResetZoom()
         {
             GridSize = GridStepDefault;
         }
 
+        /// <summary>
+        /// Normalizes the layout with border parameter set to zero.
+        /// </summary>
         public void Normalize()
         {
             Normalize(0);
         }
-
+        
+        /// <summary>
+        /// Normalizes the layout, i.e. moves all objects so that the top-most and left-most objects are exactly at the top and left coordinate zero if border is zero.
+        /// Otherwise moves all objects further to the bottom-right by border in grid-units.
+        /// </summary>
+        /// <param name="border"></param>
         public void Normalize(int border)
         {
             if (_placedObjects.Count == 0)
@@ -848,6 +979,9 @@ namespace AnnoDesigner
 
         #region Save/Load/Export methods
 
+        /// <summary>
+        /// Saves the current layout to file.
+        /// </summary>
         public void SaveToFile()
         {
             var dialog = new SaveFileDialog
@@ -862,13 +996,16 @@ namespace AnnoDesigner
                     Normalize(1);
                     DataIO.SaveToFile(_placedObjects, dialog.FileName);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    IOErrorMessageBox();
+                    IOErrorMessageBox(e);
                 }
             }
         }
 
+        /// <summary>
+        /// Loads a new layout from file.
+        /// </summary>
         public void OpenFile()
         {
             var dialog = new OpenFileDialog
@@ -884,13 +1021,18 @@ namespace AnnoDesigner
                     DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
                     Normalize(1);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    IOErrorMessageBox();
+                    IOErrorMessageBox(e);
                 }
             }
         }
 
+        /// <summary>
+        /// Renders the current layout to file.
+        /// </summary>
+        /// <param name="exportZoom">indicates whether the current zoom level should be applied, if false the default zoom is used</param>
+        /// <param name="exportSelection">indicates whether selection and influence highlights should be rendered</param>
         public void ExportImage(bool exportZoom, bool exportSelection)
         {
             var dialog = new SaveFileDialog
@@ -904,14 +1046,21 @@ namespace AnnoDesigner
                 {
                     RenderToFile(dialog.FileName, 1, exportZoom, exportSelection);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    IOErrorMessageBox();
+                    IOErrorMessageBox(e);
                 }
             }
         }
 
-        public void RenderToFile(string filename, int border, bool exportZoom, bool exportSelection)
+        /// <summary>
+        /// Renders the current layout to file.
+        /// </summary>
+        /// <param name="filename">filename of the output image</param>
+        /// <param name="border">normalization value used prior to exporting</param>
+        /// <param name="exportZoom">indicates whether the current zoom level should be applied, if false the default zoom is used</param>
+        /// <param name="exportSelection">indicates whether selection and influence highlights should be rendered</param>
+        private void RenderToFile(string filename, int border, bool exportZoom, bool exportSelection)
         {
             //TODO: copy objects to output target before normalization
             Normalize(border);
@@ -936,16 +1085,21 @@ namespace AnnoDesigner
             var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
             target.Width = width;
             target.Height = height;
-            // render to file
+            // correctly apply size
             var outputSize = new Size(width, height);
             target.Measure(outputSize);
             target.Arrange(new Rect(outputSize));
+            // render canvas to file
             DataIO.RenderToFile(target, filename);
         }
 
-        private static void IOErrorMessageBox()
+        /// <summary>
+        /// Displays a message box containing some error information.
+        /// </summary>
+        /// <param name="e">exception containing error information</param>
+        private static void IOErrorMessageBox(Exception e)
         {
-            MessageBox.Show("Something went wrong while saving/loading file.");
+            MessageBox.Show(e.Message, "Something went wrong while saving/loading file.");
         }
 
         #endregion

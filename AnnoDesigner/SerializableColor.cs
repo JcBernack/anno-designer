@@ -3,6 +3,9 @@ using System.Windows.Media;
 
 namespace AnnoDesigner
 {
+    /// <summary>
+    /// Provides a serializable representation of the System.Windows.Media.Color class
+    /// </summary>
     [Serializable]
     public struct SerializableColor
     {

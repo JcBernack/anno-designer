@@ -107,7 +107,7 @@ namespace AnnoDesigner
 
         #endregion
 
-        #region Anno canvas events
+        #region Main methods
 
         private void UpdateUIFromObject(AnnoObject obj)
         {

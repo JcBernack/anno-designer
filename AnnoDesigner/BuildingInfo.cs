@@ -1,23 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using System.Windows;
 
 namespace AnnoDesigner
 {
-    public class Presets
-    {
-        public List<BuildingInfo> BuildingInfos
-        {
-            get;
-            private set;
-        }
-
-        public Presets()
-        {
-            BuildingInfos = DataIO.LoadFromFile<List<BuildingInfo>>("presets.json");
-        }
-    }
-
     [DataContract]
     public class BuildingInfo
     {
