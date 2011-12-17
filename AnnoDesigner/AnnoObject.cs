@@ -10,7 +10,7 @@ namespace AnnoDesigner
     public class AnnoObject
     {
         /// <summary>
-        /// Size of in grid units
+        /// Size in grid units
         /// </summary>
         [DataMember]
         public Size Size;
@@ -53,7 +53,7 @@ namespace AnnoDesigner
         }
 
         /// <summary>
-        /// Copy constructor used to place independent
+        /// Copy constructor used to place independent objects on the grid
         /// </summary>
         /// <param name="obj"></param>
         public AnnoObject(AnnoObject obj)
