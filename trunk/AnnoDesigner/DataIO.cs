@@ -6,8 +6,17 @@ using System.Windows.Media.Imaging;
 
 namespace AnnoDesigner
 {
+    /// <summary>
+    /// Provides I/O methods
+    /// </summary>
     public static class DataIO
     {
+        /// <summary>
+        /// Serializes the given object to JSON and writes it to the given file.
+        /// </summary>
+        /// <typeparam name="T">type of the object being serialized</typeparam>
+        /// <param name="obj">object to serialize</param>
+        /// <param name="filename">output JSON filename</param>
         public static void SaveToFile<T>(T obj, string filename)
         {
             var stream = File.Open(filename, FileMode.Create);
@@ -16,6 +25,12 @@ namespace AnnoDesigner
             stream.Close();
         }
 
+        /// <summary>
+        /// Deserializes the given JSON file to an object of type T.
+        /// </summary>
+        /// <typeparam name="T">type of object being deserialized</typeparam>
+        /// <param name="filename">input JSON filename</param>
+        /// <returns>deserialized object</returns>
         public static T LoadFromFile<T>(string filename)
         {
             T obj;
@@ -23,6 +38,12 @@ namespace AnnoDesigner
             return obj;
         }
 
+        /// <summary>
+        /// Deserializes the given JSON file to an object.
+        /// </summary>
+        /// <typeparam name="T">type of the object being deserialized</typeparam>
+        /// <param name="obj">output object</param>
+        /// <param name="filename">input JSON filename</param>
         public static void LoadFromFile<T>(out T obj, string filename)
         {
             var stream = File.Open(filename, FileMode.Open);
@@ -31,6 +52,11 @@ namespace AnnoDesigner
             stream.Close();
         }
 
+        /// <summary>
+        /// Renders the given target to an image file, png encoded.
+        /// </summary>
+        /// <param name="target">target to be rendered</param>
+        /// <param name="filename">output filename</param>
         public static void RenderToFile(FrameworkElement target, string filename)
         {
             // render control
