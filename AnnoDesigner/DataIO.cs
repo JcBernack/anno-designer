@@ -19,10 +19,11 @@ namespace AnnoDesigner
         /// <param name="filename">output JSON filename</param>
         public static void SaveToFile<T>(T obj, string filename)
         {
-            var stream = File.Open(filename, FileMode.Create);
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            serializer.WriteObject(stream, obj);
-            stream.Close();
+            using (var stream = File.Open(filename, FileMode.Create))
+            {
+                var serializer = new DataContractJsonSerializer(typeof (T));
+                serializer.WriteObject(stream, obj);
+            }
         }
 
         /// <summary>
@@ -46,10 +47,11 @@ namespace AnnoDesigner
         /// <param name="filename">input JSON filename</param>
         public static void LoadFromFile<T>(out T obj, string filename)
         {
-            var stream = File.Open(filename, FileMode.Open);
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            obj = (T)serializer.ReadObject(stream);
-            stream.Close();
+            using (var stream = File.Open(filename, FileMode.Open))
+            {
+                var serializer = new DataContractJsonSerializer(typeof (T));
+                obj = (T) serializer.ReadObject(stream);
+            }
         }
 
         /// <summary>
@@ -67,9 +69,10 @@ namespace AnnoDesigner
             var png = new PngBitmapEncoder();
             png.Frames.Add(BitmapFrame.Create(rtb));
             // save file
-            var file = new FileStream(filename, FileMode.Create);
-            png.Save(file);
-            file.Close();
+            using (var file = new FileStream(filename, FileMode.Create))
+            {
+                png.Save(file);
+            }
         }
     }
 }
