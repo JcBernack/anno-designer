@@ -190,21 +190,6 @@ namespace AnnoDesigner
             ApplyCurrentObject();
         }
 
-        private void MenuItemNewClick(object sender, RoutedEventArgs e)
-        {
-            annoCanvas.ClearPlacedObjects();
-        }
-
-        private void MenuItemSaveAsClick(object sender, RoutedEventArgs e)
-        {
-            annoCanvas.SaveToFile();
-        }
-
-        private void MenuItemOpenClick(object sender, RoutedEventArgs e)
-        {
-            annoCanvas.OpenFile();
-        }
-
         private void MenuItemExportImageClick(object sender, RoutedEventArgs e)
         {
             annoCanvas.ExportImage(MenuItemExportZoom.IsChecked, MenuItemExportSelection.IsChecked);

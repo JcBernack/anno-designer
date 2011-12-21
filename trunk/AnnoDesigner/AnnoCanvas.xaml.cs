@@ -119,7 +119,7 @@ namespace AnnoDesigner
         /// Event which is fired when the current object is changed from within the control, i.e. not by calling SetCurrentObject().
         /// </summary>
         public event Action<AnnoObject> OnCurrentObjectChange;
-        private void FireOnShowStatusMessage(AnnoObject obj)
+        private void FireOnCurrentObjectChange(AnnoObject obj)
         {
             if (OnCurrentObjectChange != null)
             {
@@ -209,6 +209,11 @@ namespace AnnoDesigner
         /// Current object to be placed.
         /// </summary>
         private AnnoObject _currentObject;
+
+        /// <summary>
+        /// Last loaded file, i.e. the currently active file
+        /// </summary>
+        private string _loadedFile;
 
         // pens and brushes
         private readonly Pen _linePen;
@@ -604,10 +609,7 @@ namespace AnnoDesigner
                 if (obj != null)
                 {
                     _currentObject = new AnnoObject(obj);
-                    if (OnCurrentObjectChange != null)
-                    {
-                        OnCurrentObjectChange(_currentObject);
-                    }
+                    FireOnCurrentObjectChange(_currentObject);
                 }
                 return;
             }
@@ -935,9 +937,10 @@ namespace AnnoDesigner
         /// <summary>
         /// Removes all objects from the grid.
         /// </summary>
-        public void ClearPlacedObjects()
+        public void NewFile()
         {
             _placedObjects.Clear();
+            _loadedFile = "";
             InvalidateVisual();
         }
 
@@ -980,9 +983,40 @@ namespace AnnoDesigner
         #region Save/Load/Export methods
 
         /// <summary>
+        /// Writes layout to file.
+        /// </summary>
+        private void SaveFile()
+        {
+            try
+            {
+                Normalize(1);
+                DataIO.SaveToFile(_placedObjects, _loadedFile);
+            }
+            catch (Exception e)
+            {
+                IOErrorMessageBox(e);
+            }
+        }
+
+        /// <summary>
         /// Saves the current layout to file.
         /// </summary>
-        public void SaveToFile()
+        public void Save()
+        {
+            if (string.IsNullOrEmpty(_loadedFile))
+            {
+                SaveAs();
+            }
+            else
+            {
+                SaveFile();
+            }
+        }
+
+        /// <summary>
+        /// Opens a dialog and saves the current layout to file.
+        /// </summary>
+        public void SaveAs()
         {
             var dialog = new SaveFileDialog
             {
@@ -991,18 +1025,14 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                try
-                {
-                    Normalize(1);
-                    DataIO.SaveToFile(_placedObjects, dialog.FileName);
-                }
-                catch (Exception e)
-                {
-                    IOErrorMessageBox(e);
-                }
+                _loadedFile = dialog.FileName;
+                SaveFile();
             }
         }
 
+        /// <summary>
+        /// Opens a dialog and loads the given file.
+        /// </summary>
         public void OpenFile()
         {
             var dialog = new OpenFileDialog
@@ -1025,6 +1055,7 @@ namespace AnnoDesigner
             {
                 _selectedObjects.Clear();
                 DataIO.LoadFromFile(out _placedObjects, filename);
+                _loadedFile = filename;
                 Normalize(1);
             }
             catch (Exception e)
@@ -1107,6 +1138,37 @@ namespace AnnoDesigner
             MessageBox.Show(e.Message, "Something went wrong while saving/loading file.");
         }
 
+        #endregion
+
+        #region Commands
+
+        private static readonly Dictionary<ICommand, Action<AnnoCanvas>> CommandExecuteMappings;
+
+        static AnnoCanvas()
+        {
+            CommandExecuteMappings = new Dictionary<ICommand, Action<AnnoCanvas>>
+            {
+                { ApplicationCommands.New, _ => _.NewFile() },
+                { ApplicationCommands.Open, _ => _.OpenFile() },
+                { ApplicationCommands.Save, _ => _.Save() },
+                { ApplicationCommands.SaveAs, _ => _.SaveAs() }
+            };
+            foreach (var action in CommandExecuteMappings)
+            {
+                CommandManager.RegisterClassCommandBinding(typeof(AnnoCanvas), new CommandBinding(action.Key, ExecuteCommand));
+            }
+        }
+
+        private static void ExecuteCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            var canvas = sender as AnnoCanvas;
+            if (canvas != null && CommandExecuteMappings.ContainsKey(e.Command))
+            {
+                CommandExecuteMappings[e.Command].Invoke(canvas);
+                e.Handled = true;
+            }
+        }
+    
         #endregion
     }
 }
