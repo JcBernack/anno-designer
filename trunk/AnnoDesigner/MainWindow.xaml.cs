@@ -22,7 +22,6 @@ namespace AnnoDesigner
     {
         private List<BuildingInfo> _presets;
         private AnnoObject _currentObject;
-        private readonly List<string> _icons;
         private const int CurrentVersion = 5;
         private readonly WebClient _webClient;
 
@@ -51,9 +50,6 @@ namespace AnnoDesigner
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 209, 123), "Scheme 2 - field B"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - factory"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - path"));
-            // add icons
-            _icons = Directory.GetFiles(Path.Combine(App.ApplicationPath, "icons"), "*.png").ToList();
-            _icons.Sort();
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -61,7 +57,10 @@ namespace AnnoDesigner
             // add icons to the combobox
             comboBoxIcon.Items.Clear();
             comboBoxIcon.Items.Add(new ComboBoxItem { Content = "None" });
-            _icons.ForEach(_ => comboBoxIcon.Items.Add(new ComboBoxItem { Content = Path.GetFileNameWithoutExtension(_) }));
+            foreach (var icon in annoCanvas.Icons)
+            {
+                comboBoxIcon.Items.Add(new ComboBoxItem { Content = icon.Key });
+            }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
             MenuItemVersion.Header = "Current version: " + CurrentVersion;
@@ -122,7 +121,10 @@ namespace AnnoDesigner
             textBoxHeight.Text = obj.Size.Height.ToString();
             colorPicker.SelectedColor = obj.Color;
             textBoxLabel.Text = obj.Label;
-            comboBoxIcon.SelectedIndex = _icons.FindIndex(_ => !string.IsNullOrEmpty(obj.Icon) && _.EndsWith(obj.Icon)) + 1;
+            if (!string.IsNullOrEmpty(obj.Icon))
+            {
+                comboBoxIcon.SelectedItem = comboBoxIcon.Items.Cast<ComboBoxItem>().Single(_ => _.Content.ToString() == Path.GetFileNameWithoutExtension(obj.Icon));
+            }
             textBoxRadius.Text = obj.Radius.ToString();
         }
 
@@ -141,7 +143,7 @@ namespace AnnoDesigner
                     Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                     Color = colorPicker.SelectedColor,
                     Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
-                    Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedIndex == 0 ? null : _icons[comboBoxIcon.SelectedIndex - 1],
+                    Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedIndex == 0 ? null : ((ComboBoxItem)comboBoxIcon.SelectedItem).Content.ToString(),
                     Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
                 };
                 // do some sanity checks

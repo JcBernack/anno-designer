@@ -16,7 +16,7 @@
         </Grid.ColumnDefinitions>
         <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="True" RenderLabel="True" />
         <Menu Height="23" VerticalAlignment="Top" Grid.ColumnSpan="2">
-            <MenuItem Header="File" Padding="27,2,28,3">
+            <MenuItem Header="File" Padding="27,2,28,3" TabIndex="20">
                 <MenuItem Header="New" Command="ApplicationCommands.New" CommandTarget="{Binding ElementName=annoCanvas}" />
                 <MenuItem Header="Open" Command="ApplicationCommands.Open" CommandTarget="{Binding ElementName=annoCanvas}" />
                 <MenuItem Header="Save" Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=annoCanvas}" />
@@ -24,7 +24,7 @@
                 <Separator />
                 <MenuItem Header="Exit" Click="MenuItemClick" />
             </MenuItem>
-            <MenuItem Header="Extras" Padding="27,2,28,3">
+            <MenuItem Header="Extras" Padding="27,2,28,3" TabIndex="21">
                 <!--<MenuItem Header="Prefer local presets" IsCheckable="True" IsEnabled="False" />
                 <MenuItem Header="Apply automatic color scheme" IsEnabled="False" />-->
                 <MenuItem Header="Normalize" Click="MenuItemNormalizeClick" />
@@ -35,7 +35,7 @@
                 <Separator />
                 <MenuItem Header="Register file extension" Click="MenuItemRegisterExtensionClick" />
             </MenuItem>
-            <MenuItem Header="Export">
+            <MenuItem Header="Export" TabIndex="22">
                 <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
                 <Separator />
                 <MenuItem Header="Use current zoom on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportZoom" />
@@ -43,43 +43,43 @@
             </MenuItem>
             
             <Separator />
-            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" />
-            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" />
-            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" IsEnabled="True" />
+            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" TabIndex="23" />
+            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" TabIndex="24" />
+            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" IsEnabled="True" TabIndex="25" />
         </Menu>
         <DockPanel Grid.Column="1" Grid.Row="1" LastChildFill="True">
             <GroupBox Header="Building settings" DockPanel.Dock="Top">
                 <StackPanel>
                     <DockPanel LastChildFill="False" Height="26">
                         <Label Content="Size" />
-                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxHeight" Text="4" Width="40" />
+                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxHeight" Text="4" Width="40" TabIndex="1" />
                         <Label Content="x" DockPanel.Dock="Right" />
-                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxWidth" Text="4" Width="40" />
+                        <TextBox DockPanel.Dock="Right" Height="23" Name="textBoxWidth" Text="4" Width="40" TabIndex="0" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
                         <Label Content="Color" />
-                        <extToolkit:ColorPicker DisplayColorAndName="True" DockPanel.Dock="Right" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" ShowRecentColors="False" StandardColorsHeader="Standard Color Presets" Width="120" />
+                        <extToolkit:ColorPicker DisplayColorAndName="True" DockPanel.Dock="Right" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" ShowRecentColors="False" StandardColorsHeader="Standard Color Presets" Width="120" TabIndex="2" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Label" Name="checkBoxLabel" VerticalAlignment="Center" />
-                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxLabel" Text="Depot" Width="120" />
+                        <CheckBox Content="Label" Name="checkBoxLabel" VerticalAlignment="Center" TabIndex="3" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxLabel" Text="Depot" Width="120" TabIndex="4" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Icon" Name="checkBoxIcon" VerticalAlignment="Center" IsChecked="True" />
-                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" Width="120">
+                        <CheckBox Content="Icon" Name="checkBoxIcon" VerticalAlignment="Center" IsChecked="True" TabIndex="5" />
+                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" Width="120" TabIndex="6">
                             <ComboBoxItem Content="None" IsSelected="True" />
                             <ComboBoxItem Content="Liquor" />
                         </ComboBox>
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Radius" Name="checkBoxRadius" VerticalAlignment="Center" IsChecked="True" />
-                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="0" />
+                        <CheckBox Content="Radius" Name="checkBoxRadius" VerticalAlignment="Center" IsChecked="True" TabIndex="7" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="0" TabIndex="8" />
                     </DockPanel>
-                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" />
+                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="9" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Building presets" IsEnabled="True" DockPanel.Dock="Top">
-                <ListView Name="listViewPresets" MouseDoubleClick="ListViewPresetsMouseDoubleClick" KeyDown="ListViewPresetsKeyDown">
+                <ListView Name="listViewPresets" MouseDoubleClick="ListViewPresetsMouseDoubleClick" KeyDown="ListViewPresetsKeyDown" TabIndex="10">
                     <ListViewItem Content="Not loaded." />
                 </ListView>
             </GroupBox>
