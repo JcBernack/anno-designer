@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace AnnoDesigner
         : UserControl
     {
         #region Properties
+
+        public readonly Dictionary<string, BitmapImage> Icons;
 
         private const int GridStepMin = 8;
         private const int GridStepMax = 100;
@@ -226,6 +229,10 @@ namespace AnnoDesigner
         public AnnoCanvas()
         {
             InitializeComponent();
+            // control settings
+            Focusable = true;
+            ClipToBounds = true;
+            // initialize
             CurrentMode = MouseMode.Standard;
             _placedObjects = new List<AnnoObject>();
             _selectedObjects = new List<AnnoObject>();
@@ -239,7 +246,19 @@ namespace AnnoDesigner
             color = Colors.LawnGreen;
             color.A = 92;
             _influencedBrush = new SolidColorBrush(color);
-            Focusable = true;
+            // load all icons if not in design time
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                Icons = new Dictionary<string, BitmapImage>();
+                foreach (var path in Directory.GetFiles(Path.Combine(App.ApplicationPath, "icons"), "*.png"))
+                {
+                    var filename = Path.GetFileNameWithoutExtension(path);
+                    if (filename != null)
+                    {
+                        Icons.Add(filename, new BitmapImage(new Uri(path)));
+                    }
+                }
+            }
         }
 
         #endregion
@@ -365,14 +384,15 @@ namespace AnnoDesigner
                 var iconPos = objRect.TopLeft;
                 iconPos.X += objRect.Width/2 - iconSize.Width/2;
                 iconPos.Y += objRect.Height/2 - iconSize.Height/2;
-                if (File.Exists(obj.Icon))
+                var iconName = Path.GetFileNameWithoutExtension(obj.Icon); // for backwards compatibility to older layouts
+                if (iconName != null && Icons.ContainsKey(iconName))
                 {
-                    drawingContext.DrawImage(new BitmapImage(new Uri(obj.Icon, UriKind.Relative)), new Rect(iconPos, iconSize));
+                    drawingContext.DrawImage(Icons[iconName], new Rect(iconPos, iconSize));
                     iconRendered = true;
                 }
                 else
                 {
-                    FireOnShowStatusMessage(string.Format("Icon file missing ({0}).", obj.Icon));
+                    FireOnShowStatusMessage(string.Format("Icon file missing ({0}).", iconName));
                 }
             }
             // draw object label
@@ -571,7 +591,6 @@ namespace AnnoDesigner
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             _mouseWithinControl = true;
-            Focus();
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
@@ -602,6 +621,10 @@ namespace AnnoDesigner
         /// <param name="e"></param>
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
+            if (!IsFocused)
+            {
+                Focus();
+            }
             HandleMouse(e);
             if (e.ClickCount > 1)
             {
@@ -935,16 +958,6 @@ namespace AnnoDesigner
         }
 
         /// <summary>
-        /// Removes all objects from the grid.
-        /// </summary>
-        public void NewFile()
-        {
-            _placedObjects.Clear();
-            _loadedFile = "";
-            InvalidateVisual();
-        }
-
-        /// <summary>
         /// Resets the zoom to the default level.
         /// </summary>
         public void ResetZoom()
@@ -980,7 +993,18 @@ namespace AnnoDesigner
 
         #endregion
 
-        #region Save/Load/Export methods
+        #region New/Save/Load/Export methods
+
+        /// <summary>
+        /// Removes all objects from the grid.
+        /// </summary>
+        public void NewFile()
+        {
+            _placedObjects.Clear();
+            _selectedObjects.Clear();
+            _loadedFile = "";
+            InvalidateVisual();
+        }
 
         /// <summary>
         /// Writes layout to file.
