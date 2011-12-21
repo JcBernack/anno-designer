@@ -1003,9 +1003,6 @@ namespace AnnoDesigner
             }
         }
 
-        /// <summary>
-        /// Loads a new layout from file.
-        /// </summary>
         public void OpenFile()
         {
             var dialog = new OpenFileDialog
@@ -1015,16 +1012,24 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                try
-                {
-                    _selectedObjects.Clear();
-                    DataIO.LoadFromFile(out _placedObjects, dialog.FileName);
-                    Normalize(1);
-                }
-                catch (Exception e)
-                {
-                    IOErrorMessageBox(e);
-                }
+                OpenFile(dialog.FileName);
+            }
+        }
+
+        /// <summary>
+        /// Loads a new layout from file.
+        /// </summary>
+        public void OpenFile(string filename)
+        {
+            try
+            {
+                _selectedObjects.Clear();
+                DataIO.LoadFromFile(out _placedObjects, filename);
+                Normalize(1);
+            }
+            catch (Exception e)
+            {
+                IOErrorMessageBox(e);
             }
         }
 

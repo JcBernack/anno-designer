@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
         xmlns:my="clr-namespace:AnnoDesigner"
-        Title="Anno Designer" Height="545" Width="954" Loaded="WindowLoaded" Icon="/AnnoDesigner;component/app_icon.png">
+        Title="Anno Designer" Height="545" Width="954" Loaded="WindowLoaded" Icon="/AnnoDesigner;component/icon.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -31,6 +31,8 @@
                 <Separator />
                 <MenuItem Header="Check for updates" Click="MenuItemVersionCheckImageClick" />
                 <MenuItem Header="Current version: x" Name="MenuItemVersion" IsEnabled="False" />
+                <Separator />
+                <MenuItem Header="Register file extension" Click="MenuItemRegisterExtensionClick" />
             </MenuItem>
             <MenuItem Header="Export">
                 <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />

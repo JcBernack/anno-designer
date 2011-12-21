@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.Win32;
 using Microsoft.Windows.Controls;
 using MessageBox = Microsoft.Windows.Controls.MessageBox;
 
@@ -50,7 +52,7 @@ namespace AnnoDesigner
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - factory"));
             colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - path"));
             // add icons
-            _icons = Directory.GetFiles(@"icons\", "*.png").ToList();
+            _icons = Directory.GetFiles(Path.Combine(App.ApplicationPath, "icons"), "*.png").ToList();
             _icons.Sort();
         }
 
@@ -65,10 +67,15 @@ namespace AnnoDesigner
             MenuItemVersion.Header = "Current version: " + CurrentVersion;
             CheckForUpdates(false);
             // load presets
-            _presets = DataIO.LoadFromFile<List<BuildingInfo>>("presets.json");
+            _presets = DataIO.LoadFromFile<List<BuildingInfo>>(Path.Combine(App.ApplicationPath, "presets.json"));
             listViewPresets.Items.Clear();
             var excludedTemplates = new[] { "Ark", "ThirdPartyWarehouse", "ThirdpartyMilitaryBuilding" };
             _presets.Where(_ => !excludedTemplates.Contains(_.Template)).OrderBy(_ => _.GetDisplayValue()).ToList().ForEach(_ => listViewPresets.Items.Add(_.GetDisplayValue()));
+            // load file given by argument
+            if (!string.IsNullOrEmpty(App.FilenameArgument))
+            {
+                annoCanvas.OpenFile(App.FilenameArgument);
+            }
         }
 
         #endregion
@@ -245,6 +252,21 @@ namespace AnnoDesigner
         {
             annoCanvas.Normalize(1);
         }
+
+        private void MenuItemRegisterExtensionClick(object sender, RoutedEventArgs e)
+        {
+            // registers the anno_designer class type and adds the correct command string to pass a file argument to the application
+            Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\anno_designer\shell\open\command", null, string.Format("\"{0}\" \"%1\"", App.ExecutablePath));
+            Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\anno_designer\DefaultIcon", null, string.Format("\"{0}\",0", App.ExecutablePath));
+            // registers the .ad file extension to the anno_designer class
+            Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\.ad", null, "anno_designer");
+        }
+
+        //private void MenuItemRemoveExtensionClick(object sender, RoutedEventArgs e)
+        //{
+        //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\anno_designer");
+        //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\.ad");
+        //}
 
         #endregion
     }
