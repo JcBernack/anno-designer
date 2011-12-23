@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using MessageBox = Microsoft.Windows.Controls.MessageBox;
 
 namespace AnnoDesigner
 {
@@ -11,6 +14,8 @@ namespace AnnoDesigner
     /// </summary>
     public static class DataIO
     {
+        #region Serialization and Deserialization
+
         /// <summary>
         /// Serializes the given object to JSON and writes it to the given file.
         /// </summary>
@@ -21,7 +26,7 @@ namespace AnnoDesigner
         {
             using (var stream = File.Open(filename, FileMode.Create))
             {
-                var serializer = new DataContractJsonSerializer(typeof (T));
+                var serializer = new DataContractJsonSerializer(typeof(T));
                 serializer.WriteObject(stream, obj);
             }
         }
@@ -49,10 +54,14 @@ namespace AnnoDesigner
         {
             using (var stream = File.Open(filename, FileMode.Open))
             {
-                var serializer = new DataContractJsonSerializer(typeof (T));
-                obj = (T) serializer.ReadObject(stream);
+                var serializer = new DataContractJsonSerializer(typeof(T));
+                obj = (T)serializer.ReadObject(stream);
             }
         }
+
+        #endregion
+
+        #region Render to file
 
         /// <summary>
         /// Renders the given target to an image file, png encoded.
@@ -74,5 +83,69 @@ namespace AnnoDesigner
                 png.Save(file);
             }
         }
+
+        #endregion
+
+        #region Layout saving and loading
+
+        /// <summary>
+        /// Container with just the file version number
+        /// </summary>
+        [DataContract]
+        private class LayoutVersionContainer
+        {
+            [DataMember]
+            public int FileVersion;
+        }
+
+        /// <summary>
+        /// Container with file version and all objects
+        /// </summary>
+        [DataContract]
+        private class SavedLayout
+            : LayoutVersionContainer
+        {
+            [DataMember]
+            public List<AnnoObject> Objects;
+
+            public SavedLayout(List<AnnoObject> objects)
+            {
+                FileVersion = Constants.FileVersion;
+                Objects = objects;
+            }
+        }
+
+        /// <summary>
+        /// Saves the given objects to the given file and includes the current file version number.
+        /// </summary>
+        /// <param name="objects">objects to save</param>
+        /// <param name="filename">filename to save to</param>
+        public static void SaveLayout(List<AnnoObject> objects, string filename)
+        {
+            SaveToFile(new SavedLayout(objects), filename);
+        }
+
+        /// <summary>
+        /// Loads all objects from the given file, taking care of file version mismatches.
+        /// </summary>
+        /// <param name="filename">file to load</param>
+        /// <returns>list of loaded objects</returns>
+        public static List<AnnoObject> LoadLayout(string filename)
+        {
+            var layoutVersion = LoadFromFile<LayoutVersionContainer>(filename);
+            if (layoutVersion.FileVersion != Constants.FileVersion)
+            {
+                if (MessageBox.Show(
+                        "Try loading anyway?\nThis is very likely to fail or result in strange things happening, but who cares?",
+                        "File version mismatch", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                {
+                    return null;
+                }
+            }
+            var layout = LoadFromFile<SavedLayout>(filename);
+            return layout.Objects;
+        }
+
+        #endregion
     }
 }

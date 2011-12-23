@@ -58,6 +58,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BuildingInfo.cs" />
+    <Compile Include="BuildingTreeViewItem.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="IconComboBoxItem.xaml.cs" />
+    <Compile Include="Presets.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
     <Page Include="AnnoCanvas.xaml">

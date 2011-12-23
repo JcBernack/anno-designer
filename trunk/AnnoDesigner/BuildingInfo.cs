@@ -6,20 +6,26 @@ namespace AnnoDesigner
     [DataContract]
     public class BuildingInfo
     {
+        // technical information
+        //[DataMember(Name = "GUID")]
+        //public int Guid;
+        //[DataMember(Name = ".ifo")]
+        //public int IfoFile;
+
         // main
         [DataMember(Name = "BuildBlocker.x")]
         public int Width;
         [DataMember(Name = "BuildBlocker.z")]
-        public int Heigth;
+        public int Height;
         [DataMember]
-        public string Name;
+        public string Identifier;
         [DataMember]
         public string IconFileName;
-        [DataMember]
-        public string Eng1;
+        [DataMember(Name = "Eng1")]
+        public string Eng;
         [DataMember]
         public int InfluenceRadius;
-        
+
         // grouping
         [DataMember]
         public string Faction;
@@ -29,31 +35,27 @@ namespace AnnoDesigner
         public string Template;
 
         // production
-        [DataMember(Name = "Production.Product.GUID")]
-        public int ProductGUID;
-        [DataMember(Name = "Production.Product.Name")]
-        public string ProductName;
-        [DataMember(Name = "Production.Product.Eng1")]
-        public string ProductEng1;
-
-        // additional
-        //[DataMember]
-        //public int GUID;
+        //[DataMember(Name = "Production.Product.GUID")]
+        //public int ProductGUID;
+        //[DataMember(Name = "Production.Product.Name")]
+        //public string ProductName;
+        //[DataMember(Name = "Production.Product.Eng1")]
+        //public string ProductEng1;
 
         public AnnoObject ToAnnoObject()
         {
             return new AnnoObject
             {
-                Label = Eng1,
+                Label = Eng,
                 Icon = IconFileName,
                 Radius = InfluenceRadius,
-                Size = new Size(Width, Heigth)
+                Size = new Size(Width, Height)
             };
         }
 
-        public string GetDisplayValue()
+        public string GetOrderParameter()
         {
-            return Name;
+            return Eng;
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,10 +18,10 @@ namespace AnnoDesigner
     public partial class MainWindow
         : Window
     {
-        private List<BuildingInfo> _presets;
+        private Presets _presets;
         private AnnoObject _currentObject;
-        private const int CurrentVersion = 5;
         private readonly WebClient _webClient;
+        private IconComboBoxItem _noIconItem;
 
         #region Initialization
 
@@ -34,42 +32,52 @@ namespace AnnoDesigner
             _webClient = new WebClient();
             _webClient.DownloadStringCompleted += WebClientDownloadStringCompleted;
             // add event handlers
-            annoCanvas.OnCurrentObjectChange += UpdateUIFromObject;
-            annoCanvas.OnShowStatusMessage += ShowStatusMessage;
+            annoCanvas.OnCurrentObjectChanged += UpdateUIFromObject;
+            annoCanvas.OnStatusMessageChanged += StatusMessageChanged;
+            annoCanvas.OnLoadedFileChanged += LoadedFileChanged;
             // add color presets
             colorPicker.StandardColors.Clear();
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "Scheme 1 - depot"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(171, 232, 107), "Scheme 1"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(76, 106, 222), "Scheme 1"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 150, 70), "Scheme 1"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(128, 128, 128), "Scheme 1 - path"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 67, 61), "Scheme 2 - depot"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 0, 239), "Scheme 2- building A"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 108, 200), "Scheme 2 - field A"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 166, 0), "Scheme 2 - building B"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 209, 123), "Scheme 2 - field B"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - factory"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - path"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "Scheme 1 - Depot"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(76, 106, 222), "Scheme 1 - Factory"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 150, 70), "Scheme 1 - Farm"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(171, 232, 107), "Scheme 1 - Field"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(128, 128, 128), "Scheme 1 - Path"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 67, 61), "Scheme 2 - Depot"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - Factory"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 0, 239), "Scheme 2- Building A"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 108, 200), "Scheme 2 - Field A"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 166, 0), "Scheme 2 - Building B"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 209, 123), "Scheme 2 - Field B"));
+            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - Path"));
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             // add icons to the combobox
             comboBoxIcon.Items.Clear();
-            comboBoxIcon.Items.Add(new ComboBoxItem { Content = "None" });
+            _noIconItem = new IconComboBoxItem("None");
+            comboBoxIcon.Items.Add(_noIconItem);
             foreach (var icon in annoCanvas.Icons)
             {
-                comboBoxIcon.Items.Add(new ComboBoxItem { Content = icon.Key });
+                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Key));
             }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
-            MenuItemVersion.Header = "Current version: " + CurrentVersion;
+            MenuItemVersion.Header = "Current version: " + Constants.Version;
             CheckForUpdates(false);
             // load presets
-            _presets = DataIO.LoadFromFile<List<BuildingInfo>>(Path.Combine(App.ApplicationPath, "presets.json"));
-            listViewPresets.Items.Clear();
-            var excludedTemplates = new[] { "Ark", "ThirdPartyWarehouse", "ThirdpartyMilitaryBuilding" };
-            _presets.Where(_ => !excludedTemplates.Contains(_.Template)).OrderBy(_ => _.GetDisplayValue()).ToList().ForEach(_ => listViewPresets.Items.Add(_.GetDisplayValue()));
+            treeViewPresets.Items.Clear();
+            try
+            {
+                _presets = DataIO.LoadFromFile<Presets>(Path.Combine(App.ApplicationPath, "presets.json"));
+                _presets.AddToTree(treeViewPresets);
+                GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _presets.Version);
+            }
+            catch (Exception ex)
+            {
+                GroupBoxPresets.Header = "Building presets - load failed";
+                MessageBox.Show(ex.Message, "Loading the building presets failed.");
+            }
             // load file given by argument
             if (!string.IsNullOrEmpty(App.FilenameArgument))
             {
@@ -93,7 +101,7 @@ namespace AnnoDesigner
                 MessageBox.Show(e.Error.Message, "Version check failed");
                 return;
             }
-            if (int.Parse(e.Result) > CurrentVersion)
+            if (int.Parse(e.Result) > Constants.Version)
             {
                 // new version found
                 if (MessageBox.Show("A newer version was found, do you want to visit the project page?\nhttp://anno-designer.googlecode.com/", "Update available", MessageBoxButton.YesNo, MessageBoxImage.Asterisk, MessageBoxResult.OK) == MessageBoxResult.Yes)
@@ -103,7 +111,7 @@ namespace AnnoDesigner
             }
             else
             {
-                ShowStatusMessage("Version is up to date.");
+                StatusMessageChanged("Version is up to date.");
                 if ((bool)e.UserState)
                 {
                     MessageBox.Show("This version is up to date.", "No updates found");
@@ -113,20 +121,52 @@ namespace AnnoDesigner
 
         #endregion
 
-        #region Main methods
+        #region AnnoCanvas events
 
         private void UpdateUIFromObject(AnnoObject obj)
         {
+            if (obj == null)
+            {
+                return;
+            }
+            // size
             textBoxWidth.Text = obj.Size.Width.ToString();
             textBoxHeight.Text = obj.Size.Height.ToString();
+            // color
             colorPicker.SelectedColor = obj.Color;
+            // label
+            //checkBoxLabel.IsChecked = !string.IsNullOrEmpty(obj.Label);
             textBoxLabel.Text = obj.Label;
-            if (!string.IsNullOrEmpty(obj.Icon))
+            // icon
+            //checkBoxIcon.IsChecked = !string.IsNullOrEmpty(obj.Icon);
+            try
             {
-                comboBoxIcon.SelectedItem = comboBoxIcon.Items.Cast<ComboBoxItem>().Single(_ => _.Content.ToString() == Path.GetFileNameWithoutExtension(obj.Icon));
+                comboBoxIcon.SelectedItem = string.IsNullOrEmpty(obj.Icon) ? _noIconItem : comboBoxIcon.Items.Cast<IconComboBoxItem>().Single(_ => _.IconName == Path.GetFileNameWithoutExtension(obj.Icon));
             }
+            catch (Exception)
+            {
+                comboBoxIcon.SelectedItem = _noIconItem;
+            }
+            // radius
+            //checkBoxRadius.IsChecked = obj.Radius > 0;
             textBoxRadius.Text = obj.Radius.ToString();
         }
+
+        private void StatusMessageChanged(string message)
+        {
+            StatusBarItemStatus.Content = message;
+            System.Diagnostics.Debug.WriteLine(string.Format("Status message changed: {0}", message));
+        }
+
+        private void LoadedFileChanged(string filename)
+        {
+            Title = string.IsNullOrEmpty(filename) ? "Anno Designer" : string.Format("{0} - Anno Designer", Path.GetFileName(filename));
+            System.Diagnostics.Debug.WriteLine(string.Format("Loaded file changed: {0}", string.IsNullOrEmpty(filename) ? "(none)" : filename));
+        }
+
+        #endregion
+
+        #region Main methods
 
         private static bool IsChecked(CheckBox checkBox)
         {
@@ -135,26 +175,23 @@ namespace AnnoDesigner
 
         private void ApplyCurrentObject()
         {
-            try
+            // parse user inputs and create new object
+            _currentObject = new AnnoObject
             {
-                // parse user inputs and create new object
-                _currentObject = new AnnoObject
-                {
-                    Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
-                    Color = colorPicker.SelectedColor,
-                    Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
-                    Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedIndex == 0 ? null : ((ComboBoxItem)comboBoxIcon.SelectedItem).Content.ToString(),
-                    Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
-                };
-                // do some sanity checks
-                if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
-                {
-                    annoCanvas.SetCurrentObject(_currentObject);
-                }
+                Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
+                Color = colorPicker.SelectedColor,
+                Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
+                Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconComboBoxItem)comboBoxIcon.SelectedItem).IconName,
+                Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
+            };
+            // do some sanity checks
+            if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
+            {
+                annoCanvas.SetCurrentObject(_currentObject);
             }
-            catch
+            else
             {
-                MessageBox.Show("Error: Please check configuration.");
+                throw new Exception("Invalid building configuration.");
             }
         }
 
@@ -162,34 +199,40 @@ namespace AnnoDesigner
         {
             try
             {
-                var obj = _presets.Find(_ => _.GetDisplayValue() == (string)listViewPresets.SelectedItem).ToAnnoObject();
-                obj.Color = colorPicker.SelectedColor;
-                UpdateUIFromObject(obj);
-                ApplyCurrentObject();
+                var item = (BuildingTreeViewItem) treeViewPresets.SelectedItem;
+                if (item != null && item.BuildingInfo != null)
+                {
+                    var obj = item.BuildingInfo.ToAnnoObject();
+                    obj.Color = colorPicker.SelectedColor;
+                    UpdateUIFromObject(obj);
+                    ApplyCurrentObject();
+                }
             }
             catch (Exception)
             {
+                MessageBox.Show("Something went wrong while applying the preset.");
             }
-        }
-
-        private void ShowStatusMessage(string message)
-        {
-            StatusBarItemStatus.Content = message;
-            System.Diagnostics.Debug.WriteLine(message);
         }
 
         #endregion
 
         #region UI events
 
-        private void MenuItemClick(object sender, RoutedEventArgs e)
+        private void MenuItemCloseClick(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
         private void ButtonPlaceBuildingClick(object sender, RoutedEventArgs e)
         {
-            ApplyCurrentObject();
+            try
+            {
+                ApplyCurrentObject();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error: Invalid building configuration.");
+            }
         }
 
         private void MenuItemExportImageClick(object sender, RoutedEventArgs e)
@@ -217,12 +260,12 @@ namespace AnnoDesigner
             CheckForUpdates(true);
         }
         
-        private void ListViewPresetsMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void TreeViewPresetsMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ApplyPreset();
         }
 
-        private void ListViewPresetsKeyDown(object sender, KeyEventArgs e)
+        private void TreeViewPresetsKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Return)
             {
@@ -251,6 +294,7 @@ namespace AnnoDesigner
 
         //private void MenuItemRemoveExtensionClick(object sender, RoutedEventArgs e)
         //{
+        //    // note: not tested!
         //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\anno_designer");
         //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\.ad");
         //}

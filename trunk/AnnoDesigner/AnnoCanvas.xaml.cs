@@ -119,28 +119,100 @@ namespace AnnoDesigner
         }
 
         /// <summary>
-        /// Event which is fired when the current object is changed from within the control, i.e. not by calling SetCurrentObject().
+        /// Backing field of the CurrentObject property
         /// </summary>
-        public event Action<AnnoObject> OnCurrentObjectChange;
-        private void FireOnCurrentObjectChange(AnnoObject obj)
+        private AnnoObject _currentObject;
+
+        /// <summary>
+        /// Current object to be placed. Fires an event when changed.
+        /// </summary>
+        public AnnoObject CurrentObject
         {
-            if (OnCurrentObjectChange != null)
+            get
             {
-                OnCurrentObjectChange(obj);
+                return _currentObject;
+            }
+            private set
+            {
+                if (_currentObject != value)
+                {
+                    _currentObject = value;
+                    if (OnCurrentObjectChanged != null)
+                    {
+                        OnCurrentObjectChanged(value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event which is fired when the current object is changed
+        /// </summary>
+        public event Action<AnnoObject> OnCurrentObjectChanged;
+
+        /// <summary>
+        /// Backing field of the StatusMessage property.
+        /// </summary>
+        private string _statusMessage;
+
+        /// <summary>
+        /// Current status message.
+        /// </summary>
+        public string StatusMessage
+        {
+            get
+            {
+                return _statusMessage;
+            }
+            private set
+            {
+                if (_statusMessage != value)
+                {
+                    _statusMessage = value;
+                    if (OnStatusMessageChanged != null)
+                    {
+                        OnStatusMessageChanged(value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event which is fired when the status message has been changed.
+        /// </summary>
+        public event Action<string> OnStatusMessageChanged;
+
+        /// <summary>
+        /// Backing field of the LoadedFile property.
+        /// </summary>
+        private string _loadedFile;
+
+        /// <summary>
+        /// Last loaded file, i.e. the currently active file. Fire an event when changed.
+        /// </summary>
+        public string LoadedFile
+        {
+            get
+            {
+                return _loadedFile;
+            }
+            private set
+            {
+                if (_loadedFile != value)
+                {
+                    _loadedFile = value;
+                    if (OnLoadedFileChanged != null)
+                    {
+                        OnLoadedFileChanged(value);
+                    }
+                }
             }
         }
 
         /// <summary>
         /// Event which is fired when the status message should be changed.
         /// </summary>
-        public event Action<string> OnShowStatusMessage;
-        private void FireOnShowStatusMessage(string message)
-        {
-            if (OnShowStatusMessage != null)
-            {
-                OnShowStatusMessage(message);
-            }
-        }
+        public event Action<string> OnLoadedFileChanged;
 
         #endregion
 
@@ -161,7 +233,11 @@ namespace AnnoDesigner
             DragAll
         }
 
+        /// <summary>
+        /// Backing field of the CurrentMode property.
+        /// </summary>
         private MouseMode _currentMode;
+        
         /// <summary>
         /// Indicates the current mouse mode.
         /// </summary>
@@ -174,9 +250,10 @@ namespace AnnoDesigner
             set
             {
                 _currentMode = value;
-                FireOnShowStatusMessage("Mode: " + _currentMode);
+                StatusMessage = "Mode: " + _currentMode;
             }
         }
+
         /// <summary>
         /// Indicates whether the mouse is within this control.
         /// </summary>
@@ -207,16 +284,6 @@ namespace AnnoDesigner
         /// All of them must also be contained in the _placedObjects list.
         /// </summary>
         private readonly List<AnnoObject> _selectedObjects;
-
-        /// <summary>
-        /// Current object to be placed.
-        /// </summary>
-        private AnnoObject _currentObject;
-
-        /// <summary>
-        /// Last loaded file, i.e. the currently active file
-        /// </summary>
-        private string _loadedFile;
 
         // pens and brushes
         private readonly Pen _linePen;
@@ -313,7 +380,7 @@ namespace AnnoDesigner
             _selectedObjects.ForEach(_ => RenderObjectInfluence(drawingContext, _));
             _selectedObjects.ForEach(_ => RenderObjectSelection(drawingContext, _));
 
-            if (_currentObject == null)
+            if (CurrentObject == null)
             {
                 // highlight object which is currently hovered
                 var hoveredObj = GetObjectAt(_mousePosition);
@@ -329,11 +396,11 @@ namespace AnnoDesigner
                 {
                     MoveCurrentObjectToMouse();
                     // draw influence radius
-                    RenderObjectInfluence(drawingContext, _currentObject);
+                    RenderObjectInfluence(drawingContext, CurrentObject);
                     // draw with transparency
-                    _currentObject.Color.A = 128;
-                    RenderObject(drawingContext, _currentObject);
-                    _currentObject.Color.A = 255;
+                    CurrentObject.Color.A = 128;
+                    RenderObject(drawingContext, CurrentObject);
+                    CurrentObject.Color.A = 255;
                 }
             }
             // draw selection rect while dragging the mouse
@@ -350,16 +417,16 @@ namespace AnnoDesigner
         /// </summary>
         private void MoveCurrentObjectToMouse()
         {
-            if (_currentObject == null)
+            if (CurrentObject == null)
             {
                 return;
             }
             // determine grid position beneath mouse
             var pos = _mousePosition;
-            var size = GridToScreen(_currentObject.Size);
+            var size = GridToScreen(CurrentObject.Size);
             pos.X -= size.Width / 2;
             pos.Y -= size.Height / 2;
-            _currentObject.Position = RoundScreenToGrid(pos);
+            CurrentObject.Position = RoundScreenToGrid(pos);
         }
 
         /// <summary>
@@ -392,7 +459,7 @@ namespace AnnoDesigner
                 }
                 else
                 {
-                    FireOnShowStatusMessage(string.Format("Icon file missing ({0}).", iconName));
+                    StatusMessage = string.Format("Icon file missing ({0}).", iconName);
                 }
             }
             // draw object label
@@ -631,8 +698,7 @@ namespace AnnoDesigner
                 var obj = GetObjectAt(_mousePosition);
                 if (obj != null)
                 {
-                    _currentObject = new AnnoObject(obj);
-                    FireOnCurrentObjectChange(_currentObject);
+                    CurrentObject = new AnnoObject(obj);
                 }
                 return;
             }
@@ -641,12 +707,12 @@ namespace AnnoDesigner
             {
                 CurrentMode = MouseMode.DragAllStart;
             }
-            else if (e.LeftButton == MouseButtonState.Pressed && _currentObject != null)
+            else if (e.LeftButton == MouseButtonState.Pressed && CurrentObject != null)
             {
                 // place new object
                 TryPlaceCurrentObject();
             }
-            else if (e.LeftButton == MouseButtonState.Pressed && _currentObject == null)
+            else if (e.LeftButton == MouseButtonState.Pressed && CurrentObject == null)
             {
                 var obj = GetObjectAt(_mousePosition);
                 if (obj == null)
@@ -710,7 +776,7 @@ namespace AnnoDesigner
             }
             else if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (_currentObject != null)
+                if (CurrentObject != null)
                 {
                     // place new object
                     TryPlaceCurrentObject();
@@ -795,7 +861,7 @@ namespace AnnoDesigner
                 }
                 return;
             }
-            if (e.ChangedButton == MouseButton.Left && _currentObject == null)
+            if (e.ChangedButton == MouseButton.Left && CurrentObject == null)
             {
                 switch (CurrentMode)
                 {
@@ -836,7 +902,7 @@ namespace AnnoDesigner
                 switch (CurrentMode)
                 {
                     case MouseMode.Standard:
-                        if (_currentObject == null)
+                        if (CurrentObject == null)
                         {
                             var obj = GetObjectAt(_mousePosition);
                             if (obj == null)
@@ -857,15 +923,15 @@ namespace AnnoDesigner
                         else
                         {
                             // cancel placement of object
-                            _currentObject = null;
+                            CurrentObject = null;
                         }
                         break;
                 }
             }
             // rotate current object
-            if (e.ChangedButton == MouseButton.Middle && _currentObject != null)
+            if (e.ChangedButton == MouseButton.Middle && CurrentObject != null)
             {
-                _currentObject.Size = Rotate(_currentObject.Size);
+                CurrentObject.Size = Rotate(CurrentObject.Size);
             }
             InvalidateVisual();
         }
@@ -924,9 +990,9 @@ namespace AnnoDesigner
         /// <returns>true if placement succeeded, otherwise false</returns>
         private bool TryPlaceCurrentObject()
         {
-            if (_currentObject != null && !_placedObjects.Exists(_ => ObjectIntersectionExists(_currentObject, _)))
+            if (CurrentObject != null && !_placedObjects.Exists(_ => ObjectIntersectionExists(CurrentObject, _)))
             {
-                _placedObjects.Add(new AnnoObject(_currentObject));
+                _placedObjects.Add(new AnnoObject(CurrentObject));
                 return true;
             }
             return false;
@@ -953,6 +1019,7 @@ namespace AnnoDesigner
         public void SetCurrentObject(AnnoObject obj)
         {
             obj.Position = _mousePosition;
+            // note: setting of the backing field doens't fire the changed event
             _currentObject = obj;
             InvalidateVisual();
         }
@@ -1002,7 +1069,7 @@ namespace AnnoDesigner
         {
             _placedObjects.Clear();
             _selectedObjects.Clear();
-            _loadedFile = "";
+            LoadedFile = "";
             InvalidateVisual();
         }
 
@@ -1014,7 +1081,7 @@ namespace AnnoDesigner
             try
             {
                 Normalize(1);
-                DataIO.SaveToFile(_placedObjects, _loadedFile);
+                DataIO.SaveLayout(_placedObjects, LoadedFile);
             }
             catch (Exception e)
             {
@@ -1027,7 +1094,7 @@ namespace AnnoDesigner
         /// </summary>
         public void Save()
         {
-            if (string.IsNullOrEmpty(_loadedFile))
+            if (string.IsNullOrEmpty(LoadedFile))
             {
                 SaveAs();
             }
@@ -1049,7 +1116,7 @@ namespace AnnoDesigner
             };
             if (dialog.ShowDialog() == true)
             {
-                _loadedFile = dialog.FileName;
+                LoadedFile = dialog.FileName;
                 SaveFile();
             }
         }
@@ -1077,10 +1144,14 @@ namespace AnnoDesigner
         {
             try
             {
-                _selectedObjects.Clear();
-                DataIO.LoadFromFile(out _placedObjects, filename);
-                _loadedFile = filename;
-                Normalize(1);
+                var layout = DataIO.LoadLayout(filename);
+                if (layout != null)
+                {
+                    _selectedObjects.Clear();
+                    _placedObjects = layout;
+                    LoadedFile = filename;
+                    Normalize(1);
+                }
             }
             catch (Exception e)
             {
