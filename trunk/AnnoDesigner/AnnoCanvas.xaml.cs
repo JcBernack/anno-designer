@@ -1185,7 +1185,7 @@ namespace AnnoDesigner
         }
 
         /// <summary>
-        /// Renders the current layout to file.
+        /// Asynchronously renders the current layout to file.
         /// </summary>
         /// <param name="filename">filename of the output image</param>
         /// <param name="border">normalization value used prior to exporting</param>
@@ -1193,35 +1193,50 @@ namespace AnnoDesigner
         /// <param name="exportSelection">indicates whether selection and influence highlights should be rendered</param>
         private void RenderToFile(string filename, int border, bool exportZoom, bool exportSelection)
         {
-            //TODO: copy objects to output target before normalization
-            Normalize(border);
-            // initialize output canvas
-            var target = new AnnoCanvas
+            // copy selected objects
+            var selectedObjects = _selectedObjects.Select(_ => new AnnoObject(_)).ToList();
+            // copy all not selected objects
+            var allObjects = _placedObjects.Where(_ => !_selectedObjects.Contains(_)).Select(_ => new AnnoObject(_)).ToList();
+            allObjects.AddRange(selectedObjects);
+            System.Diagnostics.Debug.WriteLine(string.Format("UI thread: {0}", Thread.CurrentThread.ManagedThreadId));
+            ThreadStart renderThread = delegate
             {
-                _placedObjects = _placedObjects,
-                RenderGrid = RenderGrid,
-                RenderIcon = RenderIcon,
-                RenderLabel = RenderLabel
+                System.Diagnostics.Debug.WriteLine(string.Format("Render thread: {0}", Thread.CurrentThread.ManagedThreadId));
+                // initialize output canvas
+                var target = new AnnoCanvas
+                {
+                    _placedObjects = allObjects,
+                    RenderGrid = RenderGrid,
+                    RenderIcon = RenderIcon,
+                    RenderLabel = RenderLabel
+                };
+                // normalize layout
+                target.Normalize(border);
+                // set zoom level
+                if (exportZoom)
+                {
+                    target.GridSize = GridSize;
+                }
+                // set selection
+                if (exportSelection)
+                {
+                    target._selectedObjects.AddRange(selectedObjects);
+                }
+                // calculate output size
+                var width = target.GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
+                var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
+                target.Width = width;
+                target.Height = height;
+                // apply size
+                var outputSize = new Size(width, height);
+                target.Measure(outputSize);
+                target.Arrange(new Rect(outputSize));
+                // render canvas to file
+                DataIO.RenderToFile(target, filename);
             };
-            if (exportZoom)
-            {
-                target.GridSize = GridSize;
-            }
-            if (exportSelection)
-            {
-                target._selectedObjects.AddRange(_selectedObjects);
-            }
-            // calculate correct size
-            var width = target.GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
-            var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
-            target.Width = width;
-            target.Height = height;
-            // correctly apply size
-            var outputSize = new Size(width, height);
-            target.Measure(outputSize);
-            target.Arrange(new Rect(outputSize));
-            // render canvas to file
-            DataIO.RenderToFile(target, filename);
+            var thread = new Thread(renderThread);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         /// <summary>
