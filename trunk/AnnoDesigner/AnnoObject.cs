@@ -46,6 +46,12 @@ namespace AnnoDesigner
         public double Radius;
 
         /// <summary>
+        /// Indicates whether the border should be omitted.
+        /// </summary>
+        [DataMember]
+        public bool Borderless;
+
+        /// <summary>
         /// Empty constructor needed for deserialization
         /// </summary>
         public AnnoObject()
@@ -64,6 +70,7 @@ namespace AnnoDesigner
             Label = obj.Label;
             Icon = obj.Icon;
             Radius = obj.Radius;
+            Borderless = obj.Borderless;
         }
     }
 }

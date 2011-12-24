@@ -5,23 +5,22 @@ namespace AnnoDesigner
     public class BuildingTreeViewItem
         : TreeViewItem
     {
-        public readonly BuildingInfo BuildingInfo;
+        public readonly AnnoObject Object;
 
         public BuildingTreeViewItem(string header)
         {
-            BuildingInfo = null;
             Header = header;
         }
 
-        public BuildingTreeViewItem(BuildingInfo buildingInfo)
+        public BuildingTreeViewItem(string header, AnnoObject obj)
+            : this(header)
         {
-            BuildingInfo = buildingInfo;
-            Header = buildingInfo.Eng;
+            Object = obj;
         }
 
         public bool IsBuildingItem()
         {
-            return BuildingInfo != null;
+            return Object != null;
         }
     }
 }

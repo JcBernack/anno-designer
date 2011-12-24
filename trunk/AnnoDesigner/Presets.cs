@@ -35,7 +35,7 @@ namespace AnnoDesigner
                     var secondLevelItem = new BuildingTreeViewItem(secondLevel.Key);
                     foreach (var buildingInfo in secondLevel.OrderBy(_ => _.GetOrderParameter()))
                     {
-                        secondLevelItem.Items.Add(new BuildingTreeViewItem(buildingInfo));
+                        secondLevelItem.Items.Add(new BuildingTreeViewItem(buildingInfo.Eng, buildingInfo.ToAnnoObject()));
                     }
                     firstLevelItem.Items.Add(secondLevelItem);
                 }
