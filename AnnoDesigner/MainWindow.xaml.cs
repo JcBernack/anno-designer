@@ -67,7 +67,8 @@ namespace AnnoDesigner
             CheckForUpdates(false);
             // load presets
             treeViewPresets.Items.Clear();
-            treeViewPresets.Items.Add(new BuildingTreeViewItem(new BuildingInfo { Width = 1, Height = 1, Eng = "" }) { Header = "road tile" });
+            // manually add a road tile preset
+            treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
             try
             {
                 _presets = DataIO.LoadFromFile<Presets>(Path.Combine(App.ApplicationPath, "presets.json"));
@@ -151,6 +152,8 @@ namespace AnnoDesigner
             // radius
             //checkBoxRadius.IsChecked = obj.Radius > 0;
             textBoxRadius.Text = obj.Radius.ToString();
+            // borderless flag
+            checkBoxBorderless.IsChecked = obj.Borderless;
         }
 
         private void StatusMessageChanged(string message)
@@ -183,7 +186,8 @@ namespace AnnoDesigner
                 Color = colorPicker.SelectedColor,
                 Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
                 Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconComboBoxItem)comboBoxIcon.SelectedItem).IconName,
-                Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text)
+                Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text),
+                Borderless = IsChecked(checkBoxBorderless)
             };
             // do some sanity checks
             if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
@@ -201,11 +205,9 @@ namespace AnnoDesigner
             try
             {
                 var item = (BuildingTreeViewItem) treeViewPresets.SelectedItem;
-                if (item != null && item.BuildingInfo != null)
+                if (item != null && item.Object != null)
                 {
-                    var obj = item.BuildingInfo.ToAnnoObject();
-                    obj.Color = colorPicker.SelectedColor;
-                    UpdateUIFromObject(obj);
+                    UpdateUIFromObject(new AnnoObject(item.Object) { Color = colorPicker.SelectedColor });
                     ApplyCurrentObject();
                 }
             }

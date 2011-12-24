@@ -470,7 +470,8 @@ namespace AnnoDesigner
         {
             // draw object rectangle
             var objRect = GetObjectScreenRect(obj);
-            drawingContext.DrawRectangle(new SolidColorBrush(obj.Color), _linePen, objRect);
+            var brush = new SolidColorBrush(obj.Color);
+            drawingContext.DrawRectangle(brush, obj.Borderless ? new Pen(brush, _linePen.Thickness) : _linePen, objRect);
             // draw object icon if it is at least 2x2 cells
             var iconRendered = false;
             if (_renderIcon && !string.IsNullOrEmpty(obj.Icon))
@@ -1025,6 +1026,8 @@ namespace AnnoDesigner
             if (CurrentObject != null && !_placedObjects.Exists(_ => ObjectIntersectionExists(CurrentObject, _)))
             {
                 _placedObjects.Add(new AnnoObject(CurrentObject));
+                // sort the objects because borderless objects should be drawn first
+                _placedObjects.Sort((a,b) => b.Borderless.CompareTo(a.Borderless));
                 return true;
             }
             return false;

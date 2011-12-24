@@ -77,11 +77,14 @@
                         <CheckBox Content="Radius" Name="checkBoxRadius" VerticalAlignment="Center" IsChecked="True" TabIndex="7" />
                         <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="0" TabIndex="8" />
                     </DockPanel>
-                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="9" />
+                    <DockPanel LastChildFill="False" Height="26">
+                        <CheckBox Content="Borderless" Name="checkBoxBorderless" VerticalAlignment="Center" TabIndex="9" />
+                    </DockPanel>
+                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="10" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Building presets - not loaded" Name="GroupBoxPresets" IsEnabled="True" DockPanel.Dock="Top">
-                <TreeView Name="treeViewPresets" MouseDoubleClick="TreeViewPresetsMouseDoubleClick" KeyDown="TreeViewPresetsKeyDown" TabIndex="10" />
+                <TreeView Name="treeViewPresets" MouseDoubleClick="TreeViewPresetsMouseDoubleClick" KeyDown="TreeViewPresetsKeyDown" TabIndex="11" />
             </GroupBox>
         </DockPanel>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
