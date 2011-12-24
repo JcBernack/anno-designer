@@ -63,7 +63,8 @@ namespace AnnoDesigner
             }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
-            MenuItemVersion.Header = "Current version: " + Constants.Version;
+            MenuItemVersion.Header = "Version: " + Constants.Version;
+            MenuItemFileVersion.Header = "File version: " + Constants.FileVersion;
             CheckForUpdates(false);
             // load presets
             treeViewPresets.Items.Clear();
@@ -74,6 +75,7 @@ namespace AnnoDesigner
                 _presets = DataIO.LoadFromFile<Presets>(Path.Combine(App.ApplicationPath, "presets.json"));
                 _presets.AddToTree(treeViewPresets);
                 GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _presets.Version);
+                MenuItemPresetsVersion.Header = "Presets version: " + _presets.Version;
             }
             catch (Exception ex)
             {
@@ -301,6 +303,17 @@ namespace AnnoDesigner
         //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\anno_designer");
         //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\.ad");
         //}
+
+        private void MenuItemHomepageClick(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://code.google.com/p/anno-designer/");
+        }
+
+        private void MenuItemAboutClick(object sender, RoutedEventArgs e)
+        {
+            //TODO: add a nice little window with information
+            //throw new NotImplementedException();
+        }
 
         #endregion
     }
