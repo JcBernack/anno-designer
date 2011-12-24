@@ -23,12 +23,12 @@ namespace AnnoDesigner
     {
         #region Properties
 
+        /// <summary>
+        /// Contains all loaded icons as a mapping of name (the filename without extension) to full path.
+        /// </summary>
         public readonly Dictionary<string, BitmapImage> Icons;
 
-        private const int GridStepMin = 8;
-        private const int GridStepMax = 100;
-        private const int GridStepDefault = 20;
-        private int _gridStep = GridStepDefault;
+        private int _gridStep = Constants.GridStepDefault;
 
         /// <summary>
         /// Gets or sets the width of the grid cells.
@@ -43,10 +43,10 @@ namespace AnnoDesigner
             set
             {
                 var tmp = value;
-                if (tmp < GridStepMin)
-                    tmp = GridStepMin;
-                if (tmp > GridStepMax)
-                    tmp = GridStepMax;
+                if (tmp < Constants.GridStepMin)
+                    tmp = Constants.GridStepMin;
+                if (tmp > Constants.GridStepMax)
+                    tmp = Constants.GridStepMax;
                 if (_gridStep != tmp)
                 {
                     InvalidateVisual();
@@ -218,6 +218,9 @@ namespace AnnoDesigner
 
         #region Privates and constructor
 
+        /// <summary>
+        /// States the mode of mouse interaction.
+        /// </summary>
         private enum MouseMode
         {
             // used if not dragging
@@ -285,14 +288,43 @@ namespace AnnoDesigner
         /// </summary>
         private readonly List<AnnoObject> _selectedObjects;
 
-        // pens and brushes
+        #region Pens and Brushes
+
+        /// <summary>
+        /// Used for grid lines and object borders.
+        /// </summary>
         private readonly Pen _linePen;
+
+        /// <summary>
+        /// Used for selection and hover highlights and selection rect.
+        /// </summary>
         private readonly Pen _highlightPen;
+
+        /// <summary>
+        /// Used for the radius circle.
+        /// </summary>
         private readonly Pen _radiusPen;
+
+        /// <summary>
+        /// Used to highlight objects within influence.
+        /// </summary>
         private readonly Pen _influencedPen;
+
+        /// <summary>
+        /// Used to fill the selection rect and influence circle.
+        /// </summary>
         private readonly Brush _lightBrush;
+
+        /// <summary>
+        /// Used to fill objects within influence.
+        /// </summary>
         private readonly Brush _influencedBrush;
 
+        #endregion
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public AnnoCanvas()
         {
             InitializeComponent();
@@ -1029,7 +1061,7 @@ namespace AnnoDesigner
         /// </summary>
         public void ResetZoom()
         {
-            GridSize = GridStepDefault;
+            GridSize = Constants.GridStepDefault;
         }
 
         /// <summary>
@@ -1171,6 +1203,11 @@ namespace AnnoDesigner
                 DefaultExt = ".png",
                 Filter = "PNG (*.png)|*.png|All Files (*.*)|*.*"
             };
+            if (!string.IsNullOrEmpty(LoadedFile))
+            {
+                // default the filename to the same name as the saved layout
+                dialog.FileName = Path.GetFileNameWithoutExtension(LoadedFile);
+            }
             if (dialog.ShowDialog() == true)
             {
                 try
@@ -1252,10 +1289,17 @@ namespace AnnoDesigner
 
         #region Commands
 
+        /// <summary>
+        /// Holds event handlers for command executions.
+        /// </summary>
         private static readonly Dictionary<ICommand, Action<AnnoCanvas>> CommandExecuteMappings;
 
+        /// <summary>
+        /// Creates event handlers for command executions and registers them at the CommandManager.
+        /// </summary>
         static AnnoCanvas()
         {
+            // create event handler mapping
             CommandExecuteMappings = new Dictionary<ICommand, Action<AnnoCanvas>>
             {
                 { ApplicationCommands.New, _ => _.NewFile() },
@@ -1263,12 +1307,18 @@ namespace AnnoDesigner
                 { ApplicationCommands.Save, _ => _.Save() },
                 { ApplicationCommands.SaveAs, _ => _.SaveAs() }
             };
+            // register event handlers for the specified commands
             foreach (var action in CommandExecuteMappings)
             {
                 CommandManager.RegisterClassCommandBinding(typeof(AnnoCanvas), new CommandBinding(action.Key, ExecuteCommand));
             }
         }
 
+        /// <summary>
+        /// Handler for all executed command events.
+        ///  </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void ExecuteCommand(object sender, ExecutedRoutedEventArgs e)
         {
             var canvas = sender as AnnoCanvas;
