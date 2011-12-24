@@ -67,6 +67,7 @@ namespace AnnoDesigner
             CheckForUpdates(false);
             // load presets
             treeViewPresets.Items.Clear();
+            treeViewPresets.Items.Add(new BuildingTreeViewItem(new BuildingInfo { Width = 1, Height = 1, Eng = "" }) { Header = "road tile" });
             try
             {
                 _presets = DataIO.LoadFromFile<Presets>(Path.Combine(App.ApplicationPath, "presets.json"));
