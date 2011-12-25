@@ -5,7 +5,6 @@ using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using AnnoDesigner.Presets;
 using Microsoft.Win32;
 using Microsoft.Windows.Controls;
@@ -36,23 +35,6 @@ namespace AnnoDesigner
             annoCanvas.OnCurrentObjectChanged += UpdateUIFromObject;
             annoCanvas.OnStatusMessageChanged += StatusMessageChanged;
             annoCanvas.OnLoadedFileChanged += LoadedFileChanged;
-            // load color presets
-            colorPicker.StandardColors.Clear();
-            try
-            {
-                var colorPresets = DataIO.LoadFromFile<ColorPresets>(Path.Combine(App.ApplicationPath, "colors.json"));
-                foreach (var colorScheme in colorPresets.ColorSchemes)
-                {
-                    foreach (var colorInfo in colorScheme.ColorInfos)
-                    {
-                        colorPicker.StandardColors.Add(new ColorItem(colorInfo.Color, string.Format("{0} ({1})", colorInfo.ColorTarget, colorScheme.Name)));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "Loading of color presets failed");
-            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -70,13 +52,30 @@ namespace AnnoDesigner
             MenuItemVersion.Header = "Version: " + Constants.Version;
             MenuItemFileVersion.Header = "File version: " + Constants.FileVersion;
             CheckForUpdates(false);
+            // load color presets
+            colorPicker.StandardColors.Clear();
+            try
+            {
+                var colorPresets = DataIO.LoadFromFile<ColorPresets>(Path.Combine(App.ApplicationPath, Constants.ColorPresetsFile));
+                foreach (var colorScheme in colorPresets.ColorSchemes)
+                {
+                    foreach (var colorInfo in colorScheme.ColorInfos)
+                    {
+                        colorPicker.StandardColors.Add(new ColorItem(colorInfo.Color, string.Format("{0} ({1})", colorInfo.ColorTarget, colorScheme.Name)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Loading of the color presets failed");
+            }
             // load presets
             treeViewPresets.Items.Clear();
             // manually add a road tile preset
             treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
             try
             {
-                _buildingPresets = DataIO.LoadFromFile<BuildingPresets>(Path.Combine(App.ApplicationPath, "presets.json"));
+                _buildingPresets = DataIO.LoadFromFile<BuildingPresets>(Path.Combine(App.ApplicationPath, Constants.BuildingPresetsFile));
                 _buildingPresets.AddToTree(treeViewPresets);
                 GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _buildingPresets.Version);
                 MenuItemPresetsVersion.Header = "Presets version: " + _buildingPresets.Version;
@@ -84,7 +83,7 @@ namespace AnnoDesigner
             catch (Exception ex)
             {
                 GroupBoxPresets.Header = "Building presets - load failed";
-                MessageBox.Show(ex.Message, "Loading the building presets failed.");
+                MessageBox.Show(ex.Message, "Loading of the building presets failed");
             }
             // load file given by argument
             if (!string.IsNullOrEmpty(App.FilenameArgument))

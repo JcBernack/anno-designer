@@ -21,6 +21,16 @@ namespace AnnoDesigner
         public const int FileVersion = 2;
 
         /// <summary>
+        /// Json encoded file containing the color presets.
+        /// </summary>
+        public const string ColorPresetsFile = "colors.json";
+        
+        /// <summary>
+        /// Json encoded file containing the building presets.
+        /// </summary>
+        public const string BuildingPresetsFile = "presets.json";
+
+        /// <summary>
         /// The minimal grid size to which the user can zoom out.
         /// </summary>
         public const int GridStepMin = 8;
