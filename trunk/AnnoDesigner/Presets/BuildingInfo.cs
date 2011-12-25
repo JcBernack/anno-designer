@@ -1,8 +1,12 @@
 ﻿using System.Runtime.Serialization;
 using System.Windows;
 
-namespace AnnoDesigner
+namespace AnnoDesigner.Presets
 {
+    /// <summary>
+    /// Contains information for one building type.
+    /// Is deserialized from presets.json.
+    /// </summary>
     [DataContract]
     public class BuildingInfo
     {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -74,13 +75,13 @@ namespace AnnoDesigner
             const int dpi = 96;
             var rtb = new RenderTargetBitmap((int)target.ActualWidth, (int)target.ActualHeight, dpi, dpi, PixelFormats.Default);
             rtb.Render(target);
-            // encode to png
-            var png = new PngBitmapEncoder();
-            png.Frames.Add(BitmapFrame.Create(rtb));
+            // put result into bitmap
+            var encoder = Constants.GetExportImageEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
             // save file
             using (var file = new FileStream(filename, FileMode.Create))
             {
-                png.Save(file);
+                encoder.Save(file);
             }
         }
 

@@ -349,7 +349,7 @@ namespace AnnoDesigner
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 Icons = new Dictionary<string, BitmapImage>();
-                foreach (var path in Directory.GetFiles(Path.Combine(App.ApplicationPath, "icons"), "*.png"))
+                foreach (var path in Directory.GetFiles(Path.Combine(App.ApplicationPath, Constants.IconFolder), Constants.IconFolderFilter))
                 {
                     var filename = Path.GetFileNameWithoutExtension(path);
                     if (filename != null)
@@ -1146,8 +1146,8 @@ namespace AnnoDesigner
         {
             var dialog = new SaveFileDialog
             {
-                DefaultExt = ".ad",
-                Filter = "Anno Designer Files (*.ad)|*.ad|All Files (*.*)|*.*"
+                DefaultExt = Constants.SavedLayoutExtension,
+                Filter = Constants.SaveOpenDialogFilter
             };
             if (dialog.ShowDialog() == true)
             {
@@ -1163,8 +1163,8 @@ namespace AnnoDesigner
         {
             var dialog = new OpenFileDialog
             {
-                DefaultExt = ".ad",
-                Filter = "Anno Designer Files (*.ad)|*.ad|All Files (*.*)|*.*"
+                DefaultExt = Constants.SavedLayoutExtension,
+                Filter = Constants.SaveOpenDialogFilter
             };
             if (dialog.ShowDialog() == true)
             {
@@ -1203,8 +1203,8 @@ namespace AnnoDesigner
         {
             var dialog = new SaveFileDialog
             {
-                DefaultExt = ".png",
-                Filter = "PNG (*.png)|*.png|All Files (*.*)|*.*"
+                DefaultExt = Constants.ExportedImageExtension,
+                Filter = Constants.ExportDialogFilter
             };
             if (!string.IsNullOrEmpty(LoadedFile))
             {

@@ -1,0 +1,16 @@
+﻿<Window x:Class="AnnoDesigner.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About Anno Designer" Height="300" Width="400" Icon="/AnnoDesigner;component/icon.ico" ResizeMode="NoResize" KeyDown="WindowKeyDown" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Image Height="64" Width="64" Source="/AnnoDesigner;component/Stuff/icon64.png" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,12,0,0" />
+        <Label HorizontalAlignment="Left" Margin="82,12,0,0" VerticalAlignment="Top" FontSize="24" Content="Anno Designer" />
+        <Label Margin="82,48,0,0" VerticalAlignment="Top" Content="A building layout designer for Ubisofts Anno-series" />
+        <Label Margin="12,92,0,0" VerticalAlignment="Top" FontSize="14" Content="Credits" />
+        <Label Margin="24,121,0,0" VerticalAlignment="Top" Content="Application by Jan Christoph Bernack (ZackSchneider)"  />
+        <Label Margin="24,148,0,0" VerticalAlignment="Top" Content="Building presets for Anno2070 by Peter Hozak (DeathApril)" />
+        <Label Margin="0,180,0,0" HorizontalContentAlignment="Center" VerticalAlignment="Top" Content="Many thanks to all the users who contributed to this project!" />
+        <Button Height="23" VerticalAlignment="Bottom" Width="150" Margin="12,0,216,12" Content="Go to project homepage" Click="ButtonProjectHomepageClick" />
+        <Button Height="23" VerticalAlignment="Bottom" Width="150" Margin="216,0,12,12" Content="Close" Click="ButtonCloseClick" />
+    </Grid>
+</Window>

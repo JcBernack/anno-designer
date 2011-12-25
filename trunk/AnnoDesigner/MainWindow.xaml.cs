@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using AnnoDesigner.Presets;
 using Microsoft.Win32;
 using Microsoft.Windows.Controls;
 using MessageBox = Microsoft.Windows.Controls.MessageBox;
@@ -18,7 +19,7 @@ namespace AnnoDesigner
     public partial class MainWindow
         : Window
     {
-        private Presets _presets;
+        private BuildingPresets _buildingPresets;
         private AnnoObject _currentObject;
         private readonly WebClient _webClient;
         private IconComboBoxItem _noIconItem;
@@ -35,20 +36,23 @@ namespace AnnoDesigner
             annoCanvas.OnCurrentObjectChanged += UpdateUIFromObject;
             annoCanvas.OnStatusMessageChanged += StatusMessageChanged;
             annoCanvas.OnLoadedFileChanged += LoadedFileChanged;
-            // add color presets
+            // load color presets
             colorPicker.StandardColors.Clear();
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(214, 49, 49), "Scheme 1 - Depot"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(76, 106, 222), "Scheme 1 - Factory"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 150, 70), "Scheme 1 - Farm"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(171, 232, 107), "Scheme 1 - Field"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(128, 128, 128), "Scheme 1 - Path"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 67, 61), "Scheme 2 - Depot"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(0, 247, 241), "Scheme 2 - Factory"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(247, 0, 239), "Scheme 2- Building A"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 108, 200), "Scheme 2 - Field A"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 166, 0), "Scheme 2 - Building B"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(255, 209, 123), "Scheme 2 - Field B"));
-            colorPicker.StandardColors.Add(new ColorItem(Color.FromRgb(36, 255, 0), "Scheme 2 - Path"));
+            try
+            {
+                var colorPresets = DataIO.LoadFromFile<ColorPresets>(Path.Combine(App.ApplicationPath, "colors.json"));
+                foreach (var colorScheme in colorPresets.ColorSchemes)
+                {
+                    foreach (var colorInfo in colorScheme.ColorInfos)
+                    {
+                        colorPicker.StandardColors.Add(new ColorItem(colorInfo.Color, string.Format("{0} ({1})", colorInfo.ColorTarget, colorScheme.Name)));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Loading of color presets failed");
+            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -72,10 +76,10 @@ namespace AnnoDesigner
             treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
             try
             {
-                _presets = DataIO.LoadFromFile<Presets>(Path.Combine(App.ApplicationPath, "presets.json"));
-                _presets.AddToTree(treeViewPresets);
-                GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _presets.Version);
-                MenuItemPresetsVersion.Header = "Presets version: " + _presets.Version;
+                _buildingPresets = DataIO.LoadFromFile<BuildingPresets>(Path.Combine(App.ApplicationPath, "presets.json"));
+                _buildingPresets.AddToTree(treeViewPresets);
+                GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _buildingPresets.Version);
+                MenuItemPresetsVersion.Header = "Presets version: " + _buildingPresets.Version;
             }
             catch (Exception ex)
             {
@@ -311,8 +315,7 @@ namespace AnnoDesigner
 
         private void MenuItemAboutClick(object sender, RoutedEventArgs e)
         {
-            //TODO: add a nice little window with information
-            //throw new NotImplementedException();
+            new About { Owner = this }.ShowDialog();
         }
 
         #endregion

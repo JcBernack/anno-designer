@@ -57,13 +57,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BuildingInfo.cs" />
+    <Compile Include="About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BuildingTreeViewItem.cs" />
-    <Compile Include="Constants.cs" />
     <Compile Include="IconComboBoxItem.xaml.cs" />
-    <Compile Include="Presets.cs" />
+    <Compile Include="Presets\BuildingInfo.cs" />
+    <Compile Include="Presets\BuildingPresets.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Presets\ColorInfo.cs" />
+    <Compile Include="Presets\ColorPresets.cs" />
+    <Compile Include="Presets\ColorScheme.cs" />
+    <Compile Include="Presets\ColorTarget.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
+    <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AnnoCanvas.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -92,10 +103,20 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="colors.json" />
     <None Include="presets.json" />
+    <None Include="Stuff\list_of_buildings_v0.3.json" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Stuff\icon128.png" />
+    <Resource Include="Stuff\icon16.png" />
+    <Resource Include="Stuff\icon256.png" />
+    <Resource Include="Stuff\icon32.png" />
+    <Resource Include="Stuff\icon61_web.png" />
+    <Resource Include="Stuff\icon64.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -103,7 +124,8 @@
 del $(TargetDir)layouts /Q
 xcopy $(ProjectDir)icons\* $(TargetDir)icons\* /Y
 xcopy $(ProjectDir)layouts\* $(TargetDir)layouts\* /Y
-copy $(ProjectDir)presets.json $(TargetDir)</PostBuildEvent>
+copy $(ProjectDir)presets.json $(TargetDir)
+copy $(ProjectDir)colors.json $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

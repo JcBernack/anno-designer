@@ -3,7 +3,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Controls;
 
-namespace AnnoDesigner
+namespace AnnoDesigner.Presets
 {
     /// <summary>
     /// Notes for buildings list json:
@@ -11,7 +11,7 @@ namespace AnnoDesigner
     /// some radii are missing, e.g. coffee plantation
     /// </summary>
     [DataContract]
-    public class Presets
+    public class BuildingPresets
     {
         [DataMember(Name = "_model")]
         public string Model;
