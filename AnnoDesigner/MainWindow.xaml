@@ -20,12 +20,12 @@
         <my:AnnoCanvas x:Name="annoCanvas" Grid.RowSpan="1" Grid.Row="1" RenderGrid="True" RenderIcon="True" RenderLabel="True" />
         <GridSplitter Grid.Row="1" Width="6" />
         <Menu Height="23" VerticalAlignment="Top" Grid.ColumnSpan="2">
-            <Menu.ItemsPanel>
+            <!--<Menu.ItemsPanel>
                 <ItemsPanelTemplate>
                     <DockPanel HorizontalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
-            </Menu.ItemsPanel>
-            <MenuItem Header="File" Padding="27,2,28,3" TabIndex="20">
+            </Menu.ItemsPanel>-->
+            <MenuItem Header="File" TabIndex="20">
                 <MenuItem Header="New" Command="ApplicationCommands.New" CommandTarget="{Binding ElementName=annoCanvas}" />
                 <MenuItem Header="Open" Command="ApplicationCommands.Open" CommandTarget="{Binding ElementName=annoCanvas}" />
                 <MenuItem Header="Save" Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=annoCanvas}" />
@@ -33,7 +33,7 @@
                 <Separator />
                 <MenuItem Header="Exit" Click="MenuItemCloseClick" />
             </MenuItem>
-            <MenuItem Header="Extras" Padding="27,2,28,3" TabIndex="21">
+            <MenuItem Header="Extras" TabIndex="21">
                 <!--<MenuItem Header="Prefer local presets" IsCheckable="True" IsEnabled="False" />
                 <MenuItem Header="Apply automatic color scheme" IsEnabled="False" />-->
                 <MenuItem Header="Normalize" Click="MenuItemNormalizeClick" />
@@ -47,11 +47,6 @@
                 <MenuItem Header="Use current zoom on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportZoom" />
                 <MenuItem Header="Render selection highlights on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportSelection" />
             </MenuItem>
-            <Separator />
-            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" TabIndex="23" />
-            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" TabIndex="24" />
-            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" TabIndex="25" />
-            <Separator />
             <MenuItem Header="Help" TabIndex="26" HorizontalAlignment="Right">
                 <MenuItem Header="Version: x" Name="MenuItemVersion" IsEnabled="False" />
                 <MenuItem Header="File version: x" Name="MenuItemFileVersion" IsEnabled="False" />
@@ -61,6 +56,10 @@
                 <MenuItem Header="Go to project homepage" Click="MenuItemHomepageClick" />
                 <MenuItem Header="About Anno Designer" Click="MenuItemAboutClick" />
             </MenuItem>
+            <Separator />
+            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" TabIndex="23" />
+            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" TabIndex="24" />
+            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" TabIndex="25" />
         </Menu>
         <DockPanel Grid.Column="1" Grid.Row="1" LastChildFill="True">
             <GroupBox Header="Building settings" DockPanel.Dock="Top">
