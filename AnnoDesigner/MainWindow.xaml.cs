@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using AnnoDesigner.Presets;
+using AnnoDesigner.UI;
 using Microsoft.Win32;
 using Microsoft.Windows.Controls;
 using MessageBox = Microsoft.Windows.Controls.MessageBox;
@@ -18,8 +19,6 @@ namespace AnnoDesigner
     public partial class MainWindow
         : Window
     {
-        private BuildingPresets _buildingPresets;
-        private AnnoObject _currentObject;
         private readonly WebClient _webClient;
         private IconComboBoxItem _noIconItem;
 
@@ -45,7 +44,7 @@ namespace AnnoDesigner
             comboBoxIcon.Items.Add(_noIconItem);
             foreach (var icon in annoCanvas.Icons)
             {
-                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Key));
+                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Value.DisplayName, icon.Key));
             }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
@@ -73,17 +72,16 @@ namespace AnnoDesigner
             treeViewPresets.Items.Clear();
             // manually add a road tile preset
             treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
-            try
+            var presets = annoCanvas.BuildingPresets;
+            if (presets != null)
             {
-                _buildingPresets = DataIO.LoadFromFile<BuildingPresets>(Path.Combine(App.ApplicationPath, Constants.BuildingPresetsFile));
-                _buildingPresets.AddToTree(treeViewPresets);
-                GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", _buildingPresets.Version);
-                MenuItemPresetsVersion.Header = "Presets version: " + _buildingPresets.Version;
+                presets.AddToTree(treeViewPresets);
+                GroupBoxPresets.Header = string.Format("Building presets - loaded v{0}", presets.Version);
+                MenuItemPresetsVersion.Header = "Presets version: " + presets.Version;
             }
-            catch (Exception ex)
+            else
             {
                 GroupBoxPresets.Header = "Building presets - load failed";
-                MessageBox.Show(ex.Message, "Loading of the building presets failed");
             }
             // load file given by argument
             if (!string.IsNullOrEmpty(App.FilenameArgument))
@@ -185,7 +183,7 @@ namespace AnnoDesigner
         private void ApplyCurrentObject()
         {
             // parse user inputs and create new object
-            _currentObject = new AnnoObject
+            var obj = new AnnoObject
             {
                 Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                 Color = colorPicker.SelectedColor,
@@ -195,9 +193,9 @@ namespace AnnoDesigner
                 Borderless = IsChecked(checkBoxBorderless)
             };
             // do some sanity checks
-            if (_currentObject.Size.Width > 0 && _currentObject.Size.Height > 0 && _currentObject.Radius >= 0)
+            if (obj.Size.Width > 0 && obj.Size.Height > 0 && obj.Radius >= 0)
             {
-                annoCanvas.SetCurrentObject(_currentObject);
+                annoCanvas.SetCurrentObject(obj);
             }
             else
             {

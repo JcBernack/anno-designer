@@ -1,6 +1,6 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace AnnoDesigner
+namespace AnnoDesigner.UI
 {
     /// <summary>
     /// Represents one item within a ComboBox and is linked with an icon name.
@@ -13,10 +13,15 @@ namespace AnnoDesigner
         /// </summary>
         public readonly string IconName;
 
-        public IconComboBoxItem(string iconName)
+        public IconComboBoxItem(string displayName)
+        {
+            Content = displayName;
+        }
+
+        public IconComboBoxItem(string displayName, string iconName)
+            : this(displayName)
         {
             IconName = iconName;
-            Content = iconName;
         }
     }
 }

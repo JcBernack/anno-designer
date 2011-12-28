@@ -60,8 +60,6 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BuildingTreeViewItem.cs" />
-    <Compile Include="IconComboBoxItem.xaml.cs" />
     <Compile Include="Presets\BuildingInfo.cs" />
     <Compile Include="Presets\BuildingPresets.cs" />
     <Compile Include="Constants.cs" />
@@ -71,6 +69,9 @@
     <Compile Include="Presets\ColorTarget.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
+    <Compile Include="UI\BuildingTreeViewItem.cs" />
+    <Compile Include="UI\IconComboBoxItem.xaml.cs" />
+    <Compile Include="UI\IconImage.xaml.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
