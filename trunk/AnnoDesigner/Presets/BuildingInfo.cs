@@ -4,8 +4,7 @@ using System.Windows;
 namespace AnnoDesigner.Presets
 {
     /// <summary>
-    /// Contains information for one building type.
-    /// Is deserialized from presets.json.
+    /// Contains information for one building type, deserialized from presets.json.
     /// </summary>
     [DataContract]
     public class BuildingInfo
@@ -25,6 +24,8 @@ namespace AnnoDesigner.Presets
         public string Identifier;
         [DataMember]
         public string IconFileName;
+        [DataMember]
+        public string IconWikiaFile;
         [DataMember(Name = "Eng1")]
         public string Eng;
         [DataMember]

@@ -31,5 +31,10 @@ namespace AnnoDesigner
                 Close();
             }
         }
+
+        private void ButtonWikiaClick(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://anno2070.wikia.com/wiki/Anno_2070_Wiki");
+        }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Windows.Controls;
+using AnnoDesigner.UI;
 
 namespace AnnoDesigner.Presets
 {

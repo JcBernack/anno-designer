@@ -1,6 +1,6 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace AnnoDesigner
+namespace AnnoDesigner.UI
 {
     /// <summary>
     /// Represents one item within a TreeView and can be linked with an AnnoObject.

@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using AnnoDesigner.Presets;
+using AnnoDesigner.UI;
 using Microsoft.Win32;
 using MessageBox = Microsoft.Windows.Controls.MessageBox;
 
@@ -24,10 +26,15 @@ namespace AnnoDesigner
         #region Properties
 
         /// <summary>
-        /// Contains all loaded icons as a mapping of name (the filename without extension) to full path.
+        /// Contains all loaded icons as a mapping of name (the filename without extension) to loaded BitmapImage.
         /// </summary>
-        public readonly Dictionary<string, BitmapImage> Icons;
+        public readonly Dictionary<string, IconImage> Icons;
 
+        public readonly BuildingPresets BuildingPresets;
+        
+        /// <summary>
+        /// Backing field of the GridSize property.
+        /// </summary>
         private int _gridStep = Constants.GridStepDefault;
 
         /// <summary>
@@ -55,6 +62,9 @@ namespace AnnoDesigner
             }
         }
 
+        /// <summary>
+        /// Backing field of the RenderGrid property.
+        /// </summary>
         private bool _renderGrid;
 
         /// <summary>
@@ -76,6 +86,9 @@ namespace AnnoDesigner
             }
         }
 
+        /// <summary>
+        /// Backing field of the RenderLabel property.
+        /// </summary>
         private bool _renderLabel;
 
         /// <summary>
@@ -97,6 +110,9 @@ namespace AnnoDesigner
             }
         }
 
+        /// <summary>
+        /// Backing field of the RenderIcon property.
+        /// </summary>
         private bool _renderIcon;
 
         /// <summary>
@@ -348,15 +364,43 @@ namespace AnnoDesigner
             // load all icons if not in design time
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Icons = new Dictionary<string, BitmapImage>();
+                // load presets
+                try
+                {
+                    BuildingPresets = DataIO.LoadFromFile<BuildingPresets>(Path.Combine(App.ApplicationPath, Constants.BuildingPresetsFile));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Loading of the building presets failed");
+                }
+                var icons = new Dictionary<string, IconImage>();
                 foreach (var path in Directory.GetFiles(Path.Combine(App.ApplicationPath, Constants.IconFolder), Constants.IconFolderFilter))
                 {
-                    var filename = Path.GetFileNameWithoutExtension(path);
-                    if (filename != null)
+                    var filenameWithExt = Path.GetFileName(path);
+                    var filenameWithoutExt = Path.GetFileNameWithoutExtension(path);
+                    if (!string.IsNullOrEmpty(filenameWithoutExt))
                     {
-                        Icons.Add(filename, new BitmapImage(new Uri(path)));
+                        // the default name which is displayed for icons should be the filename
+                        var displayName = filenameWithoutExt;
+                        // if loading of the presets succeeded
+                        if (BuildingPresets != null && BuildingPresets.Buildings != null)
+                        {
+                            // and there is a matching preset
+                            var matchedWikiaNames = BuildingPresets.Buildings.FindAll(_ => _.IconFileName == filenameWithExt)
+                                .Select(_ => Path.GetFileNameWithoutExtension(_.IconWikiaFile))
+                                .Where(_ => !string.IsNullOrEmpty(_));
+                            if (matchedWikiaNames.Count() > 0)
+                            {
+                                // use the WikiaFileName without its extension for this icon
+                                displayName = Path.GetFileNameWithoutExtension(matchedWikiaNames.First());
+                            }
+                        }
+                        // add the current icon
+                        icons.Add(filenameWithoutExt, new IconImage(displayName, new BitmapImage(new Uri(path))));
                     }
                 }
+                // sort icons by its DisplayName
+                Icons = icons.OrderBy(_ => _.Value.DisplayName).ToDictionary(_ => _.Key, _ => _.Value);
             }
         }
 
@@ -487,7 +531,7 @@ namespace AnnoDesigner
                 var iconName = Path.GetFileNameWithoutExtension(obj.Icon); // for backwards compatibility to older layouts
                 if (iconName != null && Icons.ContainsKey(iconName))
                 {
-                    drawingContext.DrawImage(Icons[iconName], new Rect(iconPos, iconSize));
+                    drawingContext.DrawImage(Icons[iconName].Icon, new Rect(iconPos, iconSize));
                     iconRendered = true;
                 }
                 else
