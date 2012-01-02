@@ -1,13 +1,9 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media;
-
-namespace AnnoDesigner.UI
+﻿namespace AnnoDesigner.UI
 {
     /// <summary>
     /// Represents one item within a ComboBox and is linked with an icon name.
     /// </summary>
     public class IconComboBoxItem
-        //: ComboBoxItem
     {
         /// <summary>
         /// Name of the icon that this item is linked to.

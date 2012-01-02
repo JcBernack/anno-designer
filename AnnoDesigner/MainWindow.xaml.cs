@@ -71,7 +71,8 @@ namespace AnnoDesigner
             // load presets
             treeViewPresets.Items.Clear();
             // manually add a road tile preset
-            treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
+            treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Radius = 0 }));
+            treeViewPresets.Items.Add(new BuildingTreeViewItem("borderless road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
             var presets = annoCanvas.BuildingPresets;
             if (presets != null)
             {
@@ -143,7 +144,6 @@ namespace AnnoDesigner
             //checkBoxLabel.IsChecked = !string.IsNullOrEmpty(obj.Label);
             textBoxLabel.Text = obj.Label;
             // icon
-            //checkBoxIcon.IsChecked = !string.IsNullOrEmpty(obj.Icon);
             try
             {
                 comboBoxIcon.SelectedItem = string.IsNullOrEmpty(obj.Icon) ? _noIconItem : comboBoxIcon.Items.Cast<IconComboBoxItem>().Single(_ => _.IconName == Path.GetFileNameWithoutExtension(obj.Icon));
@@ -153,7 +153,6 @@ namespace AnnoDesigner
                 comboBoxIcon.SelectedItem = _noIconItem;
             }
             // radius
-            //checkBoxRadius.IsChecked = obj.Radius > 0;
             textBoxRadius.Text = obj.Radius.ToString();
             // borderless flag
             checkBoxBorderless.IsChecked = obj.Borderless;
@@ -188,8 +187,8 @@ namespace AnnoDesigner
                 Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                 Color = colorPicker.SelectedColor,
                 Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
-                Icon = !IsChecked(checkBoxIcon) || comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconComboBoxItem)comboBoxIcon.SelectedItem).IconName,
-                Radius = !IsChecked(checkBoxRadius) || string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text),
+                Icon = comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconComboBoxItem)comboBoxIcon.SelectedItem).IconName,
+                Radius = string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text),
                 Borderless = IsChecked(checkBoxBorderless)
             };
             // do some sanity checks
