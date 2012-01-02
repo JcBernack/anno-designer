@@ -4,8 +4,17 @@ namespace AnnoDesigner.UI
 {
     public class IconImage
     {
-        public readonly string DisplayName;
-        public readonly BitmapImage Icon;
+        public string DisplayName
+        {
+            get;
+            private set;
+        }
+
+        public BitmapImage Icon
+        {
+            get;
+            private set;
+        }
 
         public IconImage(string displayName, BitmapImage icon)
         {

@@ -44,7 +44,7 @@ namespace AnnoDesigner
             comboBoxIcon.Items.Add(_noIconItem);
             foreach (var icon in annoCanvas.Icons)
             {
-                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Value.DisplayName, icon.Key));
+                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Key, icon.Value));
             }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
