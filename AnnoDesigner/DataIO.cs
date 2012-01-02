@@ -132,17 +132,26 @@ namespace AnnoDesigner
         /// <returns>list of loaded objects</returns>
         public static List<AnnoObject> LoadLayout(string filename)
         {
+            // try to load file version
             var layoutVersion = LoadFromFile<LayoutVersionContainer>(filename);
+            // show message if file versions don't match or if loading of the file version failed
             if (layoutVersion.FileVersion != Constants.FileVersion)
             {
                 if (MessageBox.Show(
-                        "Try loading anyway?\nThis is very likely to fail or result in strange things happening, but who cares?",
+                        "Try loading anyway?\nThis is very likely to fail or result in strange things happening.",
                         "File version mismatch", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 {
                     return null;
                 }
             }
+            // try to load layout
             var layout = LoadFromFile<SavedLayout>(filename);
+            // use fallback for old layouts
+            if (layout.Objects == null)
+            {
+                layout = new SavedLayout(LoadFromFile<List<AnnoObject>>(filename));
+            }
+            // return objects
             return layout.Objects;
         }
 

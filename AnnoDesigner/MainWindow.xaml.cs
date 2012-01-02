@@ -295,14 +295,21 @@ namespace AnnoDesigner
             Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\anno_designer\DefaultIcon", null, string.Format("\"{0}\",0", App.ExecutablePath));
             // registers the .ad file extension to the anno_designer class
             Registry.SetValue(@"HKEY_CURRENT_USER\Software\Classes\.ad", null, "anno_designer");
+            ShowRegistrationMessageBox();
         }
 
-        //private void MenuItemRemoveExtensionClick(object sender, RoutedEventArgs e)
-        //{
-        //    // note: not tested!
-        //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\anno_designer");
-        //    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\.ad");
-        //}
+        private void MenuItemUnregisterExtensionClick(object sender, RoutedEventArgs e)
+        {
+            // removes the registry entries
+            Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\anno_designer");
+            Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\.ad");
+            ShowRegistrationMessageBox();
+        }
+
+        private void ShowRegistrationMessageBox()
+        {
+            MessageBox.Show("You may need to reboot or relog for changes to take effect.", "Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
 
         private void MenuItemHomepageClick(object sender, RoutedEventArgs e)
         {
