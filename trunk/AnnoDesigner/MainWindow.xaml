@@ -80,7 +80,7 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="46">
                         <Label Content="Icon" VerticalAlignment="Center" />
-                        <ComboBox DockPanel.Dock="Right" Width="140" Height="46" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6">
+                        <ComboBox DockPanel.Dock="Right" Width="140" Height="46" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6" TextSearch.TextPath="DisplayName">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
