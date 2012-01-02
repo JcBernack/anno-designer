@@ -80,7 +80,27 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
                         <CheckBox Content="Icon" Name="checkBoxIcon" VerticalAlignment="Center" IsChecked="True" TabIndex="5" />
-                        <ComboBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" Width="120" TabIndex="6">
+                        <ComboBox DockPanel.Dock="Right" Width="120" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6">
+                            <!--<ComboBox.Template>
+                                <ControlTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox Margin="5">
+                                            <Image Width="23" Height="23" Source="{Binding Path=Icon.Icon}" />
+                                        </Viewbox>
+                                        <TextBlock Margin="0,5,5,5" VerticalAlignment="Center" Text="{Binding Path=DisplayName}" />
+                                    </StackPanel>
+                                </ControlTemplate>
+                            </ComboBox.Template>-->
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Viewbox Margin="5">
+                                            <Image Width="23" Height="23" Source="{Binding Path=Icon.Icon}" />
+                                        </Viewbox>
+                                        <TextBlock Margin="0,5,5,5" VerticalAlignment="Center" Text="{Binding Path=DisplayName}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                             <ComboBoxItem Content="Not loaded" IsSelected="True" />
                         </ComboBox>
                     </DockPanel>
