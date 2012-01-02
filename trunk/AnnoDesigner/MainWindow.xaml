@@ -40,6 +40,7 @@
                 <MenuItem Header="Reset zoom" Click="MenuItemResetZoomClick" />
                 <Separator />
                 <MenuItem Header="Register file extension" Click="MenuItemRegisterExtensionClick" />
+                <MenuItem Header="Unregister file extension" Click="MenuItemUnregisterExtensionClick" />
             </MenuItem>
             <MenuItem Header="Export" TabIndex="22">
                 <MenuItem Header="Export Image" Click="MenuItemExportImageClick" />
