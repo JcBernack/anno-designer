@@ -72,25 +72,15 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
                         <Label Content="Color" />
-                        <extToolkit:ColorPicker DisplayColorAndName="True" DockPanel.Dock="Right" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" ShowRecentColors="False" StandardColorsHeader="Standard Color Presets" Width="120" TabIndex="2" />
+                        <extToolkit:ColorPicker DisplayColorAndName="True" DockPanel.Dock="Right" Name="colorPicker" SelectedColor="#FFD63131" ShowAvailableColors="False" ShowRecentColors="False" StandardColorsHeader="Standard Color Presets" Width="140" TabIndex="2" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Label" Name="checkBoxLabel" VerticalAlignment="Center" TabIndex="3" IsChecked="True" />
-                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxLabel" Text="Building" Width="120" TabIndex="4" />
+                        <Label Content="Label" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxLabel" Text="Building" Width="140" TabIndex="4" />
                     </DockPanel>
-                    <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Icon" Name="checkBoxIcon" VerticalAlignment="Center" IsChecked="True" TabIndex="5" />
-                        <ComboBox DockPanel.Dock="Right" Width="120" Height="23" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6">
-                            <!--<ComboBox.Template>
-                                <ControlTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Viewbox Margin="5">
-                                            <Image Width="23" Height="23" Source="{Binding Path=Icon.Icon}" />
-                                        </Viewbox>
-                                        <TextBlock Margin="0,5,5,5" VerticalAlignment="Center" Text="{Binding Path=DisplayName}" />
-                                    </StackPanel>
-                                </ControlTemplate>
-                            </ComboBox.Template>-->
+                    <DockPanel LastChildFill="False" Height="46">
+                        <Label Content="Icon" VerticalAlignment="Center" />
+                        <ComboBox DockPanel.Dock="Right" Width="140" Height="46" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -105,17 +95,19 @@
                         </ComboBox>
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Radius" Name="checkBoxRadius" VerticalAlignment="Center" IsChecked="True" TabIndex="7" />
-                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="120" Text="0" TabIndex="8" />
+                        <Label Content="Radius" />
+                        <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="140" Text="0" TabIndex="8" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
-                        <CheckBox Content="Borderless" Name="checkBoxBorderless" VerticalAlignment="Center" TabIndex="9" />
+                        <Label Content="Options" />
+                        <CheckBox Content="Borderless" Name="checkBoxBorderless" VerticalAlignment="Center" TabIndex="10" Margin="10,0,0,0" DockPanel.Dock="Right" />
+                        <CheckBox Content="Enable label" Name="checkBoxLabel" VerticalAlignment="Center" TabIndex="9" IsChecked="True" DockPanel.Dock="Right" />
                     </DockPanel>
-                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="10" />
+                    <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="11" />
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Building presets - not loaded" Name="GroupBoxPresets" IsEnabled="True" DockPanel.Dock="Top">
-                <TreeView Name="treeViewPresets" MouseDoubleClick="TreeViewPresetsMouseDoubleClick" KeyDown="TreeViewPresetsKeyDown" TabIndex="11" />
+                <TreeView Name="treeViewPresets" MouseDoubleClick="TreeViewPresetsMouseDoubleClick" KeyDown="TreeViewPresetsKeyDown" TabIndex="12" />
             </GroupBox>
         </DockPanel>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
