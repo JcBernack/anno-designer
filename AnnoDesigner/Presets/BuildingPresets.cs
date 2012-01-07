@@ -30,13 +30,13 @@ namespace AnnoDesigner.Presets
             var list = Buildings.Where(_ => !excludedTemplates.Contains(_.Template)).Where(_ => !excludedFactions.Contains(_.Faction));
             foreach (var firstLevel in list.GroupBy(_ => _.Faction).OrderBy(_ => _.Key))
             {
-                var firstLevelItem = new BuildingTreeViewItem(firstLevel.Key);
+                var firstLevelItem = new TreeViewItem { Header = firstLevel.Key };
                 foreach (var secondLevel in firstLevel.GroupBy(_ => _.Group).OrderBy(_ => _.Key))
                 {
-                    var secondLevelItem = new BuildingTreeViewItem(secondLevel.Key);
+                    var secondLevelItem = new TreeViewItem { Header = secondLevel.Key };
                     foreach (var buildingInfo in secondLevel.OrderBy(_ => _.GetOrderParameter()))
                     {
-                        secondLevelItem.Items.Add(new BuildingTreeViewItem(buildingInfo.Eng, buildingInfo.ToAnnoObject()));
+                        secondLevelItem.Items.Add(buildingInfo.ToAnnoObject());
                     }
                     firstLevelItem.Items.Add(secondLevelItem);
                 }

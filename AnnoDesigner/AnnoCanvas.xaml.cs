@@ -388,15 +388,15 @@ namespace AnnoDesigner
                             // and there is a matching preset
                             var matchedWikiaNames = BuildingPresets.Buildings.FindAll(_ => _.IconFileName == filenameWithExt)
                                 .Select(_ => Path.GetFileNameWithoutExtension(_.IconWikiaFile))
-                                .Where(_ => !string.IsNullOrEmpty(_));
-                            if (matchedWikiaNames.Count() > 0)
+                                .Where(_ => !string.IsNullOrEmpty(_)).ToList();
+                            if (matchedWikiaNames.Any())
                             {
                                 // use the WikiaFileName without its extension for this icon
                                 displayName = Path.GetFileNameWithoutExtension(matchedWikiaNames.First());
                             }
                         }
                         // add the current icon
-                        icons.Add(filenameWithoutExt, new IconImage(displayName, new BitmapImage(new Uri(path))));
+                        icons.Add(filenameWithoutExt, new IconImage(filenameWithoutExt, displayName, new BitmapImage(new Uri(path))));
                     }
                 }
                 // sort icons by its DisplayName

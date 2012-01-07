@@ -3,10 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:extToolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
         xmlns:my="clr-namespace:AnnoDesigner"
+        xmlns:myUI="clr-namespace:AnnoDesigner.UI"
         Title="Anno Designer"
         Icon="/AnnoDesigner;component/icon.ico"
         Height="545" Width="954"
         Loaded="WindowLoaded">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type myUI:IconImage}">
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Margin="5">
+                    <Image Width="23" Height="23" Source="{Binding Path=Icon}" />
+                </Viewbox>
+                <TextBlock Margin="0,5,5,5" VerticalAlignment="Center" Text="{Binding Path=DisplayName}" />
+            </StackPanel>
+        </DataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type my:AnnoObject}">
+            <TextBlock Text="{Binding Label}"/>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -81,19 +95,7 @@
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="46">
                         <Label Content="Icon" VerticalAlignment="Center" />
-                        <ComboBox DockPanel.Dock="Right" Width="140" Height="46" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6" TextSearch.TextPath="DisplayName">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Viewbox Margin="5">
-                                            <Image Width="23" Height="23" Source="{Binding Path=Icon.Icon}" />
-                                        </Viewbox>
-                                        <TextBlock Margin="0,5,5,5" VerticalAlignment="Center" Text="{Binding Path=DisplayName}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                            <ComboBoxItem Content="Not loaded" IsSelected="True" />
-                        </ComboBox>
+                        <ComboBox DockPanel.Dock="Right" Width="140" Height="46" IsEnabled="True" Name="comboBoxIcon" SelectedIndex="0" TabIndex="6" TextSearch.TextPath="DisplayName" />
                     </DockPanel>
                     <DockPanel LastChildFill="False" Height="26">
                         <Label Content="Radius" />

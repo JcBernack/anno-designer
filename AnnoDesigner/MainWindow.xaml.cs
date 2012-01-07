@@ -20,7 +20,7 @@ namespace AnnoDesigner
         : Window
     {
         private readonly WebClient _webClient;
-        private IconComboBoxItem _noIconItem;
+        private IconImage _noIconItem;
 
         #region Initialization
 
@@ -40,11 +40,11 @@ namespace AnnoDesigner
         {
             // add icons to the combobox
             comboBoxIcon.Items.Clear();
-            _noIconItem = new IconComboBoxItem("None");
+            _noIconItem = new IconImage("None");
             comboBoxIcon.Items.Add(_noIconItem);
             foreach (var icon in annoCanvas.Icons)
             {
-                comboBoxIcon.Items.Add(new IconComboBoxItem(icon.Key, icon.Value));
+                comboBoxIcon.Items.Add(icon.Value);
             }
             comboBoxIcon.SelectedIndex = 0;
             // check for updates on startup
@@ -71,8 +71,8 @@ namespace AnnoDesigner
             // load presets
             treeViewPresets.Items.Clear();
             // manually add a road tile preset
-            treeViewPresets.Items.Add(new BuildingTreeViewItem("road tile", new AnnoObject{ Size = new Size(1,1), Radius = 0 }));
-            treeViewPresets.Items.Add(new BuildingTreeViewItem("borderless road tile", new AnnoObject{ Size = new Size(1,1), Borderless = true, Radius = 0 }));
+            treeViewPresets.Items.Add(new AnnoObject{ Label = "road tile", Size = new Size(1,1), Radius = 0 });
+            treeViewPresets.Items.Add(new AnnoObject{ Label = "borderless road tile", Size = new Size(1,1), Borderless = true, Radius = 0 });
             var presets = annoCanvas.BuildingPresets;
             if (presets != null)
             {
@@ -141,12 +141,11 @@ namespace AnnoDesigner
             // color
             colorPicker.SelectedColor = obj.Color;
             // label
-            //checkBoxLabel.IsChecked = !string.IsNullOrEmpty(obj.Label);
             textBoxLabel.Text = obj.Label;
             // icon
             try
             {
-                comboBoxIcon.SelectedItem = string.IsNullOrEmpty(obj.Icon) ? _noIconItem : comboBoxIcon.Items.Cast<IconComboBoxItem>().Single(_ => _.IconName == Path.GetFileNameWithoutExtension(obj.Icon));
+                comboBoxIcon.SelectedItem = string.IsNullOrEmpty(obj.Icon) ? _noIconItem : comboBoxIcon.Items.Cast<IconImage>().Single(_ => _.Name == Path.GetFileNameWithoutExtension(obj.Icon));
             }
             catch (Exception)
             {
@@ -154,7 +153,8 @@ namespace AnnoDesigner
             }
             // radius
             textBoxRadius.Text = obj.Radius.ToString();
-            // borderless flag
+            // flags
+            //checkBoxLabel.IsChecked = !string.IsNullOrEmpty(obj.Label);
             checkBoxBorderless.IsChecked = obj.Borderless;
         }
 
@@ -167,7 +167,7 @@ namespace AnnoDesigner
         private void LoadedFileChanged(string filename)
         {
             Title = string.IsNullOrEmpty(filename) ? "Anno Designer" : string.Format("{0} - Anno Designer", Path.GetFileName(filename));
-            System.Diagnostics.Debug.WriteLine(string.Format("Loaded file changed: {0}", string.IsNullOrEmpty(filename) ? "(none)" : filename));
+            System.Diagnostics.Debug.WriteLine(string.Format("Loaded file: {0}", string.IsNullOrEmpty(filename) ? "(none)" : filename));
         }
 
         #endregion
@@ -187,7 +187,7 @@ namespace AnnoDesigner
                 Size = new Size(int.Parse(textBoxWidth.Text), int.Parse(textBoxHeight.Text)),
                 Color = colorPicker.SelectedColor,
                 Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
-                Icon = comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconComboBoxItem)comboBoxIcon.SelectedItem).IconName,
+                Icon = comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconImage)comboBoxIcon.SelectedItem).Name,
                 Radius = string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text),
                 Borderless = IsChecked(checkBoxBorderless)
             };
@@ -206,10 +206,10 @@ namespace AnnoDesigner
         {
             try
             {
-                var item = (BuildingTreeViewItem) treeViewPresets.SelectedItem;
-                if (item != null && item.Object != null)
+                var selectedItem = treeViewPresets.SelectedItem as AnnoObject;
+                if (selectedItem != null)
                 {
-                    UpdateUIFromObject(new AnnoObject(item.Object) { Color = colorPicker.SelectedColor });
+                    UpdateUIFromObject(new AnnoObject(selectedItem) { Color = colorPicker.SelectedColor });
                     ApplyCurrentObject();
                 }
             }

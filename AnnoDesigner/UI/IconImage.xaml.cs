@@ -4,6 +4,12 @@ namespace AnnoDesigner.UI
 {
     public class IconImage
     {
+        public string Name
+        {
+            get;
+            private set;
+        }
+
         public string DisplayName
         {
             get;
@@ -16,8 +22,15 @@ namespace AnnoDesigner.UI
             private set;
         }
 
-        public IconImage(string displayName, BitmapImage icon)
+        public IconImage(string name)
         {
+            Name = name;
+            DisplayName = name;
+        }
+
+        public IconImage(string name, string displayName, BitmapImage icon)
+        {
+            Name = name;
             DisplayName = displayName;
             Icon = icon;
         }
