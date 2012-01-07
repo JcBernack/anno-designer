@@ -69,8 +69,6 @@
     <Compile Include="Presets\ColorTarget.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
-    <Compile Include="UI\BuildingTreeViewItem.cs" />
-    <Compile Include="UI\IconComboBoxItem.xaml.cs" />
     <Compile Include="UI\IconImage.xaml.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>

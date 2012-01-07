@@ -37,7 +37,11 @@ namespace AnnoDesigner
         /// Label string
         /// </summary>
         [DataMember]
-        public string Label;
+        public string Label
+        {
+            get;
+            set;
+        }
         
         /// <summary>
         /// Influence radius in grid units
