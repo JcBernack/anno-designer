@@ -147,12 +147,7 @@ namespace AnnoDesigner
             // try to load layout
             var layout = LoadFromFile<SavedLayout>(filename);
             // use fallback for old layouts
-            if (layout.Objects == null)
-            {
-                layout = new SavedLayout(LoadFromFile<List<AnnoObject>>(filename));
-            }
-            // return objects
-            return layout.Objects;
+            return layout.Objects ?? LoadFromFile<List<AnnoObject>>(filename);
         }
 
         #endregion
