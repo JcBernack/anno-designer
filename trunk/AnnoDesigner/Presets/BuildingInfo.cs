@@ -16,21 +16,23 @@ namespace AnnoDesigner.Presets
         //public int IfoFile;
 
         // main
-        [DataMember(Name = "BuildBlocker.x")]
-        public int Width;
-        [DataMember(Name = "BuildBlocker.z")]
-        public int Height;
+        [DataMember]
+        public SerializableDictionary<int> BuildBlocker;
         [DataMember]
         public string Identifier;
         [DataMember]
         public string IconFileName;
         [DataMember]
         public string IconWikiaFile;
-        [DataMember(Name = "Eng1")]
-        public string Eng;
         [DataMember]
         public int InfluenceRadius;
 
+        [DataMember]
+        public SerializableDictionary<string> Localisation;
+
+        //[DataMember]
+        //public SerializableDictionary<int> BuildCost;
+        
         // grouping
         [DataMember]
         public string Faction;
@@ -51,16 +53,17 @@ namespace AnnoDesigner.Presets
         {
             return new AnnoObject
             {
-                Label = Eng,
+                Label = Localisation == null ? "" : Localisation["eng"],
                 Icon = IconFileName,
                 Radius = InfluenceRadius,
-                Size = new Size(Width, Height)
+                Size = BuildBlocker == null ? new Size() : new Size(BuildBlocker["x"], BuildBlocker["z"])
+                //BuildCosts = BuildCost
             };
         }
 
         public string GetOrderParameter()
         {
-            return Eng;
+            return Localisation["eng"];
         }
     }
 }

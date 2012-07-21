@@ -135,6 +135,30 @@ namespace AnnoDesigner
         }
 
         /// <summary>
+        /// Backing field of the RenderStats property.
+        /// </summary>
+        private bool _renderStats;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the calculated statistics of the layout should be rendered.
+        /// </summary>
+        public bool RenderStats
+        {
+            get
+            {
+                return _renderStats;
+            }
+            set
+            {
+                if (_renderStats != value)
+                {
+                    InvalidateVisual();
+                }
+                _renderStats = value;
+            }
+        }
+
+        /// <summary>
         /// Backing field of the CurrentObject property
         /// </summary>
         private AnnoObject _currentObject;
@@ -356,12 +380,12 @@ namespace AnnoDesigner
             _radiusPen = new Pen(Brushes.Black, 1);
             _influencedPen = new Pen(Brushes.LawnGreen, 1);
             var color = Colors.LightYellow;
-            color.A = 92;
+            color.A = 32;
             _lightBrush = new SolidColorBrush(color);
             color = Colors.LawnGreen;
-            color.A = 92;
+            color.A = 32;
             _influencedBrush = new SolidColorBrush(color);
-            // load all icons if not in design time
+            // load presets and icons if not in design time
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 // load presets
@@ -416,7 +440,7 @@ namespace AnnoDesigner
         {
             //var m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
             //var dpiFactor = 1 / m.M11;
-            var dpiFactor = 1;
+            const int dpiFactor = 1;
             _linePen.Thickness = dpiFactor * 1;
             _highlightPen.Thickness = dpiFactor * 2;
             _radiusPen.Thickness = dpiFactor * 2;
@@ -435,6 +459,13 @@ namespace AnnoDesigner
             // draw background
             drawingContext.DrawRectangle(Brushes.White, null, new Rect(new Point(), RenderSize));
 
+            // draw additional information
+            if (RenderStats)
+            {
+                width -= Constants.StatisticsMargin;
+                RenderStatistics(drawingContext);
+            }
+
             // draw grid
             if (RenderGrid)
             {
@@ -442,6 +473,7 @@ namespace AnnoDesigner
                 {
                     drawingContext.DrawLine(_linePen, new Point(i, 0), new Point(i, height));
                 }
+                drawingContext.DrawLine(_linePen, new Point(width, 0), new Point(width, height));
                 for (var i = 0; i < height; i += _gridStep)
                 {
                     drawingContext.DrawLine(_linePen, new Point(0, i), new Point(width, i));
@@ -449,7 +481,7 @@ namespace AnnoDesigner
             }
 
             // draw mouse grid position highlight
-            //drawingContext.DrawRectangle(Brushes.LightYellow, linePen, new Rect(GridToScreen(ScreenToGrid(_mousePosition)), new Size(_gridStep, _gridStep)));
+            //drawingContext.DrawRectangle(_lightBrush, _highlightPen, new Rect(GridToScreen(ScreenToGrid(_mousePosition)), new Size(_gridStep, _gridStep)));
 
             // draw placed objects
             _placedObjects.ForEach(_ => RenderObject(drawingContext, _));
@@ -544,7 +576,7 @@ namespace AnnoDesigner
             {
                 var textPoint = objRect.TopLeft;
                 var text = new FormattedText(obj.Label, Thread.CurrentThread.CurrentCulture, FlowDirection.LeftToRight,
-                                             new Typeface("Verdana"), 12, Brushes.Black)
+                                             new Typeface("Verdana"), 12, Brushes.Black, null, TextFormattingMode.Display)
                 {
                     MaxTextWidth = objRect.Width,
                     MaxTextHeight = objRect.Height
@@ -601,9 +633,54 @@ namespace AnnoDesigner
                     {
                         drawingContext.DrawRectangle(_influencedBrush, _influencedPen, oRect);
                     }
+                    //o.Label = (Math.Sqrt(distance.X*distance.X + distance.Y*distance.Y) - Math.Sqrt(radius*radius)).ToString();
                 }
                 // draw circle
                 drawingContext.DrawGeometry(_lightBrush, _radiusPen, circle);
+            }
+        }
+
+        /// <summary>
+        /// Renders calculated statistics of the current layout like the bounding box and space efficiency
+        /// </summary>
+        /// <param name="drawingContext">context used for rendering</param>
+        protected void RenderStatistics(DrawingContext drawingContext)
+        {
+            var informationLines = new List<string>();
+            if (!_placedObjects.Any())
+            {
+                informationLines.Add("Nothing placed");
+            }
+            else
+            {
+                // calculate bouding box
+                var boxX = _placedObjects.Max(_ => _.Position.X + _.Size.Width) - _placedObjects.Min(_ => _.Position.X);
+                var boxY = _placedObjects.Max(_ => _.Position.Y + _.Size.Height) - _placedObjects.Min(_ => _.Position.Y);
+                // calculate area of all buildings
+                var minTiles = _placedObjects.Where(_ => !_.Road).Sum(_ => _.Size.Width * _.Size.Height);
+                // format lines
+                informationLines.Add("Bounding Box");
+                informationLines.Add(string.Format(" {0}x{1}", boxX, boxY));
+                informationLines.Add(string.Format(" {0} Tiles", boxX * boxY));
+                informationLines.Add("");
+                informationLines.Add("Minimum Area");
+                informationLines.Add(string.Format(" {0} Tiles", minTiles));
+                informationLines.Add("");
+                informationLines.Add("Space efficiency");
+                informationLines.Add(string.Format(" {0}%", Math.Round(minTiles / boxX / boxY * 100)));
+            }
+            // render all the lines
+            for (var i = 0; i < informationLines.Count; i++)
+            {
+                var line = informationLines[i];
+                var text = new FormattedText(line, Thread.CurrentThread.CurrentCulture, FlowDirection.LeftToRight,
+                                             new Typeface("Verdana"), 12, Brushes.Black, null ,TextFormattingMode.Display)
+                {
+                    MaxTextWidth = Constants.StatisticsMargin,
+                    MaxTextHeight = RenderSize.Height,
+                    TextAlignment = TextAlignment.Left
+                };
+                drawingContext.DrawText(text, new Point(RenderSize.Width - Constants.StatisticsMargin + 10, 10 + i * 15));
             }
         }
 
@@ -1292,7 +1369,8 @@ namespace AnnoDesigner
                     _placedObjects = allObjects,
                     RenderGrid = RenderGrid,
                     RenderIcon = RenderIcon,
-                    RenderLabel = RenderLabel
+                    RenderLabel = RenderLabel,
+                    RenderStats = RenderStats
                 };
                 // normalize layout
                 target.Normalize(border);
@@ -1309,6 +1387,10 @@ namespace AnnoDesigner
                 // calculate output size
                 var width = target.GridToScreen(_placedObjects.Max(_ => _.Position.X + _.Size.Width) + border) + 1;
                 var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
+                if (RenderStats)
+                {
+                    width += Constants.StatisticsMargin - 1;
+                }
                 target.Width = width;
                 target.Height = height;
                 // apply size

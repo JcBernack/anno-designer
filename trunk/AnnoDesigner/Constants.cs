@@ -46,6 +46,11 @@ namespace AnnoDesigner
         public const int GridStepDefault = 20;
 
         /// <summary>
+        /// Defines the margin in pixels on the right side of the layout which is used to render the statistics
+        /// </summary>
+        public const int StatisticsMargin = 120;
+
+        /// <summary>
         /// The folder containing all icon files.
         /// </summary>
         public const string IconFolder = "icons";

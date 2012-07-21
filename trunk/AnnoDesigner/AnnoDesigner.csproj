@@ -42,7 +42,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.XML" />
@@ -69,6 +68,7 @@
     <Compile Include="Presets\ColorTarget.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
+    <Compile Include="SerializableDictionary.cs" />
     <Compile Include="UI\IconImage.xaml.cs" />
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
