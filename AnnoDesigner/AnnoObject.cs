@@ -56,6 +56,15 @@ namespace AnnoDesigner
         public bool Borderless;
 
         /// <summary>
+        /// Indicates whether the object is treated as a road tile.
+        /// </summary>
+        [DataMember]
+        public bool Road;
+
+        //[DataMember]
+        //public SerializableDictionary<int> BuildCosts;
+
+        /// <summary>
         /// Empty constructor needed for deserialization
         /// </summary>
         public AnnoObject()
@@ -75,6 +84,9 @@ namespace AnnoDesigner
             Icon = obj.Icon;
             Radius = obj.Radius;
             Borderless = obj.Borderless;
+            Road = obj.Road;
+            // note: this is not really a copy, just a reference, but it is not supposed to change anyway
+            //BuildCosts = obj.BuildCosts;
         }
     }
 }

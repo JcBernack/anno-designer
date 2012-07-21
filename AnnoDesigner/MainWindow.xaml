@@ -62,7 +62,7 @@
                 <MenuItem Header="Use current zoom on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportZoom" />
                 <MenuItem Header="Render selection highlights on exported image" IsCheckable="True" IsChecked="False" Name="MenuItemExportSelection" />
             </MenuItem>
-            <MenuItem Header="Help" TabIndex="26" HorizontalAlignment="Right">
+            <MenuItem Header="Help" TabIndex="23" HorizontalAlignment="Right">
                 <MenuItem Header="Version: x" Name="MenuItemVersion" IsEnabled="False" />
                 <MenuItem Header="File version: x" Name="MenuItemFileVersion" IsEnabled="False" />
                 <MenuItem Header="Presets version: not loaded" Name="MenuItemPresetsVersion" IsEnabled="False" />
@@ -72,9 +72,10 @@
                 <MenuItem Header="About Anno Designer" Click="MenuItemAboutClick" />
             </MenuItem>
             <Separator />
-            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" TabIndex="23" />
-            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" TabIndex="24" />
-            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" TabIndex="25" />
+            <MenuItem Header="Show grid" IsCheckable="True" IsChecked="True" Click="MenuItemGridClick" TabIndex="24" />
+            <MenuItem Header="Show labels" IsCheckable="True" IsChecked="True" Click="MenuItemLabelClick" TabIndex="25" />
+            <MenuItem Header="Show icons" IsCheckable="True" IsChecked="True" Click="MenuItemIconClick" TabIndex="26" />
+            <MenuItem Header="Show stats" IsCheckable="True" IsChecked="False" Click="MenuItemStatsClick" TabIndex="27" />
         </Menu>
         <DockPanel Grid.Column="1" Grid.Row="1" LastChildFill="True">
             <GroupBox Header="Building settings" DockPanel.Dock="Top">
@@ -101,10 +102,13 @@
                         <Label Content="Radius" />
                         <TextBox DockPanel.Dock="Right" Height="23" IsEnabled="True" Name="textBoxRadius" Width="140" Text="0" TabIndex="8" />
                     </DockPanel>
-                    <DockPanel LastChildFill="False" Height="26">
+                    <DockPanel LastChildFill="False">
                         <Label Content="Options" />
-                        <CheckBox Content="Borderless" Name="checkBoxBorderless" VerticalAlignment="Center" TabIndex="10" Margin="10,0,0,0" DockPanel.Dock="Right" />
-                        <CheckBox Content="Enable label" Name="checkBoxLabel" VerticalAlignment="Center" TabIndex="9" IsChecked="True" DockPanel.Dock="Right" />
+                        <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
+                            <CheckBox Content="Enable label" Name="checkBoxLabel" Margin="0,5,0,5" VerticalAlignment="Center" TabIndex="9" IsChecked="True" />
+                            <CheckBox Content="Borderless" Name="checkBoxBorderless" Margin="0,0,0,5" VerticalAlignment="Center" TabIndex="10" />
+                            <CheckBox Content="Road" Name="checkBoxRoad" Margin="0,0,0,5" VerticalAlignment="Center" TabIndex="11" />
+                        </StackPanel>
                     </DockPanel>
                     <Button Click="ButtonPlaceBuildingClick" Content="Place building" Height="23" TabIndex="11" />
                 </StackPanel>

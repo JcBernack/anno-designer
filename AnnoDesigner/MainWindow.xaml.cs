@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using AnnoDesigner.Presets;
 using AnnoDesigner.UI;
@@ -71,8 +71,8 @@ namespace AnnoDesigner
             // load presets
             treeViewPresets.Items.Clear();
             // manually add a road tile preset
-            treeViewPresets.Items.Add(new AnnoObject{ Label = "road tile", Size = new Size(1,1), Radius = 0 });
-            treeViewPresets.Items.Add(new AnnoObject{ Label = "borderless road tile", Size = new Size(1,1), Borderless = true, Radius = 0 });
+            treeViewPresets.Items.Add(new AnnoObject { Label = "road tile", Size = new Size(1, 1), Radius = 0, Road = true });
+            treeViewPresets.Items.Add(new AnnoObject { Label = "borderless road tile", Size = new Size(1, 1), Radius = 0, Borderless = true, Road = true });
             var presets = annoCanvas.BuildingPresets;
             if (presets != null)
             {
@@ -156,6 +156,7 @@ namespace AnnoDesigner
             // flags
             //checkBoxLabel.IsChecked = !string.IsNullOrEmpty(obj.Label);
             checkBoxBorderless.IsChecked = obj.Borderless;
+            checkBoxRoad.IsChecked = obj.Road;
         }
 
         private void StatusMessageChanged(string message)
@@ -174,7 +175,7 @@ namespace AnnoDesigner
 
         #region Main methods
 
-        private static bool IsChecked(CheckBox checkBox)
+        private static bool IsChecked(ToggleButton checkBox)
         {
             return checkBox.IsChecked ?? false;
         }
@@ -189,7 +190,8 @@ namespace AnnoDesigner
                 Label = IsChecked(checkBoxLabel) ? textBoxLabel.Text : "",
                 Icon = comboBoxIcon.SelectedItem == _noIconItem ? null : ((IconImage)comboBoxIcon.SelectedItem).Name,
                 Radius = string.IsNullOrEmpty(textBoxRadius.Text) ? 0 : double.Parse(textBoxRadius.Text),
-                Borderless = IsChecked(checkBoxBorderless)
+                Borderless = IsChecked(checkBoxBorderless),
+                Road = IsChecked(checkBoxRoad)
             };
             // do some sanity checks
             if (obj.Size.Width > 0 && obj.Size.Height > 0 && obj.Radius >= 0)
@@ -258,6 +260,11 @@ namespace AnnoDesigner
         private void MenuItemIconClick(object sender, RoutedEventArgs e)
         {
             annoCanvas.RenderIcon = !annoCanvas.RenderIcon;
+        }
+
+        private void MenuItemStatsClick(object sender, RoutedEventArgs e)
+        {
+            annoCanvas.RenderStats = !annoCanvas.RenderStats;
         }
 
         private void MenuItemVersionCheckImageClick(object sender, RoutedEventArgs e)
