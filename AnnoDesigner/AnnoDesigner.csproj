@@ -105,6 +105,7 @@
     <None Include="colors.json" />
     <None Include="presets.json" />
     <None Include="Stuff\list_of_buildings_v0.3.json" />
+    <None Include="Stuff\list_of_buildings_v0.4.json" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />

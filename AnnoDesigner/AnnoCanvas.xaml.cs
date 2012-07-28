@@ -456,15 +456,14 @@ namespace AnnoDesigner
             var width = RenderSize.Width;
             var height = RenderSize.Height;
 
-            // draw background
-            drawingContext.DrawRectangle(Brushes.White, null, new Rect(new Point(), RenderSize));
-
-            // draw additional information
+            // apply offset when rendering statistics
             if (RenderStats)
             {
                 width -= Constants.StatisticsMargin;
-                RenderStatistics(drawingContext);
             }
+
+            // draw background
+            drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(new Point(), RenderSize));
 
             // draw grid
             if (RenderGrid)
@@ -473,7 +472,6 @@ namespace AnnoDesigner
                 {
                     drawingContext.DrawLine(_linePen, new Point(i, 0), new Point(i, height));
                 }
-                drawingContext.DrawLine(_linePen, new Point(width, 0), new Point(width, height));
                 for (var i = 0; i < height; i += _gridStep)
                 {
                     drawingContext.DrawLine(_linePen, new Point(0, i), new Point(width, i));
@@ -511,11 +509,19 @@ namespace AnnoDesigner
                     CurrentObject.Color.A = 255;
                 }
             }
+
             // draw selection rect while dragging the mouse
             if (CurrentMode == MouseMode.SelectionRect)
             {
                 drawingContext.DrawRectangle(_lightBrush, _highlightPen, _selectionRect);
             }
+            
+            // draw additional information
+            if (RenderStats)
+            {
+                RenderStatistics(drawingContext);
+            }
+
             // pop back guidlines set
             drawingContext.Pop();
         }
@@ -646,6 +652,12 @@ namespace AnnoDesigner
         /// <param name="drawingContext">context used for rendering</param>
         protected void RenderStatistics(DrawingContext drawingContext)
         {
+            // clear background
+            var offset = RenderSize.Width - Constants.StatisticsMargin;
+            //drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(offset, 0, Constants.StatisticsMargin, RenderSize.Height));
+            // draw vertical grid line
+            //drawingContext.DrawLine(_linePen, new Point(offset, 0), new Point(offset, RenderSize.Height));
+
             var informationLines = new List<string>();
             if (!_placedObjects.Any())
             {
@@ -1389,7 +1401,7 @@ namespace AnnoDesigner
                 var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
                 if (RenderStats)
                 {
-                    width += Constants.StatisticsMargin - 1;
+                    width += Constants.StatisticsMargin;
                 }
                 target.Width = width;
                 target.Height = height;
