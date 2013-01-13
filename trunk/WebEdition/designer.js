@@ -1,6 +1,59 @@
-//
-// Requires jQuery
-//
+/**
+ * Anno Designer - Web Edition
+ * Date: 09.01.13
+ * @requires jQuery
+ * @author Jan Christoph Bernack
+ */
+
+var Convert = {
+    bool: function(str) { return str == "1" },
+    int: function(str) { return parseInt(str); }
+};
+
+var Building = function(left, top, width, height, color, label) {
+    this.left = left;
+    this.top = top;
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.label = label;
+    this.enableLabel = false;
+    this.borderless = false;
+    this.road = false;
+};
+
+Building.FromObject = function (obj) {
+    var b = new Building(
+        Convert.int(obj.left),
+        Convert.int(obj.top),
+        Convert.int(obj.width),
+        Convert.int(obj.height),
+        obj.color,
+        obj.label
+    );
+    b.enableLabel = Convert.bool(obj.enableLabel);
+    b.borderless = Convert.bool(obj.borderless);
+    b.road = Convert.bool(obj.road);
+    return b;
+};
+
+Building.prototype.Position = function (point) {
+    if (point) {
+        this.left = point.x;
+        this.top = point.y;
+        return this;
+    } else {
+        return new Point(this.left, this.top);
+    }
+};
+
+Building.prototype.Size = function () {
+    return new Size(this.width, this.height);
+};
+
+Building.prototype.Rect = function () {
+    return new Rect(this.left, this.top, this.width, this.height);
+};
 
 // Editor mouse behavior
 // + MouseMove
@@ -11,32 +64,15 @@
 //   - no action active: select objects (shift/ctrl mechanics)
 //   -   or prepare dragging
 //   - placing an object: place object if it fits (collision detection)
-// + MouseClick (left)
-//   - get properties of clicked objects
-// + MouseClick (right)
-//   - no action active: remove object at mouse
-//   - placing an object: stop placing objects
-// + MouseWheel
-//   - change zoom level (grid cell size)
+//# + MouseDblClick (left)
+//#   - get properties of clicked objects
+//# + MouseClick (right)
+//#   - no action active: remove object at mouse
+//#   - placing an object: stop placing objects
+//# + MouseWheel
+//#   - change zoom level (grid cell size)
 // + Hotkeys:
 //   - entf: remove selected objects, if any
-
-var Type = {
-    bool: function(str) { return str == "1" },
-    int: function(str) { return parseInt(str); }
-};
-
-var Building = function(obj) {
-    this.left = Type.int(obj.left);
-    this.top = Type.int(obj.top);
-    this.width = Type.int(obj.width);
-    this.height = Type.int(obj.height);
-    this.color = obj.color;
-    this.label = obj.label;
-    this.enableLabel = Type.bool(obj.enableLabel);
-    this.borderless = Type.bool(obj.borderless);
-    this.road = Type.bool(obj.road);
-};
 
 // Constructor
 var Designer = function (options) {
@@ -60,13 +96,14 @@ var Designer = function (options) {
     this.SetSize();
     this.Render();
     var $this = this;
+    var grid = this._options.grid;
     this._resizer.resizable({
-        grid: this._options.size,
+        grid: grid,
         stop: function(event, ui) {
-            $this.SetSize($this._toGridCoord(ui.size.width), $this._toGridCoord(ui.size.height));
+            $this.SetSize(new Size(ui.size.width, ui.size.height).Scale(1/grid));
             $this.Render();
-            $this._resizer.width($this._toPixelCoord($this._options.width));
-            $this._resizer.height($this._toPixelCoord($this._options.height));
+            $this._resizer.width($this._options.width * grid);
+            $this._resizer.height($this._options.height * grid);
         }
     });
 };
@@ -74,10 +111,10 @@ var Designer = function (options) {
 Designer.defaultOptions = {
     serviceUrl: "rest/layout",
     containerId: "editor",
-    autoSize: false,
+    autoSize: true,
     enableEditing: true,
     drawGrid: true,
-    size: 15,
+    grid: 15,
     width: 15,
     height: 10,
     zoomSpeed: 1.1,
@@ -111,13 +148,13 @@ Designer.prototype._createButtonpane = function () {
             $.minicolors.init();
             // prepare buttons
             pane.find("#new").button({ icons: { primary: "ui-icon-document" } })
-                .click(function(e) { $this.New(); });
+                .click(function() { $this.New(); });
             pane.find("#save").button({ icons: { primary: "ui-icon-pencil" }, disabled: true })
-                .click(function(e) { $this.Save(); });
+                .click(function() { $this.Save(); });
             pane.find("#saveas").button({ icons: { primary: "ui-icon-disk" } })
-                .click(function(e) { $this.SaveAs(); });
+                .click(function() { $this.SaveAs(); });
             pane.find("#apply").button({ icons: { primary: "ui-icon-check" } })
-                .click(function(e) { $this._currentObject = $this._getManualProperties(); });
+                .click(function() { $this._currentObject = $this._getManualProperties(); });
             // put the whole menu inside an accordion
             pane.accordion({
                 heightStyle: "content",
@@ -132,6 +169,9 @@ Designer.prototype._createButtonpane = function () {
 
 Designer.prototype._setManualProperties = function(building) {
     var b = this._buttonpane;
+    if (b == null || building == null) {
+        return;
+    }
     b.find("#width").val(building.width);
     b.find("#height").val(building.height);
     b.find("#color").val(building.color);
@@ -143,16 +183,20 @@ Designer.prototype._setManualProperties = function(building) {
 };
 
 Designer.prototype._getManualProperties = function() {
-    var b = this._buttonpane;
-    var building = { };
-    building.width = parseInt(b.find("#width").val());
-    building.height = parseInt(b.find("#height").val());
-    building.color = b.find("#color").val();
-    building.label = b.find("#label").val();
-    building.enableLabel = b.find("#enableLabel")[0].checked;
-    building.borderless = b.find("#borderless")[0].checked;
-    building.road = b.find("#road")[0].checked;
-    return building;
+    var bp = this._buttonpane;
+    if (bp == null) {
+        return null;
+    }
+    var b = new Building(0, 0,
+        parseInt(bp.find("#width").val()),
+        parseInt(bp.find("#height").val()),
+        bp.find("#color").val(),
+        bp.find("#label").val()
+    );
+    b.enableLabel = bp.find("#enableLabel")[0].checked;
+    b.borderless = bp.find("#borderless")[0].checked;
+    b.road = bp.find("#road")[0].checked;
+    return b;
 };
 
 // ** Event handling
@@ -167,6 +211,9 @@ Designer.prototype._registerEvents = function () {
     });
     $(this._canvas).bind("click.designer", function (e) {
         $this._onMouseClick.apply($this, [e]);
+    });
+    $(this._canvas).bind("dblclick.designer", function (e) {
+        $this._onMouseDblClick.apply($this, [e]);
     });
     $(this._canvas).bind("contextmenu.designer", function (e) {
         $this._onMouseClickRight.apply($this, [e]);
@@ -185,19 +232,19 @@ Designer.prototype._unregisterEvents = function () {
 };
 
 Designer.prototype._onMouseMove = function (e) {
-    var pos = this._toGridCoord({
-        x: e.offsetX,
-        y: e.offsetY
-    });
+    var pos = new Point(e.offsetX, e.offsetY);
+    var grid = this._options.grid;
     if (this._currentObject == null) {
         // find object under mouse
-        this._hoveredObject = this._findObjectAtPosition(pos.x, pos.y);
+        this._hoveredObject = this._findObjectAtPosition(pos.Scale(1/grid));
     } else {
         // place currentObject at mouse
         this._hoveredObject = null;
-        //TODO: place centered on mouse position
-        this._currentObject.left = pos.x;
-        this._currentObject.top = pos.y;
+        // place centered on mouse position
+        var size = this._currentObject.Size().Scale(grid);
+        pos.x -= size.width / 2;
+        pos.y -= size.height / 2;
+        this._currentObject.Position(pos.Scale(1/grid, true));
     }
     // redraw to adjust highlighting
     this.Render();
@@ -212,35 +259,36 @@ Designer.prototype._onMouseClick = function (e) {
     if (this._currentObject != null) {
         var copy = $.extend(true, {}, this._currentObject);
         this._objects.push(copy);
-    } else {
-        var pos = this._toGridCoord({
-            x: e.offsetX,
-            y: e.offsetY
-        });
-        // find object under mouse
-        for (var i = 0; i < this._objects.length; i++) {
-            var o = this._objects[i];
-            if (RectContainsPoint(o.left, o.top, o.width, o.height, pos.x, pos.y)) {
-                this._setManualProperties(o);
-                break;
-            }
-        }
+        this.Render();
     }
-    this.Render();
+};
+
+Designer.prototype._onMouseDblClick = function (e) {
+    if (this._currentObject == null) {
+        var pos = new Point(e.offsetX, e.offsetY).Scale(1/this._options.grid);
+        this._setManualProperties(this._findObjectAtPosition(pos));
+        this.Render();
+    }
 };
 
 Designer.prototype._onMouseClickRight = function(e) {
     // right mouse button
-    this._currentObject = null;
+    if (this._currentObject != null) {
+        this._currentObject = null;
+    } else {
+        var pos = new Point(e.offsetX, e.offsetY);
+        var obj = this._findObjectAtPosition(pos.Scale(1/this._options.grid));
+        this._objects.remove(obj);
+    }
 };
 
 Designer.prototype._onMouseWheel = function(e) {
     // mouse wheel
     var delta = event.wheelDelta/50 || -event.detail;
-    this._options.size = Math.round(this._options.size * (delta < 0 ? 1/this._options.zoomSpeed : this._options.zoomSpeed));
-    if (this._options.size < 1)
+    this._options.grid = Math.round(this._options.grid * (delta < 0 ? 1/this._options.zoomSpeed : this._options.zoomSpeed));
+    if (this._options.grid < 1)
     {
-        this._options.size = 1;
+        this._options.grid = 1;
     }
     if (this._options.autoSize) {
         this.AutoSize();
@@ -248,11 +296,10 @@ Designer.prototype._onMouseWheel = function(e) {
     this.Render();
 };
 
-Designer.prototype._findObjectAtPosition = function(x, y) {
+Designer.prototype._findObjectAtPosition = function(point) {
     for (var i = 0; i < this._objects.length; i++) {
-        var o = this._objects[i];
-        if (RectContainsPoint(o.left, o.top, o.width, o.height, x, y)) {
-            return o;
+        if (this._objects[i].Rect().ContainsPoint(point)) {
+            return this._objects[i];
         }
     }
     return null;
@@ -266,8 +313,9 @@ Designer.prototype.SetSize = function (width, height) {
         height = this._options.height;
     }
     // set canvas size (in pixels)
-    this._canvas.width = this._toPixelCoord(width) + 1;
-    this._canvas.height = this._toPixelCoord(height) + 1;
+    var grid = this._options.grid;
+    this._canvas.width = width * grid + 1;
+    this._canvas.height = height * grid + 1;
     // remember size (in grid units)
     this._options.width = width;
     this._options.height = height;
@@ -328,7 +376,7 @@ Designer.prototype._parseLayout = function (data) {
     // parse objects retrieved from service
     this._objects = [];
     for (var i = 0; i < data.objects.length; i++) {
-        this._objects.push(new Building(data.objects[i]));
+        this._objects.push(Building.FromObject(data.objects[i]));
     }
     // if auto-sizing adjust canvas size to fit the layout
     if (this._options.autoSize) {
@@ -371,38 +419,17 @@ Designer.prototype.Render = function () {
     var ctx = this._ctx;
     // reset transform
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    // clear the whole canvas
-    //ctx.fillStyle = "#000000";
-    //ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    // clear the whole canvas (transparent)
     ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-    // translate half pixel to the right and down to achieve pixel perfect lines
-    //_ctx.translate(0.5, 0.5);
-    var i, x, y;
-    var maxWidth = Math.floor(this._canvas.width / o.size) * o.size;
-    var maxHeight = Math.floor(this._canvas.height / o.size) * o.size;
-    // draw grid
+    // render grid
     if (o.drawGrid) {
-        ctx.translate(0.5, 0.5);
-        ctx.strokeStyle = "#000000";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        for (x = 0; x < this._canvas.width; x += o.size) {
-            // vertical lines
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, maxHeight);
-        }
-        for (y = 0; y < this._canvas.height; y += o.size) {
-            // horizontal lines
-            ctx.moveTo(0, y);
-            ctx.lineTo(maxWidth, y);
-        }
-        ctx.stroke();
-        ctx.translate(-0.5, -0.5);
+        this._renderGrid();
     }
     // skip the rest if no data is present
     if (this._objects == null) {
         return;
     }
+    var i;
     // draw current objects
     for (i = 0; i < this._objects.length; i++) {
         this._renderObject(this._objects[i]);
@@ -413,14 +440,13 @@ Designer.prototype.Render = function () {
         obj = this._highlightedObjects[i];
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#00FF00";
-        this._strokeGridRect(obj.left, obj.top, obj.width, obj.height);
+        this._strokeRect(obj.Rect().Scale(o.grid));
     }
     // draw hovered object highlight
     if (this._hoveredObject != null) {
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#FFFF00";
-        obj = this._hoveredObject;
-        this._strokeGridRect(obj.left, obj.top, obj.width, obj.height);
+        this._strokeRect(this._hoveredObject.Rect().Scale(o.grid));
     }
     // draw "ghost" if currently placing a new object
     if (this._currentObject != null) {
@@ -428,56 +454,49 @@ Designer.prototype.Render = function () {
     }
 };
 
+Designer.prototype._renderGrid = function () {
+    var ctx = this._ctx;
+    var grid = this._options.grid;
+    var maxWidth = this._options.width * grid;
+    var maxHeight = this._options.height * grid;
+    // translate half pixel to the right and down to achieve pixel perfect lines
+    ctx.translate(0.5, 0.5);
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var x = 0; x < this._canvas.width; x += grid) {
+        // vertical lines
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, maxHeight);
+    }
+    for (var y = 0; y < this._canvas.height; y += grid) {
+        // horizontal lines
+        ctx.moveTo(0, y);
+        ctx.lineTo(maxWidth, y);
+    }
+    ctx.stroke();
+    ctx.translate(-0.5, -0.5);
+};
+
 Designer.prototype._renderObject = function (obj) {
     var ctx = this._ctx;
     ctx.lineWidth = 1;
     ctx.fillStyle = obj.color;
     ctx.strokeStyle = "#000000";
-    this._fillCells(obj.left, obj.top, obj.width, obj.height, obj.borderless);
+    var rect = obj.Rect().Scale(this._options.grid);
+    this._fillRect(rect);
+    if (!obj.borderless) {
+        this._strokeRect(rect);
+    }
 };
 
 // ** Render helpers
-Designer.prototype._fillCells = function (left, top, width, height, borderless) {
-    var s = this._options.size;
-    this._ctx.fillRect(left * s, top * s, width * s, height * s);
-    if (!borderless) {
-        this._strokeGridRect(left, top, width, height);
-    }
+Designer.prototype._strokeRect = function (rect) {
+    this._ctx.translate(0.5, 0.5);
+    this._ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    this._ctx.translate(-0.5, -0.5);
 };
 
-Designer.prototype._strokeGridRect = function (left, top, width, height) {
-    var ctx = this._ctx;
-    var s = this._options.size;
-    ctx.translate(0.5, 0.5);
-    ctx.strokeRect(left * s, top * s, width * s, height * s);
-    ctx.translate(-0.5, -0.5);
-};
-// ** Coordinate helpers
-Designer.prototype._convertCoordinate = function (value, factor) {
-    var i, result;
-    if (typeof value === "number") {
-        result = Math.floor(value * factor);
-    } else if (value instanceof Array) {
-        result = [];
-        for (i = 0; i < value.length; i++) {
-            result[i] = this._convertCoordinate(value[i], factor);
-        }
-    } else if (typeof value == "object") {
-        // convert each property
-        result = {};
-        for (i in value) {
-            result[i] = this._convertCoordinate(value[i], factor);
-        }
-    } else {
-        alert("dafuq is that?");
-    }
-    return result;
-};
-
-Designer.prototype._toGridCoord = function (value) {
-    return this._convertCoordinate(value, 1 / this._options.size);
-};
-
-Designer.prototype._toPixelCoord = function (value) {
-    return this._convertCoordinate(value, this._options.size);
+Designer.prototype._fillRect = function (rect) {
+    this._ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
 };
