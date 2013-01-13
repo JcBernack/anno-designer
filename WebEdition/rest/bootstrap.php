@@ -17,6 +17,7 @@ $app->hook("slim.after", function() { global $db; $db->close(); });
 $app->get("/user/:id", "GetUser");
 $app->get("/layout", "GetAllLayouts");
 $app->get("/layout/:id", "GetLayout");
+$app->delete("/layout/:id", "DeleteLayout");
 $app->post("/layout", "SaveLayout");
 $app->run();
 
@@ -105,6 +106,16 @@ function GetLayout($id) {
     $layout["objects"] = IdQuery("select * from layout_object where layoutID=_ID_", $layout["ID"])
         ->fetch_all(MYSQLI_ASSOC);
     echo json_encode($layout);
+}
+
+function DeleteLayout($id) {
+    global $app;
+    //$layout = UniqueIdQuery("select * from layout where ID=_ID_", $id)->fetch_assoc();
+    //TODO: check permission
+    if (!IdQuery("delete from layout where ID=_ID_", $id)) {
+        $app->halt(500);
+    }
+    echo json_encode(array("success" => true));
 }
 
 function SaveLayout() {

@@ -111,6 +111,7 @@ var Designer = function (options) {
 Designer.defaultOptions = {
     serviceUrl: "rest/layout",
     containerId: "editor",
+    layoutDeleted: $.noop,
     autoSize: true,
     enableEditing: true,
     drawGrid: true,
@@ -130,10 +131,14 @@ Designer.prototype._currentObject = null;
 // the object currently under the mouse
 Designer.prototype._hoveredObject = null;
 
+// holds the layout object received from the server
+Designer.prototype._layout = null;
+
 Designer.prototype.Reset = function () {
     this._objects = [];
     this._highlightedObjects = [];
     this._hoveredObject = null;
+    this._layout = null;
 };
 
 Designer.prototype._createButtonpane = function () {
@@ -153,6 +158,8 @@ Designer.prototype._createButtonpane = function () {
                 .click(function() { $this.Save(); });
             pane.find("#saveas").button({ icons: { primary: "ui-icon-disk" } })
                 .click(function() { $this.SaveAs(); });
+			pane.find("#delete").button({ icons: { primary: "ui-icon-trash" } })
+                .click(function() { $this.Delete(); });
             pane.find("#apply").button({ icons: { primary: "ui-icon-check" } })
                 .click(function() { $this._currentObject = $this._getManualProperties(); });
             // put the whole menu inside an accordion
@@ -357,6 +364,7 @@ Designer.prototype.SaveAs = function () {
         return;
     }
     // load file from url and parse as json
+    var $this = this;
     $.ajax({
         url: this._options.serviceUrl,
         type: "POST",
@@ -367,16 +375,43 @@ Designer.prototype.SaveAs = function () {
         }),
         success: function () {
             alert("successfully saved");
+            //TODO: refresh datatable
         }
     });
 };
 
-Designer.prototype._parseLayout = function (data) {
+Designer.prototype.Delete = function () {
+    // delete the currently loaded layout
+    if (this._layout == null) {
+        return;
+    }
+    //TODO: add confirmation dialog
+    var $this = this;
+    $.ajax({
+        url: this._options.serviceUrl + "/" + this._layout.ID,
+        type: "DELETE",
+        dataType: "json",
+        success: function (data) {
+            if (!data.success) {
+                alert("deletion failed");
+                return;
+            }
+            // fire deleted event
+            $this._options.layoutDeleted($this._layout.ID);
+            // reset the editor
+            $this.Reset();
+			$this.Render();
+        }
+    });
+};
+
+Designer.prototype._parseLayout = function (layout) {
     this.Reset();
+    this._layout = layout;
     // parse objects retrieved from service
     this._objects = [];
-    for (var i = 0; i < data.objects.length; i++) {
-        this._objects.push(Building.FromObject(data.objects[i]));
+    for (var i = 0; i < layout.objects.length; i++) {
+        this._objects.push(Building.FromObject(layout.objects[i]));
     }
     // if auto-sizing adjust canvas size to fit the layout
     if (this._options.autoSize) {

@@ -22,7 +22,7 @@ error_reporting(E_ALL);
     <script src="helpers.js"></script>
     <script src="designer.js"></script>
     <script type="text/javascript" language="JavaScript">
-        var designer;
+        var designer, datatable;
         $(function () {
             // initialize theme switcher
             // https://github.com/harborhoffer/Super-Theme-Switcher
@@ -54,12 +54,8 @@ error_reporting(E_ALL);
                         $("#preview").toggleClass("preview");
                         $("#list").toggle();
                     });
-            // initialize layout rendering
-            designer = new Designer({
-            });
-            //designer.Render();
             // initialize datatable
-            var datatable = $("#listTable").dataTable({
+            datatable = $("#listTable").dataTable({
                 bJQueryUI:true,
                 bProcessing:true,
                 sAjaxSource:"rest/layout",
@@ -87,6 +83,13 @@ error_reporting(E_ALL);
                 // load preview of clicked layout
                 designer.Load(event.target.nodeName == "TR" ? event.target.id : event.target.parentNode.id);
             });
+            // initialize layout rendering
+            designer = new Designer({
+                layoutDeleted: function (id) {
+                    datatable.fnDeleteRow($("#" + id)[0]);
+                }
+            });
+            //designer.Render();
             $(".formContainer button.submitButton")
                     .button({ icons: { primary: "ui-icon-check" } })
                     .click(function() {
