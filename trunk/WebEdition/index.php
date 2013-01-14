@@ -88,22 +88,35 @@ error_reporting(E_ALL);
                     datatable.fnDeleteRow($("#" + id)[0]);
                 }
             });
-            //designer.Render();
+            // prepare login and register forms
             $(".formContainer button.submitButton")
-                    .button({ icons: { primary: "ui-icon-check" } })
-                    .click(function() {
-                        //TODO: form validation, submit form if successful
-                        return false;
-                    });
+                    .button({ icons: { primary: "ui-icon-check" } });
             $(".formContainer button.cancelButton")
                     .button({ icons: { primary: "ui-icon-close" }, text: false })
                     .removeAttr("title")
                     .click(function() {
                         $("#loginForm").hide();
                         $("#registerForm").hide();
-                        // prevent postback
-                        return false;
                     });
+            $("#loginForm form").submit(function() {
+                //TODO: login
+                // prevent postback
+                return false;
+            });
+            $("#registerForm form").submit(function() {
+                //TODO: validation
+                Rest("POST", "rest/user", {
+                        name: $("#registerName").val(),
+                        username: $("#registerUsername").val(),
+                        password: $("#registerPassword").val()
+                    }, function (data) {
+                        //TODO: add nicer information
+                        alert(data.success ? "successful": "FAIL");
+                        $("#registerForm").hide();
+                    });
+                // prevent postback
+                return false;
+            });
             // initialize default tooltips
             $(".formContainer").tooltip({
                 position: { my: "left+15 center", at: "right center", collision: "flipfit" }

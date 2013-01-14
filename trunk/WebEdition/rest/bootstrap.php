@@ -91,10 +91,15 @@ function GetUser($id) {
 }
 
 function CreateUser() {
-    //TODO: create new user
-    //$result = UniqueIdQuery("select * from user where ID=_ID_", $id);
-    //$name = mysql_real_escape_string($data["name"]);
-    //echo json_encode($result->fetch_assoc());
+    global $app, $db;
+    //TODO: validate data
+    $name = mysql_real_escape_string($_POST["name"]);
+    $username = mysql_real_escape_string($_POST["username"]);
+    $password = mysql_real_escape_string($_POST["password"]);
+    if (!$db->query("insert into user (name,username,password) values('$name','$username','$password')")) {
+        $app->halt(400);
+    }
+    echo json_encode(array("success" => true));
 }
 
 function GetAllLayouts() {
@@ -166,7 +171,7 @@ function SaveLayout() {
     }
     try {
         //TODO: add current user as author
-        $query = "insert into layout (name, created, edited, width, height, usedFields) values ('$name', NOW(), NOW(), $width, $height, $usedFields)";
+        $query = "insert into layout (name, authorID, created, edited, width, height, usedFields) values ('$name', 1, NOW(), NOW(), $width, $height, $usedFields)";
         if (!$db->query($query)) {
             throw new IksdehException(400, "adding layout failed: ".$query);
         }
