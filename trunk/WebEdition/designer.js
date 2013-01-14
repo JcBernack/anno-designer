@@ -95,21 +95,11 @@ var Designer = function (options) {
     // render an empty layout
     this.SetSize();
     this.Render();
-    var $this = this;
-    var grid = this._options.grid;
-    this._resizer.resizable({
-        grid: grid,
-        stop: function(event, ui) {
-            $this.SetSize(new Size(ui.size.width, ui.size.height).Scale(1/grid));
-            $this.Render();
-            $this._resizer.width($this._options.width * grid);
-            $this._resizer.height($this._options.height * grid);
-        }
-    });
+    this.RefreshResizer();
 };
 
 Designer.defaultOptions = {
-    serviceUrl: "rest/layout",
+    serviceUrl: "rest/",
     containerId: "editor",
     layoutDeleted: $.noop,
     autoSize: true,
@@ -149,8 +139,6 @@ Designer.prototype._createButtonpane = function () {
             $this._container.append(data);
             // find containing element
             var pane = $this._container.find(".buttonpane");
-            // initialize color picker
-            $.minicolors.init();
             // prepare buttons
             pane.find("#new").button({ icons: { primary: "ui-icon-document" } })
                 .click(function() { $this.New(); });
@@ -160,8 +148,18 @@ Designer.prototype._createButtonpane = function () {
                 .click(function() { $this.SaveAs(); });
 			pane.find("#delete").button({ icons: { primary: "ui-icon-trash" } })
                 .click(function() { $this.Delete(); });
+            pane.find("#flipSize").button({ icons: { primary: "ui-icon-transfer-e-w" }, text: false })
+                .click(function() {
+                    var w = $("#width"), h = $("#height");
+                    var tmp = w.val();
+                    w.val(h.val());
+                    h.val(tmp);
+                });
             pane.find("#apply").button({ icons: { primary: "ui-icon-check" } })
                 .click(function() { $this._currentObject = $this._getManualProperties(); });
+            // initialize color picker
+            $.minicolors.init();
+
             // put the whole menu inside an accordion
             pane.accordion({
                 heightStyle: "content",
@@ -170,6 +168,217 @@ Designer.prototype._createButtonpane = function () {
             });
             // keep reference
             $this._buttonpane = pane;
+        }
+    });
+};
+
+Designer.prototype.ToggleButtonpane = function(visible) {
+    if (arguments.length == 0) {
+        this._buttonpane.toggle();
+    } else {
+        this._buttonpane.toggle(visible);
+    }
+};
+
+Designer.prototype.RefreshResizer = function() {
+    var $this = this;
+    var grid = this._options.grid;
+    var resize = function(event, ui) {
+        $this.SetSize(new Size(ui.size.width, ui.size.height).Scale(1/grid));
+        $this.Render();
+    };
+    this._resizer.resizable({
+        grid: grid,
+        minWidth: 10 * grid,
+        minHeight: 10 * grid,
+        //autoHide: true,
+        helper: "resizer-helper",
+        start: function(event, ui) {
+            $this._resizer.addClass("resizer-helper");
+        },
+        //resize: resize,
+        stop: function(event, ui) {
+            $this._resizer.removeClass("resizer-helper");
+            resize(event, ui);
+        }
+    });
+    this._resizer.find(".ui-resizable-e").hover(function() {
+        $this._resizer.addClass("resizer-helper-e");
+    }, function() {
+        $this._resizer.removeClass("resizer-helper-e");
+    });
+    this._resizer.find(".ui-resizable-s").hover(function() {
+        $this._resizer.addClass("resizer-helper-s");
+    }, function() {
+        $this._resizer.removeClass("resizer-helper-s");
+    });
+    this._resizer.find(".ui-resizable-se").hover(function() {
+        $this._resizer.addClass("resizer-helper-e");
+        $this._resizer.addClass("resizer-helper-s");
+    }, function() {
+        $this._resizer.removeClass("resizer-helper-e");
+        $this._resizer.removeClass("resizer-helper-s");
+    });
+};
+// ** Sizing
+Designer.prototype.SetSize = function (size) {
+    switch (arguments.length) {
+        case 0:
+            // use current dimensions if called without argument
+            size = new Size(this._options.width, this._options.height);
+            break;
+        case 1:
+            break;
+        case 2:
+            // accept two arguments: width, height
+            size = new Size(arguments[0], arguments[1]);
+            break;
+    }
+    // remember size in grid units
+    this._options.width = size.width;
+    this._options.height = size.height;
+    // scale size to pixel units
+    size.Scale(this._options.grid);
+    // set canvas size in pixels
+    this._canvas.width = size.width + 1;
+    this._canvas.height = size.height + 1;
+    this._resizer.width(this._canvas.width);
+    this._resizer.height(this._canvas.height);
+    this.RefreshResizer();
+};
+
+Designer.prototype.AutoSize = function () {
+    // adjust canvas size, e.g. for changed grid-size
+    // prevents collapsing to a single cell (width x height: 1x1)
+    if (this._objects == null || this._objects.length == 0) {
+        this.SetSize();
+        return;
+    }
+    // ** DEBUG, as long as server output is nonsense
+    var width = 0;
+    var height = 0;
+    // find min width and height needed
+    for (var i = 0; i < this._objects.length; i++) {
+        var obj = this._objects[i];
+        if (obj.left + obj.width > width) {
+            width = obj.left + obj.width;
+        }
+        if (obj.top + obj.height > height) {
+            height = obj.top + obj.height;
+        }
+    }
+    // **
+    // apply correct size
+    var space = 2 * this._options.spacing;
+    this.SetSize(width + space, height + space);
+};
+
+// ** Layout helper
+Designer.prototype._findObjectAtPosition = function(point) {
+    for (var i = 0; i < this._objects.length; i++) {
+        if (this._objects[i].Rect().ContainsPoint(point)) {
+            return this._objects[i];
+        }
+    }
+    return null;
+};
+
+Designer.prototype._parseLayout = function (layout) {
+    this.Reset();
+    this._layout = layout;
+    // set information
+    var b = this._buttonpane;
+    b.find("#layoutName").val(layout.name);
+    b.find("#layoutAuthor").html(layout.author);
+    b.find("#layoutSize").html(layout.width + "x" + layout.height);
+    b.find("#layoutCreated").html(layout.created);
+    b.find("#layoutEdited").html(layout.edited);
+    // parse objects retrieved from service
+    this._objects = [];
+    for (var i = 0; i < layout.objects.length; i++) {
+        this._objects.push(Building.FromObject(layout.objects[i]));
+    }
+    // if auto-sizing adjust canvas size to fit the layout
+    if (this._options.autoSize) {
+        this.AutoSize();
+    }
+    // render the new layout
+    this.Render();
+};
+
+// ** Layout I/O
+Designer.prototype.New = function () {
+    this.Reset();
+    this.Render();
+};
+
+Designer.prototype.Load = function (id) {
+    // load file from url and parse as json
+    var $this = this;
+    $.ajax({
+        url: this._options.serviceUrl + "layout/" + id,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            $this._parseLayout(data);
+        }
+    });
+};
+
+Designer.prototype.Save = function () {
+    //TODO: implement Save()
+};
+
+Designer.prototype.SaveAs = function () {
+    // validation: empty layout
+    if (this._objects == null || this._objects.length == 0) {
+        alert("Nothing placed.");
+        return;
+    }
+    // validation: no name set
+    var name = this._buttonpane.find("#layoutName").val();
+    if (name == "") {
+        alert("No name given.");
+        return;
+    }
+    // load file from url and parse as json
+    var $this = this;
+    $.ajax({
+        url: this._options.serviceUrl + "layout",
+        type: "POST",
+        dataType: "json",
+        data: "data=" + JSON.stringify({
+            name: name,
+            objects: this._objects
+        }),
+        success: function () {
+            alert("successfully saved");
+            //TODO: refresh datatable
+        }
+    });
+};
+
+Designer.prototype.Delete = function () {
+    // delete the currently loaded layout
+    if (this._layout == null) {
+        return;
+    }
+    //TODO: add confirmation dialog
+    var $this = this;
+    $.ajax({
+        url: this._options.serviceUrl + "layout/" + this._layout.ID,
+        type: "DELETE",
+        dataType: "json",
+        success: function (data) {
+            if (!data.success) {
+                alert("deletion failed");
+                return;
+            }
+            // fire deleted event
+            $this._options.layoutDeleted($this._layout.ID);
+            // reset the editor
+            $this.Reset();
+			$this.Render();
         }
     });
 };
@@ -303,150 +512,6 @@ Designer.prototype._onMouseWheel = function(e) {
     this.Render();
 };
 
-Designer.prototype._findObjectAtPosition = function(point) {
-    for (var i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].Rect().ContainsPoint(point)) {
-            return this._objects[i];
-        }
-    }
-    return null;
-};
-
-// ** Sizing
-Designer.prototype.SetSize = function (width, height) {
-    // use current dimensions if called without argument
-    if (arguments.length < 2) {
-        width = this._options.width;
-        height = this._options.height;
-    }
-    // set canvas size (in pixels)
-    var grid = this._options.grid;
-    this._canvas.width = width * grid + 1;
-    this._canvas.height = height * grid + 1;
-    // remember size (in grid units)
-    this._options.width = width;
-    this._options.height = height;
-};
-
-// ** Layout I/O
-Designer.prototype.New = function () {
-    this.Reset();
-    this.Render();
-};
-
-Designer.prototype.Load = function (id) {
-    // load file from url and parse as json
-    var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl + "/" + id,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
-            $this._parseLayout(data);
-        }
-    });
-};
-
-Designer.prototype.Save = function () {
-    //TODO: implement Save()
-};
-
-Designer.prototype.SaveAs = function () {
-    // validation: empty layout
-    if (this._objects == null || this._objects.length == 0) {
-        alert("Nothing placed.");
-        return;
-    }
-    // validation: no name set
-    var name = this._buttonpane.find("#name").val();
-    if (name == "") {
-        alert("No name given.");
-        return;
-    }
-    // load file from url and parse as json
-    var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl,
-        type: "POST",
-        dataType: "json",
-        data: "data=" + JSON.stringify({
-            name: name,
-            objects: this._objects
-        }),
-        success: function () {
-            alert("successfully saved");
-            //TODO: refresh datatable
-        }
-    });
-};
-
-Designer.prototype.Delete = function () {
-    // delete the currently loaded layout
-    if (this._layout == null) {
-        return;
-    }
-    //TODO: add confirmation dialog
-    var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl + "/" + this._layout.ID,
-        type: "DELETE",
-        dataType: "json",
-        success: function (data) {
-            if (!data.success) {
-                alert("deletion failed");
-                return;
-            }
-            // fire deleted event
-            $this._options.layoutDeleted($this._layout.ID);
-            // reset the editor
-            $this.Reset();
-			$this.Render();
-        }
-    });
-};
-
-Designer.prototype._parseLayout = function (layout) {
-    this.Reset();
-    this._layout = layout;
-    // parse objects retrieved from service
-    this._objects = [];
-    for (var i = 0; i < layout.objects.length; i++) {
-        this._objects.push(Building.FromObject(layout.objects[i]));
-    }
-    // if auto-sizing adjust canvas size to fit the layout
-    if (this._options.autoSize) {
-        this.AutoSize();
-    }
-    // render the new layout
-    this.Render();
-};
-
-Designer.prototype.AutoSize = function () {
-    // adjust canvas size, e.g. for changed grid-size
-    // prevents collapsing to a single cell (width x height: 1x1)
-    if (this._objects == null || this._objects.length == 0) {
-        this.SetSize();
-        return;
-    }
-    // ** DEBUG, as long as server output is nonsense
-    var width = 0;
-    var height = 0;
-    // find min width and height needed
-    for (var i = 0; i < this._objects.length; i++) {
-        var obj = this._objects[i];
-        if (obj.left + obj.width > width) {
-            width = obj.left + obj.width;
-        }
-        if (obj.top + obj.height > height) {
-            height = obj.top + obj.height;
-        }
-    }
-    // **
-    // apply correct size
-    var space = 2 * this._options.spacing;
-    this.SetSize(width + space, height + space);
-};
-
 // ** Rendering
 Designer.prototype.Render = function () {
     // shorthand definitions
@@ -523,6 +588,17 @@ Designer.prototype._renderObject = function (obj) {
     if (!obj.borderless) {
         this._strokeRect(rect);
     }
+    ctx.fillStyle = "#000000";
+    this._renderText(obj.label, obj.Position(), obj.Size());
+};
+
+Designer.prototype._renderText = function(text, point, size) {
+    var ctx = this._ctx;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    var p = point.Copy().Scale(this._options.grid);
+    var s = size.Copy().Scale(this._options.grid);
+    ctx.fillText(text, p.x + s.width/2, p.y + s.height/2, s.width);
 };
 
 // ** Render helpers

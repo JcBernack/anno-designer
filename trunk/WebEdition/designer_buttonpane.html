@@ -3,24 +3,24 @@
     <div class="layout">
         <table>
             <tr>
-                <td><label for="name"><span class="icon-span ui-icon ui-icon-comment"></span>Layout name</label></td>
-                <td><input id="name" name="name" type="text"/></td>
+                <td><label for="layoutName"><span class="icon-span ui-icon ui-icon-comment"></span>Layout name</label></td>
+                <td><input id="layoutName" name="layoutName" type="text"/></td>
             </tr>
             <tr>
                 <td><span class="icon-span ui-icon ui-icon-person"></span>Author</td>
-                <td>TODO</td>
+                <td id="layoutAuthor">TODO</td>
             </tr>
             <tr>
                 <td><span class="icon-span ui-icon ui-icon-arrow-4"></span>Size</td>
-                <td>TODO</td>
+                <td id="layoutSize">TODO</td>
             </tr>
             <tr>
                 <td><span class="icon-span ui-icon ui-icon-calendar"></span>Created</td>
-                <td>TODO</td>
+                <td id="layoutCreated">TODO</td>
             </tr>
             <tr>
                 <td><span class="icon-span ui-icon ui-icon-calendar"></span>Edited</td>
-                <td>TODO</td>
+                <td id="layoutEdited">TODO</td>
             </tr>
         </table>
         <p>
@@ -35,7 +35,7 @@
         <table>
             <tr class="size">
                 <td><label for="width"><span class="icon-span ui-icon ui-icon-arrow-4"></span>Size</label></td>
-                <td><input type="text" id="width" /> x <input type="text" id="height" /></td>
+                <td><input type="text" id="width" /> x <input type="text" id="height" /><button id="flipSize">Flip</button></td>
             </tr>
             <tr class="color">
                 <td><label for="color"><span class="icon-span ui-icon ui-icon-radio-on"></span>Color</label></td>

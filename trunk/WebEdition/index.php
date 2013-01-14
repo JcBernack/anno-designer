@@ -1,6 +1,5 @@
 <?
 error_reporting(E_ALL);
-//TODO: check for postback: register, login or logout
 ?>
 <!DOCTYPE html>
 <html>
