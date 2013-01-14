@@ -15,10 +15,11 @@ if ($db->connect_errno != 0) {
 $app = new \Slim\Slim();
 $app->hook("slim.after", function() { global $db; $db->close(); });
 $app->get("/user/:id", "GetUser");
+$app->post("/user", "CreateUser");
 $app->get("/layout", "GetAllLayouts");
+$app->post("/layout", "SaveLayout");
 $app->get("/layout/:id", "GetLayout");
 $app->delete("/layout/:id", "DeleteLayout");
-$app->post("/layout", "SaveLayout");
 $app->run();
 
 // helpers
@@ -78,10 +79,22 @@ function GetInsertValues($names, $values) {
     return $result;
 }
 
+function RetriveUser($id) {
+    return UniqueIdQuery("select name from user where ID=_ID_", $id)->fetch_assoc();
+}
+
 // request handlers
 function GetUser($id) {
-    $result = UniqueIdQuery("select * from user where ID=_ID_", $id);
-    echo json_encode($result->fetch_assoc());
+    $user = RetriveUser($id);
+    //TODO: add more information
+    echo json_encode(array("name" => $user["name"]));
+}
+
+function CreateUser() {
+    //TODO: create new user
+    //$result = UniqueIdQuery("select * from user where ID=_ID_", $id);
+    //$name = mysql_real_escape_string($data["name"]);
+    //echo json_encode($result->fetch_assoc());
 }
 
 function GetAllLayouts() {
@@ -90,13 +103,14 @@ function GetAllLayouts() {
     // sorting is ignored because the datatables it on its own, but maybe this way its a bit faster,
     // because the data is already sorted correctly
     $result = $db->query("select * from layout order by created desc");
-    $rows = array();
-    while($r = $result->fetch_assoc()) {
-        $r["DT_RowId"] = $r["ID"];
-        $rows[] = $r;
+    $layouts = array();
+    while($row = $result->fetch_assoc()) {
+        $row["DT_RowId"] = $row["ID"];
+        $row["author"] = RetriveUser($row["authorID"])["name"];
+        $layouts[] = $row;
     }
     // return results for datatable
-    $response["aaData"] = $rows;
+    $response["aaData"] = $layouts;
     echo json_encode($response);
 }
 
@@ -105,6 +119,7 @@ function GetLayout($id) {
         ->fetch_assoc();
     $layout["objects"] = IdQuery("select * from layout_object where layoutID=_ID_", $layout["ID"])
         ->fetch_all(MYSQLI_ASSOC);
+    $layout["author"] = RetriveUser($layout["authorID"])["name"];
     echo json_encode($layout);
 }
 

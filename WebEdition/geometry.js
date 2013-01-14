@@ -9,6 +9,10 @@ var Point = function (x, y) {
     this.y = y;
 };
 
+Point.prototype.Copy = function() {
+    return new Point(this.x, this.y);
+};
+
 Point.prototype.Scale = function (factor) {
     var f = arguments[1] ? Math.round : Math.floor;
     this.x = f(this.x * factor);
@@ -19,6 +23,10 @@ Point.prototype.Scale = function (factor) {
 var Size = function (width, height) {
     this.width = width;
     this.height = height;
+};
+
+Size.prototype.Copy = function() {
+    return new Size(this.width, this.height);
 };
 
 Size.prototype.Scale = function (factor) {
@@ -37,6 +45,10 @@ var Rect = function (left, top, width, height) {
 
 Rect.FromPointSize = function (point, size) {
     return new Rect(point.x, point.y, size.width, size.height);
+};
+
+Rect.prototype.Copy = function() {
+    return new Rect(this.left, this.top, this.width, this.height);
 };
 
 Rect.prototype.Position = function (point) {
