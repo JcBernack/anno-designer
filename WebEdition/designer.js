@@ -128,7 +128,7 @@ Designer.prototype.Reset = function () {
     this._objects = [];
     this._highlightedObjects = [];
     this._hoveredObject = null;
-    this._layout = null;
+    this._setCurrentLayout(null);
 };
 
 Designer.prototype._createButtonpane = function () {
@@ -285,14 +285,7 @@ Designer.prototype._findObjectAtPosition = function(point) {
 
 Designer.prototype._parseLayout = function (layout) {
     this.Reset();
-    this._layout = layout;
-    // set information
-    var b = this._buttonpane;
-    b.find("#layoutName").val(layout.name);
-    b.find("#layoutAuthor").html(layout.author);
-    b.find("#layoutSize").html(layout.width + "x" + layout.height);
-    b.find("#layoutCreated").html(layout.created);
-    b.find("#layoutEdited").html(layout.edited);
+    this._setCurrentLayout(layout);
     // parse objects retrieved from service
     this._objects = [];
     for (var i = 0; i < layout.objects.length; i++) {
@@ -315,14 +308,11 @@ Designer.prototype.New = function () {
 Designer.prototype.Load = function (id) {
     // load file from url and parse as json
     var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl + "layout/" + id,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
+    Rest("GET", this._options.serviceUrl + "layout/" + id, null,
+        function (data) {
             $this._parseLayout(data);
         }
-    });
+    );
 };
 
 Designer.prototype.Save = function () {
@@ -343,19 +333,15 @@ Designer.prototype.SaveAs = function () {
     }
     // load file from url and parse as json
     var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl + "layout",
-        type: "POST",
-        dataType: "json",
-        data: "data=" + JSON.stringify({
+    Rest("POST",this._options.serviceUrl + "layout",
+        "data=" + JSON.stringify({
             name: name,
             objects: this._objects
         }),
-        success: function () {
+        function () {
             alert("successfully saved");
             //TODO: refresh datatable
-        }
-    });
+        });
 };
 
 Designer.prototype.Delete = function () {
@@ -365,11 +351,8 @@ Designer.prototype.Delete = function () {
     }
     //TODO: add confirmation dialog
     var $this = this;
-    $.ajax({
-        url: this._options.serviceUrl + "layout/" + this._layout.ID,
-        type: "DELETE",
-        dataType: "json",
-        success: function (data) {
+    Rest("DELETE", this._options.serviceUrl + "layout/" + this._layout.ID, null,
+        function (data) {
             if (!data.success) {
                 alert("deletion failed");
                 return;
@@ -379,8 +362,22 @@ Designer.prototype.Delete = function () {
             // reset the editor
             $this.Reset();
 			$this.Render();
-        }
-    });
+        });
+};
+
+Designer.prototype._setCurrentLayout  = function(layout) {
+    this._layout = layout;
+    if (layout == null) {
+        // default values to show when no layout is set
+        layout = { name: "", author: "", width: 0, height: 0, created: "", edited: "" };
+    }
+    // set information
+    var b = this._buttonpane;
+    b.find("#layoutName").val(layout.name);
+    b.find("#layoutAuthor").html(layout.author);
+    b.find("#layoutSize").html(layout.width + "x" + layout.height);
+    b.find("#layoutCreated").html(layout.created);
+    b.find("#layoutEdited").html(layout.edited);
 };
 
 Designer.prototype._setManualProperties = function(building) {

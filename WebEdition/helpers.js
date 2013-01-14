@@ -22,3 +22,13 @@ Array.prototype.remove = function (element)
     this.splice(i, 1);
     return this;
 };
+
+function Rest(method, url, data, success) {
+    return $.ajax({
+        url: url,
+        type: method,
+        dataType: "json",
+        data: data,
+        success: success
+    });
+}
