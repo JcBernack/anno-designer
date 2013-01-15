@@ -171,7 +171,7 @@ function SaveLayout() {
     }
     try {
         //TODO: add current user as author
-        $query = "insert into layout (name, authorID, created, edited, width, height, usedFields) values ('$name', 1, NOW(), NOW(), $width, $height, $usedFields)";
+        $query = "insert into layout (name, authorID, created, width, height, usedFields) values ('$name', 1, NOW(), $width, $height, $usedFields)";
         if (!$db->query($query)) {
             throw new IksdehException(400, "adding layout failed: ".$query);
         }

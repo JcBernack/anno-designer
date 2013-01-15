@@ -47,6 +47,10 @@ Rect.FromPointSize = function (point, size) {
     return new Rect(point.x, point.y, size.width, size.height);
 };
 
+Rect.FromPoints = function (topleft, bottomright) {
+    return new Rect(topleft.x, topleft.y, bottomright.x - topleft.x, bottomright.y - topleft.y);
+};
+
 Rect.prototype.Copy = function() {
     return new Rect(this.left, this.top, this.width, this.height);
 };
@@ -77,4 +81,31 @@ Rect.prototype.Scale = function (factor) {
 Rect.prototype.ContainsPoint = function(point) {
     return this.left <= point.x && point.x < this.left + this.width &&
         this.top <= point.y && point.y < this.top + this.height;
+};
+
+Rect.prototype.Left = function() {
+    var right = this.left + this.width;
+    return this.left < right ? this.left : right;
+};
+
+Rect.prototype.Right = function() {
+    var right = this.left + this.width;
+    return this.left < right ? right : this.left;
+};
+
+Rect.prototype.Top = function() {
+    var bottom = this.top + this.height;
+    return this.top < bottom ? this.top : bottom;
+};
+
+Rect.prototype.Bottom = function() {
+    var bottom = this.top + this.height;
+    return this.top < bottom ? bottom : this.top;
+};
+
+Rect.prototype.IntersectsWith = function(rect) {
+    return !(rect.Left() >= this.Right() ||
+        rect.Right() <= this.Left() ||
+        rect.Top() >= this.Bottom() ||
+        rect.Bottom() <= this.Top());
 };

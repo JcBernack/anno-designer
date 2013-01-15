@@ -12,6 +12,8 @@ html, body, body > div {
     border: 1px solid black;
 }*/
 
+#debug textarea { margin: 0; width: 150px; height: 200px; }
+
 /*NOT DEBUG*/
 
 /* make default widget font size sane */
@@ -30,10 +32,10 @@ h2 { border-bottom: 1px solid black; }
 #list { overflow: hidden; min-width: 300px; }
 .preview { float: right; margin-left: 15px }
 .editor { }
-.resizer { }
-.resizer-helper { border: 1px solid black; }
-.resizer-helper-e { border-right: 1px solid black; }
-.resizer-helper-s { border-bottom: 1px solid black; }
+.resizer { border: 1px solid transparent; }
+/*.resizer-helper { border: 1px solid #888888; }*/
+.resizer-helper-e { border-right: 1px solid #888888; }
+.resizer-helper-s { border-bottom: 1px solid #888888; }
 
 /* DESIGNER styles */
 div.resizer { display: inline-block; margin: 0; padding: 0; }

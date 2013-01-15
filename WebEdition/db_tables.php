@@ -23,10 +23,10 @@ create table materials (
 $db_defs["layout"] = "
 create table layout (
     ID int AUTO_INCREMENT PRIMARY KEY,
-    name varchar(50) character set UTF8,
+    name varchar(50) character set UTF8 NOT NULL,
     authorID int NOT NULL,
     created datetime NOT NULL,
-    edited datetime NOT NULL,
+    edited datetime,
 	width int NOT NULL,
 	height int NOT NULL,
 	usedFields int NOT NULL
