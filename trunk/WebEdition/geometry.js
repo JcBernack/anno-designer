@@ -4,10 +4,22 @@
  * @author Jan Christoph Bernack
  */
 
+function _propertiesToString() {
+    var s = [];
+    for (var p in this) {
+        if (this.hasOwnProperty(p)) {
+            s.push(p + ":" + this[p]);
+        }
+    }
+    return s.join(", ");
+}
+
 var Point = function (x, y) {
     this.x = x;
     this.y = y;
 };
+
+Point.prototype.toString = _propertiesToString;
 
 Point.prototype.Copy = function() {
     return new Point(this.x, this.y);
@@ -24,6 +36,8 @@ var Size = function (width, height) {
     this.width = width;
     this.height = height;
 };
+
+Size.prototype.toString = _propertiesToString;
 
 Size.prototype.Copy = function() {
     return new Size(this.width, this.height);
@@ -50,6 +64,8 @@ Rect.FromPointSize = function (point, size) {
 Rect.FromPoints = function (topleft, bottomright) {
     return new Rect(topleft.x, topleft.y, bottomright.x - topleft.x, bottomright.y - topleft.y);
 };
+
+Rect.prototype.toString = _propertiesToString;
 
 Rect.prototype.Copy = function() {
     return new Rect(this.left, this.top, this.width, this.height);

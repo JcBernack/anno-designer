@@ -556,7 +556,7 @@ Designer.prototype._onMouseDown = function (e) {
     var pos = this._handleMousePosition(e);
     var render = this._moveCurrentObjectToMouse();
     this._handleMouseButtons(e, true);
-    trace("mousedown " + this._mouseButtons.toString());
+    this.Trace("mousedown " + this._mouseButtons.toString());
     this._mouseDragStart = pos.Copy();
     var buttons = this._mouseButtons;
     if (buttons.left && buttons.right) {
@@ -588,7 +588,7 @@ Designer.prototype._onMouseDown = function (e) {
 Designer.prototype._onMouseMove = function (e) {
     var pos = this._handleMousePosition(e);
     var render = this._moveCurrentObjectToMouse();
-    trace("mousemove " + this._mouseButtons.toString());
+    this.Trace("mousemove " + this._mouseButtons.toString());
     var dragPos = this._mouseDragStart;
     var buttons = this._mouseButtons;
     // check if user begins to drag
@@ -617,7 +617,8 @@ Designer.prototype._onMouseMove = function (e) {
         var dis = pos.Copy();
         dis.x -= dragPos.x;
         dis.y -= dragPos.y;
-        return dis.Scale(1/grid);
+        dis.Scale(1/grid, true);
+        return dis;
     }
     var i, j, obj;
     switch (this._state) {
@@ -734,7 +735,7 @@ Designer.prototype._onMouseMove = function (e) {
 Designer.prototype._onMouseUp = function (e) {
     var pos = this._handleMousePosition(e);
     this._handleMouseButtons(e, false);
-    trace("mouseup " + this._mouseButtons.toString());
+    this.Trace("mouseup " + this._mouseButtons.toString());
     var buttons = this._mouseButtons;
     if (this._state == Designer.State.DragAll) {
         if (!buttons.left || !buttons.right) {
@@ -799,7 +800,7 @@ Designer.prototype._onMouseUp = function (e) {
 
 Designer.prototype._onMouseDblClick = function (e) {
     var pos = this._handleMousePosition(e);
-    trace("mousedblclick " + this._mouseButtons.toString());
+    this.Trace("mousedblclick " + this._mouseButtons.toString());
     if (this._currentObject == null) {
         this._setCurrentProperties(this._findObjectAtPosition(pos));
         this.ApplyCurrentObject();
@@ -808,7 +809,7 @@ Designer.prototype._onMouseDblClick = function (e) {
 };
 
 Designer.prototype._onMouseWheel = function(e) {
-    trace("mousewheel");
+    this.Trace("mousewheel");
     var delta = event.wheelDelta/50 || -event.detail;
     this._options.grid = Math.round(this._options.grid * (delta < 0 ? 1/this._options.zoomSpeed : this._options.zoomSpeed));
     if (this._options.grid < 1)
@@ -822,14 +823,14 @@ Designer.prototype._onMouseWheel = function(e) {
 };
 
 Designer.prototype._onMouseOut = function (e) {
-    trace("mouseout");
+    this.Trace("mouseout");
     this._hoveredObject = null;
     this._mousePosition = null;
     this.Render();
 };
 
 Designer.prototype._onKeyDown = function (e) {
-    trace("keydown [" + e.keyCode + "]");
+    this.Trace("keydown [" + e.keyCode + "]");
     switch (e.keyCode) {
         // delete key
         case 46:
@@ -962,4 +963,33 @@ Designer.prototype._strokeRect = function (rect) {
 
 Designer.prototype._fillRect = function (rect) {
     this._ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
+};
+
+Designer.prototype._traceCounter = 0;
+Designer.prototype.Trace = function(message) {
+//    trace(message);
+    var con = $("#debugConsole");
+    var total = con.text().split("\n");
+    // append counter to message if sent multiple times, otherwise just add it
+    if (total.last().startsWith(message)) {
+        var str = total.pop();
+        str = str.slice(0, message.length);
+        str += "(" + ++this._traceCounter + ")";
+        total.push(str);
+    } else {
+        total.push(message);
+        this._traceCounter = 0;
+    }
+    // remove first lines if empty
+    while (total[0] == "") {
+        total.shift();
+    }
+    // remove first lines, when there are too many
+    var max = 50;
+    if (total.length > max) {
+        total = total.slice(total.length - max);
+    }
+    // set text and scroll down
+    con.text(total.join("\n"));
+    con.scrollTop(con[0].scrollHeight - con.height());
 };
