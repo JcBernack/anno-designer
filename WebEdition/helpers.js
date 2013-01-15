@@ -2,22 +2,10 @@
 
 function trace(msg)
 {
-//    if (typeof console != 'undefined' && typeof console.log != 'undefined')
-//    {
-//        console.log(msg);
-//    }
-    // add new line to console and count lines
-    var con = $("#debugConsole");
-    var total = (con.text() + msg + "\n").split("\n");
-    // remove first lines, when there are too many
-    var max = 50;
-    if (total.length > max) {
-        total = total.slice(total.length - max);
+    if (typeof console != 'undefined' && typeof console.log != 'undefined')
+    {
+        console.log(msg);
     }
-    // set text
-    con.text(total.join("\n"));
-    // scroll down
-    con.scrollTop(con[0].scrollHeight - con.height());
 }
 
 function Rest(method, url, data, success) {
@@ -30,27 +18,45 @@ function Rest(method, url, data, success) {
     });
 }
 
-Array.prototype.last = function () {
-    return this[this.length - 1];
-};
+if (typeof Array.prototype.last != 'function') {
+    Array.prototype.last = function () {
+        return this[this.length - 1];
+    };
+}
 
-Array.prototype.remove = function (element)
-{
-    var i = this.indexOf(element);
-    if (i == -1)
+if (typeof Array.prototype.remove != 'function') {
+    Array.prototype.remove = function (element)
     {
-        return this;
-    }
-    this.splice(i, 1);
-    return this;
-};
-
-Array.prototype.contains = function(obj) {
-    var i = this.length;
-    while (i--) {
-        if (this[i] === obj) {
-            return true;
+        var i = this.indexOf(element);
+        if (i == -1)
+        {
+            return this;
         }
-    }
-    return false;
-};
+        this.splice(i, 1);
+        return this;
+    };
+}
+
+if (typeof Array.prototype.contains != 'function') {
+    Array.prototype.contains = function(obj) {
+        var i = this.length;
+        while (i--) {
+            if (this[i] === obj) {
+                return true;
+            }
+        }
+        return false;
+    };
+}
+
+if (typeof String.prototype.startsWith != 'function') {
+    String.prototype.startsWith = function (str){
+        return this.slice(0, str.length) == str;
+    };
+}
+
+if (typeof String.prototype.endsWith != 'function') {
+    String.prototype.endsWith = function (str){
+        return this.slice(-str.length) == str;
+    };
+}
