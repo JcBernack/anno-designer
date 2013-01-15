@@ -43,6 +43,7 @@ var Building = function(left, top, width, height, color, label) {
 };
 
 Building.FromObject = function (obj) {
+    // type conversions needed to support creating building directly from data supplied by the webservice
     var b = new Building(
         Convert.int(obj.left),
         Convert.int(obj.top),
@@ -495,7 +496,7 @@ Designer.prototype._tryPlaceCurrentObject = function() {
                 return false;
             }
         }
-        var copy = $.extend(true, {}, this._currentObject);
+        var copy = Building.FromObject(this._currentObject);
         // add borderless objects at the start of the array, because they should be drawn first
         if (copy.borderless) {
             this._objects.unshift(copy);
@@ -595,6 +596,7 @@ Designer.prototype._onMouseMove = function (e) {
         switch (this._state) {
             case Designer.State.SelectionRectStart:
                 this._state = Designer.State.SelectionRect;
+                this._selectionRect = Rect.FromPoints(dragPos, pos);
                 break;
             case Designer.State.DragSelectionStart:
                 this._state = Designer.State.DragSelection;
@@ -617,9 +619,16 @@ Designer.prototype._onMouseMove = function (e) {
         dis.y -= dragPos.y;
         return dis.Scale(1/grid);
     }
-    var i, obj;
+    var i, j, obj;
     switch (this._state) {
         default:
+            if (this._currentObject == null) {
+                obj = this._findObjectAtPosition(pos);
+                if (this._hoveredObject != obj) {
+                    this._hoveredObject = obj;
+                    render = true;
+                }
+            }
             if (buttons.left && this._currentObject != null) {
                 // keep placing objects when moving the mouse while the left button is pressed
                 if (this._tryPlaceCurrentObject()) {
@@ -629,16 +638,25 @@ Designer.prototype._onMouseMove = function (e) {
             break;
         case Designer.State.SelectionRect:
             if (e.ctrlKey || e.shiftKey) {
-                // dafuq?
+                // remove previously selected by the selection rect
+                // iterate backwards, because the array is modifed during the loop and indexes would shift
+                for (j = this._selectedObjects.length-1; j >= 0; j--) {
+                    obj = this._selectedObjects[j];
+                    if (obj.Rect().Scale(this._options.grid).IntersectsWith(this._selectionRect)) {
+                        this._selectedObjects.remove(obj);
+                    }
+                }
             } else {
                 this._selectedObjects = [];
             }
             // adjust rect
+            //TODO: snap selection rect to grid and reduce redraws?
             this._selectionRect = Rect.FromPoints(this._mouseDragStart, this._mousePosition);
             // select intersecting objects
-            for (var o = 0; o < this._objects.length; o++) {
-                obj = this._objects[o];
-                if (obj.Rect().Scale(this._options.grid).IntersectsWith(this._selectionRect)) {
+            for (j = 0; j < this._objects.length; j++) {
+                obj = this._objects[j];
+                if (!this._selectedObjects.contains(obj) &&
+                    obj.Rect().Scale(this._options.grid).IntersectsWith(this._selectionRect)) {
                     this._selectedObjects.push(obj);
                 }
             }
@@ -664,7 +682,7 @@ Designer.prototype._onMouseMove = function (e) {
                     continue;
                 }
                 var rect = this._objects[i].Rect();
-                for (var j = 0; j < this._selectedObjects.length; j++) {
+                for (j = 0; j < this._selectedObjects.length; j++) {
                     if (this._selectedObjects[j].Rect().IntersectsWith(rect)) {
                         collision = true;
                         break;
@@ -932,9 +950,14 @@ Designer.prototype._renderText = function(text, point, size) {
 
 // ** Render helpers
 Designer.prototype._strokeRect = function (rect) {
-    this._ctx.translate(0.5, 0.5);
-    this._ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
-    this._ctx.translate(-0.5, -0.5);
+    if (this._ctx.lineWidth % 2 == 0) {
+        this._ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+    } else {
+        // corrects blurry lines caused by lines between two pixels
+        this._ctx.translate(0.5, 0.5);
+        this._ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+        this._ctx.translate(-0.5, -0.5);
+    }
 };
 
 Designer.prototype._fillRect = function (rect) {
