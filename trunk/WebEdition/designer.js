@@ -4,10 +4,30 @@
  * @requires jQuery
  * @author Jan Christoph Bernack
  */
+//** Editor mouse behavior
+// + MouseMove
+//  - no action active: highlight object under mouse
+//   -   or start dragging (selection rect or move selected objects)
+//  - placing an object: move object to mouse
+// + MouseClick (left)
+//   - no action active: select objects (shift/ctrl mechanics)
+//   -   or prepare dragging
+//   - placing an object: place object if it fits (collision detection)
+// + MouseDblClick (left)
+//   - get properties of clicked objects
+// + MouseClick (right)
+//   - no action active: remove object at mouse
+//   - placing an object: stop placing objects
+// + MouseClick (middle)
+//   - placing an object: flip object dimensions
+// + MouseWheel
+//   - change zoom level (grid cell size)
+// + Hotkeys:
+//   - entf: remove selected objects, if any
 
 var Convert = {
     bool: function(str) { return str == "1" },
-    int: function(str) { return parseInt(str); }
+    int: function(str) { var n = parseInt(str); return isNaN(n) ? 0 : n; }
 };
 
 var Building = function(left, top, width, height, color, label) {
@@ -55,24 +75,15 @@ Building.prototype.Rect = function () {
     return new Rect(this.left, this.top, this.width, this.height);
 };
 
-// Editor mouse behavior
-// + MouseMove
-//#  - no action active: highlight object under mouse
-//   -   or start dragging (selection rect or move selected objects)
-//#  - placing an object: move object to mouse
-// + MouseClick (left)
-//   - no action active: select objects (shift/ctrl mechanics)
-//   -   or prepare dragging
-//   - placing an object: place object if it fits (collision detection)
-//# + MouseDblClick (left)
-//#   - get properties of clicked objects
-//# + MouseClick (right)
-//#   - no action active: remove object at mouse
-//#   - placing an object: stop placing objects
-//# + MouseWheel
-//#   - change zoom level (grid cell size)
-// + Hotkeys:
-//   - entf: remove selected objects, if any
+Building.prototype.IsValid = function () {
+    return !(this.width < 1 || this.height < 1 || this.color.length != 7);
+};
+
+var MouseButton = {
+    Left: 1,
+    Middle: 2,
+    Right: 3
+};
 
 // Constructor
 var Designer = function (options) {
@@ -85,6 +96,7 @@ var Designer = function (options) {
     container.html("");
     this._resizer = $(document.createElement("div")).addClass("resizer");
     this._canvas = document.createElement("canvas");
+    this._canvas.tabIndex = 0;
     this._resizer.append(this._canvas);
     container.append(this._resizer);
     this._ctx = this._canvas.getContext("2d");
@@ -112,10 +124,24 @@ Designer.defaultOptions = {
     spacing: 0.5 //TODO: implement normalization and set to 1
 };
 
+Designer.State = {
+    // used if not dragging
+    Standard: 0,
+    // used to drag the selection rect
+    SelectionRectStart: 1,
+    SelectionRect: 2,
+    // used to drag objects around
+    DragSelectionStart: 3,
+    DragSingleStart: 4,
+    DragSelection: 5,
+    DragAllStart: 6,
+    DragAll: 7
+};
+
 // holds an array of all objects
 Designer.prototype._objects = [];
 // holds an array of all objects which are highlighted
-Designer.prototype._highlightedObjects = [];
+Designer.prototype._selectedObjects = [];
 // the object which is currently being placed, or null if none
 Designer.prototype._currentObject = null;
 // the object currently under the mouse
@@ -123,10 +149,35 @@ Designer.prototype._hoveredObject = null;
 
 // holds the layout object received from the server
 Designer.prototype._layout = null;
+// current interaction state
+Designer.prototype._state = Designer.State.Standard;
+// mouse button states
+Designer.prototype._mouseButtons = {
+    //TODO: key-ups are missed if the buttons are released outside the canvas, this can mess up the _mouseButtons state
+    left: false,
+    middle: false,
+    right: false,
+    toString: function () {
+        var buttons = [];
+        for (var button in this) {
+            if (button == "toString") continue;
+            if (this[button]) buttons.push(button);
+        }
+        return "[" + buttons.join(",") + "]";
+    }
+};
+// mouse position
+Designer.prototype._mousePosition = null;
+// position where dragging started
+Designer.prototype._mouseDragStart = null;
+// current selection rectangle
+Designer.prototype._selectionRect = null;
+
+Designer.prototype._framesRendered = 0;
 
 Designer.prototype.Reset = function () {
     this._objects = [];
-    this._highlightedObjects = [];
+    this._selectedObjects = [];
     this._hoveredObject = null;
     this._setCurrentLayout(null);
 };
@@ -156,10 +207,9 @@ Designer.prototype._createButtonpane = function () {
                     h.val(tmp);
                 });
             pane.find("#apply").button({ icons: { primary: "ui-icon-check" } })
-                .click(function() { $this._currentObject = $this._getManualProperties(); });
+                .click(function() { $this.ApplyCurrentObject(); });
             // initialize color picker
             $.minicolors.init();
-
             // put the whole menu inside an accordion
             pane.accordion({
                 heightStyle: "content",
@@ -184,75 +234,71 @@ Designer.prototype.RefreshResizer = function() {
     var $this = this;
     var grid = this._options.grid;
     var resize = function(event, ui) {
-        $this.SetSize(new Size(ui.size.width, ui.size.height).Scale(1/grid));
-        $this.Render();
+        if ($this.SetSize(new Size(ui.size.width, ui.size.height).Scale(1/grid, true))) {
+            // redraw if dimensions have changed
+            $this.Render();
+        }
     };
     this._resizer.resizable({
         grid: grid,
         minWidth: 10 * grid,
         minHeight: 10 * grid,
-        //autoHide: true,
         helper: "resizer-helper",
         start: function(event, ui) {
             $this._resizer.addClass("resizer-helper");
         },
-        //resize: resize,
+        resize: resize,
         stop: function(event, ui) {
             $this._resizer.removeClass("resizer-helper");
             resize(event, ui);
         }
     });
-    this._resizer.find(".ui-resizable-e").hover(function() {
-        $this._resizer.addClass("resizer-helper-e");
-    }, function() {
-        $this._resizer.removeClass("resizer-helper-e");
-    });
-    this._resizer.find(".ui-resizable-s").hover(function() {
-        $this._resizer.addClass("resizer-helper-s");
-    }, function() {
-        $this._resizer.removeClass("resizer-helper-s");
-    });
-    this._resizer.find(".ui-resizable-se").hover(function() {
-        $this._resizer.addClass("resizer-helper-e");
-        $this._resizer.addClass("resizer-helper-s");
-    }, function() {
-        $this._resizer.removeClass("resizer-helper-e");
-        $this._resizer.removeClass("resizer-helper-s");
-    });
+    function toggleClass(selector, css) {
+        $this._resizer.find(selector).unbind(".designer")
+            .bind("mouseenter.designer", function() { $this._resizer.addClass(css); })
+            .bind("mouseleave.designer", function() { $this._resizer.removeClass(css); });
+    }
+    toggleClass(".ui-resizable-e", "resizer-helper-e");
+    toggleClass(".ui-resizable-s", "resizer-helper-s");
+    toggleClass(".ui-resizable-se", "resizer-helper-e resizer-helper-s");
 };
+
 // ** Sizing
 Designer.prototype.SetSize = function (size) {
     switch (arguments.length) {
-        case 0:
-            // use current dimensions if called without argument
-            size = new Size(this._options.width, this._options.height);
-            break;
-        case 1:
-            break;
-        case 2:
-            // accept two arguments: width, height
-            size = new Size(arguments[0], arguments[1]);
-            break;
+        // use current dimensions if called without argument
+        case 0: size = new Size(this._options.width, this._options.height); break;
+        case 1: break;
+        // accept two arguments: width, height
+        case 2: size = new Size(arguments[0], arguments[1]); break;
     }
     // remember size in grid units
     this._options.width = size.width;
     this._options.height = size.height;
     // scale size to pixel units
     size.Scale(this._options.grid);
-    // set canvas size in pixels
-    this._canvas.width = size.width + 1;
-    this._canvas.height = size.height + 1;
-    this._resizer.width(this._canvas.width);
-    this._resizer.height(this._canvas.height);
+    // compensate for last grid line
+    size.width++;
+    size.height++;
+    // adjust resizer
+    this._resizer.width(size.width);
+    this._resizer.height(size.height);
     this.RefreshResizer();
+    // check if nothing has changed
+    if (this._canvas.width == size.width && this._canvas.height == size.height) {
+        return false;
+    }
+    // set canvas size in pixels
+    this._canvas.width = size.width;
+    this._canvas.height = size.height;
+    return true;
 };
 
 Designer.prototype.AutoSize = function () {
     // adjust canvas size, e.g. for changed grid-size
     // prevents collapsing to a single cell (width x height: 1x1)
     if (this._objects == null || this._objects.length == 0) {
-        this.SetSize();
-        return;
+        return this.SetSize();
     }
     // ** DEBUG, as long as server output is nonsense
     var width = 0;
@@ -270,13 +316,14 @@ Designer.prototype.AutoSize = function () {
     // **
     // apply correct size
     var space = 2 * this._options.spacing;
-    this.SetSize(width + space, height + space);
+    return this.SetSize(width + space, height + space);
 };
 
 // ** Layout helper
 Designer.prototype._findObjectAtPosition = function(point) {
+    var p = point.Copy().Scale(1/this._options.grid);
     for (var i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].Rect().ContainsPoint(point)) {
+        if (this._objects[i].Rect().ContainsPoint(p)) {
             return this._objects[i];
         }
     }
@@ -380,7 +427,16 @@ Designer.prototype._setCurrentLayout  = function(layout) {
     b.find("#layoutEdited").html(layout.edited);
 };
 
-Designer.prototype._setManualProperties = function(building) {
+//** Current object handling
+Designer.prototype.ApplyCurrentObject = function() {
+    this._currentObject = this._getCurrentProperties();
+    if (!this._currentObject.IsValid()) {
+        alert("object invalid");
+        this._currentObject = null;
+    }
+};
+
+Designer.prototype._setCurrentProperties = function(building) {
     var b = this._buttonpane;
     if (b == null || building == null) {
         return;
@@ -395,14 +451,14 @@ Designer.prototype._setManualProperties = function(building) {
     $.minicolors.refresh();
 };
 
-Designer.prototype._getManualProperties = function() {
+Designer.prototype._getCurrentProperties = function() {
     var bp = this._buttonpane;
     if (bp == null) {
         return null;
     }
     var b = new Building(0, 0,
-        parseInt(bp.find("#width").val()),
-        parseInt(bp.find("#height").val()),
+        Convert.int(bp.find("#width").val()),
+        Convert.int(bp.find("#height").val()),
         bp.find("#color").val(),
         bp.find("#label").val()
     );
@@ -412,31 +468,67 @@ Designer.prototype._getManualProperties = function() {
     return b;
 };
 
+Designer.prototype._moveCurrentObjectToMouse = function() {
+    if (this._currentObject == null) {
+        return false;
+    }
+    var obj = this._currentObject;
+    // place centered on mouse position
+    var size = obj.Size().Scale(this._options.grid);
+    var pos = this._mousePosition.Copy();
+    pos.x -= size.width / 2;
+    pos.y -= size.height / 2;
+    pos.Scale(1/this._options.grid, true);
+    if (obj.left != pos.x || obj.top != pos.y) {
+        this._currentObject.Position(pos);
+        return true;
+    }
+    return false;
+};
+
+Designer.prototype._tryPlaceCurrentObject = function() {
+    if (this._currentObject != null) {
+        // check for collisions
+        var rect = this._currentObject.Rect();
+        for (var i = 0; i < this._objects.length; i++) {
+            if (this._objects[i].Rect().IntersectsWith(rect)) {
+                return false;
+            }
+        }
+        var copy = $.extend(true, {}, this._currentObject);
+        // add borderless objects at the start of the array, because they should be drawn first
+        if (copy.borderless) {
+            this._objects.unshift(copy);
+        } else {
+            this._objects.push(copy);
+        }
+        return true;
+    }
+    return false;
+};
+
 // ** Event handling
 Designer.prototype._registerEvents = function () {
     var $this = this;
+    function overwriteEvent(eventName, handler) {
+        $($this._canvas).bind(eventName + ".designer", function (e) {
+            if (handler) {
+                handler.apply($this, [e]);
+            }
+            e.preventDefault();
+            return false;
+        });
+    }
     // register mouse events
-    $(this._canvas).bind("mousemove.designer", function (e) {
-        $this._onMouseMove.apply($this, [e]);
-    });
-    $(this._canvas).bind("mouseout.designer", function (e) {
-        $this._onMouseOut.apply($this, [e]);
-    });
-    $(this._canvas).bind("click.designer", function (e) {
-        $this._onMouseClick.apply($this, [e]);
-    });
-    $(this._canvas).bind("dblclick.designer", function (e) {
-        $this._onMouseDblClick.apply($this, [e]);
-    });
-    $(this._canvas).bind("contextmenu.designer", function (e) {
-        $this._onMouseClickRight.apply($this, [e]);
-        return false;
-    });
-    $(this._canvas).bind("mousewheel.designer", function (e) {
-        $this._onMouseWheel.apply($this, [e]);
-        e.preventDefault();
-        return false;
-    });
+    overwriteEvent("mousedown", this._onMouseDown);
+    overwriteEvent("mousemove", this._onMouseMove);
+    overwriteEvent("mouseup", this._onMouseUp);
+    overwriteEvent("dblclick", this._onMouseDblClick);
+    overwriteEvent("mousewheel", this._onMouseWheel);
+    overwriteEvent("mouseout", this._onMouseOut);
+    overwriteEvent("contextmenu");
+    // register keboard events
+    overwriteEvent("keydown", this._onKeyDown);
 };
 
 Designer.prototype._unregisterEvents = function () {
@@ -444,59 +536,261 @@ Designer.prototype._unregisterEvents = function () {
     $(this._canvas).unbind(".designer")
 };
 
-Designer.prototype._onMouseMove = function (e) {
-    var pos = new Point(e.offsetX, e.offsetY);
-    var grid = this._options.grid;
-    if (this._currentObject == null) {
-        // find object under mouse
-        this._hoveredObject = this._findObjectAtPosition(pos.Scale(1/grid));
-    } else {
-        // place currentObject at mouse
-        this._hoveredObject = null;
-        // place centered on mouse position
-        var size = this._currentObject.Size().Scale(grid);
-        pos.x -= size.width / 2;
-        pos.y -= size.height / 2;
-        this._currentObject.Position(pos.Scale(1/grid, true));
+Designer.prototype._handleMousePosition = function (e) {
+    this._mousePosition = new Point(e.offsetX, e.offsetY);
+    return this._mousePosition;
+};
+
+Designer.prototype._handleMouseButtons = function (e, pressed) {
+    switch (e.which) {
+        case MouseButton.Left: this._mouseButtons.left = pressed; break;
+        case MouseButton.Middle: this._mouseButtons.middle = pressed; break;
+        case MouseButton.Right: this._mouseButtons.right = pressed; break;
     }
-    // redraw to adjust highlighting
-    this.Render();
 };
 
-Designer.prototype._onMouseOut = function (e) {
-    this._hoveredObject = null;
-    this.Render();
-};
-
-Designer.prototype._onMouseClick = function (e) {
-    if (this._currentObject != null) {
-        var copy = $.extend(true, {}, this._currentObject);
-        this._objects.push(copy);
+Designer.prototype._onMouseDown = function (e) {
+    // the canvas has to be focused, otherwise key events will not work
+    this._canvas.focus();
+    var pos = this._handleMousePosition(e);
+    var render = this._moveCurrentObjectToMouse();
+    this._handleMouseButtons(e, true);
+    trace("mousedown " + this._mouseButtons.toString());
+    this._mouseDragStart = pos.Copy();
+    var buttons = this._mouseButtons;
+    if (buttons.left && buttons.right) {
+        this._state = Designer.State.DragAllStart;
+    } else if (buttons.left && this._currentObject != null) {
+        if (this._tryPlaceCurrentObject()) {
+            render = true;
+        }
+    } else if (buttons.left && this._currentObject == null) {
+        var obj = this._findObjectAtPosition(pos);
+        if (obj == null) {
+            // user clicked in empty space: start dragging selecion rectangle
+            this._state = Designer.State.SelectionRectStart;
+            render = true;
+        } else if (!e.ctrlKey && !e.shiftKey) {
+            // user clicked on object:
+            // - if it is selected, start dragging all selected objects
+            // - if it is not, start dragging just that single object
+            this._state = this._selectedObjects.contains(obj) ?
+                Designer.State.DragSelectionStart : Designer.State.DragSingleStart;
+        }
+    }
+    // re-render if necessary
+    if (render) {
         this.Render();
     }
+};
+
+Designer.prototype._onMouseMove = function (e) {
+    var pos = this._handleMousePosition(e);
+    var render = this._moveCurrentObjectToMouse();
+    trace("mousemove " + this._mouseButtons.toString());
+    var dragPos = this._mouseDragStart;
+    var buttons = this._mouseButtons;
+    // check if user begins to drag
+    if (this._state != Designer.State.Standard && (Math.abs(dragPos.x - pos.x) > 1 || Math.abs(dragPos.y - pos.y) > 1)) {
+        switch (this._state) {
+            case Designer.State.SelectionRectStart:
+                this._state = Designer.State.SelectionRect;
+                break;
+            case Designer.State.DragSelectionStart:
+                this._state = Designer.State.DragSelection;
+                break;
+            case Designer.State.DragSingleStart:
+                this._selectedObjects = [this._findObjectAtPosition(dragPos)];
+                this._state = Designer.State.DragSelection;
+                break;
+            case Designer.State.DragAllStart:
+                this._state = Designer.State.DragAll;
+                break;
+        }
+    }
+    var grid = this._options.grid;
+    // drag delta
+    var dis;
+    function GetDragDelta() {
+        var dis = pos.Copy();
+        dis.x -= dragPos.x;
+        dis.y -= dragPos.y;
+        return dis.Scale(1/grid);
+    }
+    var i, obj;
+    switch (this._state) {
+        default:
+            if (buttons.left && this._currentObject != null) {
+                // keep placing objects when moving the mouse while the left button is pressed
+                if (this._tryPlaceCurrentObject()) {
+                    render = true;
+                }
+            }
+            break;
+        case Designer.State.SelectionRect:
+            if (e.ctrlKey || e.shiftKey) {
+                // dafuq?
+            } else {
+                this._selectedObjects = [];
+            }
+            // adjust rect
+            this._selectionRect = Rect.FromPoints(this._mouseDragStart, this._mousePosition);
+            // select intersecting objects
+            for (var o = 0; o < this._objects.length; o++) {
+                obj = this._objects[o];
+                if (obj.Rect().Scale(this._options.grid).IntersectsWith(this._selectionRect)) {
+                    this._selectedObjects.push(obj);
+                }
+            }
+            render = true;
+            break;
+        case Designer.State.DragSelection:
+            // drag selection objects around, always checking for collisions
+            dis = GetDragDelta();
+            // check if the mouse has moved at least one grid cell in any direction
+            if (dis.x == 0 && dis.y == 0) {
+                break;
+            }
+            // move selected objects
+            for (i = 0; i < this._selectedObjects.length; i++) {
+                obj = this._selectedObjects[i];
+                obj.left += dis.x;
+                obj.top += dis.y;
+            }
+            // check for collisions with unselected objects
+            var collision = false;
+            for (i = 0; i < this._objects.length; i++) {
+                if (this._selectedObjects.contains(this._objects[i])) {
+                    continue;
+                }
+                var rect = this._objects[i].Rect();
+                for (var j = 0; j < this._selectedObjects.length; j++) {
+                    if (this._selectedObjects[j].Rect().IntersectsWith(rect)) {
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision){
+                    break;
+                }
+            }
+            if (collision) {
+                // roll back movement on collision
+                for (i = 0; i < this._selectedObjects.length; i++) {
+                    obj = this._selectedObjects[i];
+                    obj.left -= dis.x;
+                    obj.top -= dis.y;
+                }
+            } else {
+                // adjust the drag start to compensate the amount we already moved
+                dis.Scale(grid);
+                this._mouseDragStart.x += dis.x;
+                this._mouseDragStart.y += dis.y;
+                render = true;
+            }
+            break;
+        case Designer.State.DragAll:
+            dis = GetDragDelta();
+            // check if the mouse has moved at least one grid cell in any direction
+            if (dis.x == 0 && dis.y == 0) {
+                break;
+            }
+            // move all objects
+            for (i = 0; i < this._objects.length; i++) {
+                this._objects[i].left += dis.x;
+                this._objects[i].top += dis.y;
+            }
+            // adjust the drag start to compensate the amount we already moved
+            dis.Scale(grid);
+            this._mouseDragStart.x += dis.x;
+            this._mouseDragStart.y += dis.y;
+            render = true;
+            break;
+    }
+    // re-render if necessary
+    if (render) {
+        this.Render();
+    }
+};
+
+Designer.prototype._onMouseUp = function (e) {
+    var pos = this._handleMousePosition(e);
+    this._handleMouseButtons(e, false);
+    trace("mouseup " + this._mouseButtons.toString());
+    var buttons = this._mouseButtons;
+    if (this._state == Designer.State.DragAll) {
+        if (!buttons.left || !buttons.right) {
+            this._state = Designer.State.Standard;
+        }
+        return;
+    }
+    var obj;
+    // left button up
+    if (e.which == MouseButton.Left && this._currentObject == null) {
+        switch (this._state) {
+            default:
+                // clear selection of no control key is pressed
+                if (!e.ctrlKey && !e.shiftKey) {
+                    this._selectedObjects = [];
+                }
+                obj = this._findObjectAtPosition(pos);
+                if (obj != null) {
+                    // user clicked an object: (de-)select it
+                    if (this._selectedObjects.contains(obj)) {
+                        this._selectedObjects.remove(obj);
+                    } else {
+                        this._selectedObjects.push(obj);
+                    }
+                }
+                break;
+            case Designer.State.SelectionRect:
+            case Designer.State.DragSelection:
+                break;
+        }
+        // return to standard state
+        this._state = Designer.State.Standard;
+    }
+    // right button up
+    if (e.which == MouseButton.Right && this._state == Designer.State.Standard) {
+        if (this._currentObject == null) {
+            obj = this._findObjectAtPosition(pos);
+            if (obj == null) {
+                if (!e.ctrlKey && !e.shiftKey) {
+                    // use right clicked in empty space: clear selection
+                    this._selectedObjects = [];
+                }
+            } else {
+                // user right clicked an existing object: remove it
+                this._objects.remove(obj);
+                this._selectedObjects.remove(obj);
+            }
+        } else {
+            // cancel placement
+            this._currentObject = null;
+        }
+    }
+    // rotate current object
+    if (e.which == MouseButton.Middle && this._currentObject != null) {
+        obj = this._currentObject;
+        var tmp = obj.width;
+        obj.width = obj.height;
+        obj.height = tmp;
+    }
+    this.Render();
 };
 
 Designer.prototype._onMouseDblClick = function (e) {
+    var pos = this._handleMousePosition(e);
+    trace("mousedblclick " + this._mouseButtons.toString());
     if (this._currentObject == null) {
-        var pos = new Point(e.offsetX, e.offsetY).Scale(1/this._options.grid);
-        this._setManualProperties(this._findObjectAtPosition(pos));
+        this._setCurrentProperties(this._findObjectAtPosition(pos));
+        this.ApplyCurrentObject();
         this.Render();
-    }
-};
-
-Designer.prototype._onMouseClickRight = function(e) {
-    // right mouse button
-    if (this._currentObject != null) {
-        this._currentObject = null;
-    } else {
-        var pos = new Point(e.offsetX, e.offsetY);
-        var obj = this._findObjectAtPosition(pos.Scale(1/this._options.grid));
-        this._objects.remove(obj);
     }
 };
 
 Designer.prototype._onMouseWheel = function(e) {
-    // mouse wheel
+    trace("mousewheel");
     var delta = event.wheelDelta/50 || -event.detail;
     this._options.grid = Math.round(this._options.grid * (delta < 0 ? 1/this._options.zoomSpeed : this._options.zoomSpeed));
     if (this._options.grid < 1)
@@ -507,6 +801,31 @@ Designer.prototype._onMouseWheel = function(e) {
         this.AutoSize();
     }
     this.Render();
+};
+
+Designer.prototype._onMouseOut = function (e) {
+    trace("mouseout");
+    this._hoveredObject = null;
+    this._mousePosition = null;
+    this.Render();
+};
+
+Designer.prototype._onKeyDown = function (e) {
+    trace("keydown [" + e.keyCode + "]");
+    switch (e.keyCode) {
+        // delete key
+        case 46:
+            if (this._selectedObjects.length == 0) {
+                break;
+            }
+            // delete currently selected objects
+            for (var i = 0; i < this._selectedObjects.length; i++) {
+                this._objects.remove(this._selectedObjects[i]);
+            }
+            this._selectedObjects = [];
+            this.Render();
+            break;
+    }
 };
 
 // ** Rendering
@@ -533,8 +852,8 @@ Designer.prototype.Render = function () {
     }
     // draw highlights
     var obj;
-    for (i = 0; i < this._highlightedObjects.length; i++) {
-        obj = this._highlightedObjects[i];
+    for (i = 0; i < this._selectedObjects.length; i++) {
+        obj = this._selectedObjects[i];
         ctx.lineWidth = 2;
         ctx.strokeStyle = "#00FF00";
         this._strokeRect(obj.Rect().Scale(o.grid));
@@ -549,6 +868,19 @@ Designer.prototype.Render = function () {
     if (this._currentObject != null) {
         this._renderObject(this._currentObject);
     }
+    if (this._state == Designer.State.SelectionRect) {
+        ctx.fillStyle = "#FFFF00";
+        ctx.globalAlpha = 0.4;
+        this._fillRect(this._selectionRect);
+        ctx.globalAlpha = 1;
+    }
+    // output debug information
+    for (var s in Designer.State) {
+        if (this._state == Designer.State[s]) {
+            $("#debugState").html(s);
+        }
+    }
+    $("#debugFrameCount").html(++this._framesRendered);
 };
 
 Designer.prototype._renderGrid = function () {
