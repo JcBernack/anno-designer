@@ -13,6 +13,7 @@ if ($db->connect_errno != 0) {
 
 // assign routes
 $app = new \Slim\Slim();
+$app->contentType("application/json");
 $app->hook("slim.after", function() { global $db; $db->close(); });
 $app->get("/user/:id", "GetUser");
 $app->post("/user", "CreateUser");
@@ -191,7 +192,8 @@ function SaveLayout() {
         if (!$db->query("COMMIT")) {
             throw new IksdehException(500, "commit transaction failed");
         }
-        echo json_encode(array("ID" => $layoutID));
+        // return result
+        echo json_encode(array("success" => true, "ID" => $layoutID));
     } catch(IksdehException $ex) {
         $db->query("ROLLBACK");
         $app->halt($ex->getCode(), $ex->getMessage());
