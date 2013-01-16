@@ -17,10 +17,10 @@ error_reporting(E_ALL);
     <script src="lib/jquery.themeswitcher.min.js"></script>
     <script src="lib/jquery.miniColors.js"></script>
     <script src="lib/json2.js"></script>
-    <script src="geometry.js"></script>
-    <script src="helpers.js"></script>
-    <script src="building.js"></script>
-    <script src="designer.js"></script>
+    <script src="scripts/geometry.js"></script>
+    <script src="scripts/helpers.js"></script>
+    <script src="scripts/building.js"></script>
+    <script src="scripts/designer.js"></script>
     <script type="text/javascript" language="JavaScript">
         var designer, datatable;
         $(function () {
