@@ -8,6 +8,17 @@ function trace(msg)
     }
 }
 
+var MouseButton = {
+    Left: 1,
+    Middle: 2,
+    Right: 3
+};
+
+var Convert = {
+    bool: function(str) { return str == "1" },
+    int: function(str) { var n = parseInt(str); return isNaN(n) ? 0 : n; }
+};
+
 function Rest(method, url, data, success) {
     return $.ajax({
         url: url,

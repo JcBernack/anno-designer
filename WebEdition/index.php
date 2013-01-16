@@ -19,6 +19,7 @@ error_reporting(E_ALL);
     <script src="lib/json2.js"></script>
     <script src="geometry.js"></script>
     <script src="helpers.js"></script>
+    <script src="building.js"></script>
     <script src="designer.js"></script>
     <script type="text/javascript" language="JavaScript">
         var designer, datatable;

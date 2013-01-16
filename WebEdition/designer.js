@@ -1,9 +1,3 @@
-/**
- * Anno Designer - Web Edition
- * Date: 09.01.13
- * @requires jQuery
- * @author Jan Christoph Bernack
- */
 //** Editor mouse behavior
 // + MouseMove
 //  - no action active: highlight object under mouse
@@ -25,68 +19,15 @@
 // + Hotkeys:
 //   - entf: remove selected objects, if any
 
-var Convert = {
-    bool: function(str) { return str == "1" },
-    int: function(str) { var n = parseInt(str); return isNaN(n) ? 0 : n; }
-};
-
-var Building = function(left, top, width, height, color, label) {
-    this.left = left;
-    this.top = top;
-    this.width = width;
-    this.height = height;
-    this.color = color;
-    this.label = label;
-    this.enableLabel = false;
-    this.borderless = false;
-    this.road = false;
-};
-
-Building.FromObject = function (obj) {
-    // type conversions needed to support creating building directly from data supplied by the webservice
-    var b = new Building(
-        Convert.int(obj.left),
-        Convert.int(obj.top),
-        Convert.int(obj.width),
-        Convert.int(obj.height),
-        obj.color,
-        obj.label
-    );
-    b.enableLabel = Convert.bool(obj.enableLabel);
-    b.borderless = Convert.bool(obj.borderless);
-    b.road = Convert.bool(obj.road);
-    return b;
-};
-
-Building.prototype.Position = function (point) {
-    if (point) {
-        this.left = point.x;
-        this.top = point.y;
-        return this;
-    } else {
-        return new Point(this.left, this.top);
-    }
-};
-
-Building.prototype.Size = function () {
-    return new Size(this.width, this.height);
-};
-
-Building.prototype.Rect = function () {
-    return new Rect(this.left, this.top, this.width, this.height);
-};
-
-Building.prototype.IsValid = function () {
-    return !(this.width < 1 || this.height < 1 || this.color.length != 7);
-};
-
-var MouseButton = {
-    Left: 1,
-    Middle: 2,
-    Right: 3
-};
-
-// Constructor
+/**
+ * Anno Designer - Web Edition
+ * Date: 09.01.2013
+ * @version 1.0
+ * @author Jan Christoph Bernack
+ * @requires jQuery, jQuery-ui, jQuery-miniColors, json2
+ * @param {Object} options Option set to overwrite any defaults.
+ * @constructor
+ */
 var Designer = function (options) {
     // extend defaults with given options
     this._options = $.extend(true, {}, Designer.defaultOptions, options);
@@ -111,6 +52,10 @@ var Designer = function (options) {
     this.RefreshResizer();
 };
 
+/**
+ * Default options used for every new instance of the designer.
+ * @type {Object}
+ */
 Designer.defaultOptions = {
     serviceUrl: "rest/",
     containerId: "editor",
@@ -125,6 +70,11 @@ Designer.defaultOptions = {
     spacing: 0.5 //TODO: implement normalization and set to 1
 };
 
+/**
+ * Enumeration of mouse interaction states.
+ * Values are arbitrary but need to be unique.
+ * @type {Object}
+ */
 Designer.State = {
     // used if not dragging
     Standard: 0,
@@ -139,20 +89,48 @@ Designer.State = {
     DragAll: 7
 };
 
-// holds an array of all objects
+/**
+ * Holds an array of all objects on the current layout.
+ * @type {Array}
+ * @private
+ */
 Designer.prototype._objects = [];
-// holds an array of all objects which are highlighted
+/**
+ * Holds an array of all objects which are highlighted.
+ * @type {Array}
+ * @private
+ */
 Designer.prototype._selectedObjects = [];
-// the object which is currently being placed, or null if none
+/**
+ * The object which is currently being placed, or null if none.
+ * @type {Building}
+ * @private
+ */
 Designer.prototype._currentObject = null;
-// the object currently under the mouse
+/**
+ * The object currently under the mouse.
+ * @type {Building}
+ * @private
+ */
 Designer.prototype._hoveredObject = null;
 
-// holds the layout object received from the server
+/**
+ * Holds the layout object received from the server
+ * @type {Object}
+ * @private
+ */
 Designer.prototype._layout = null;
-// current interaction state
+/**
+ * Current interaction state defined by a value from the Designer.State enumeration.
+ * @type {Number}
+ * @private
+ */
 Designer.prototype._state = Designer.State.Standard;
-// mouse button states
+/**
+ * Current mouse button states.
+ * @type {Object}
+ * @private
+ */
 Designer.prototype._mouseButtons = {
     //TODO: key-ups are missed if the buttons are released outside the canvas, this can mess up the _mouseButtons state
     left: false,
@@ -167,15 +145,35 @@ Designer.prototype._mouseButtons = {
         return "[" + buttons.join(",") + "]";
     }
 };
-// mouse position
+/**
+ * The current mouse position.
+ * @type {Point}
+ * @private
+ */
 Designer.prototype._mousePosition = null;
-// position where dragging started
+/**
+ * The position where dragging was started.
+ * @type {Point}
+ * @private
+ */
 Designer.prototype._mouseDragStart = null;
-// current selection rectangle
+/**
+ * The current selection rectangle.
+ * @type {Rect}
+ * @private
+ */
 Designer.prototype._selectionRect = null;
-
+/**
+ * The number of frames rendered.
+ * @type {Number}
+ * @private
+ */
 Designer.prototype._framesRendered = 0;
 
+/**
+ * Resets the designer.
+ * @public
+ */
 Designer.prototype.Reset = function () {
     this._objects = [];
     this._selectedObjects = [];
@@ -183,6 +181,11 @@ Designer.prototype.Reset = function () {
     this._setCurrentLayout(null);
 };
 
+/**
+ * Initializes the button pane by loading its template from the server and injecting it into the DOM.
+ * Also initializes all UI elements and events.
+ * @private
+ */
 Designer.prototype._createButtonpane = function () {
     var $this = this;
     $.ajax({
@@ -209,6 +212,8 @@ Designer.prototype._createButtonpane = function () {
                 });
             pane.find("#apply").button({ icons: { primary: "ui-icon-check" } })
                 .click(function() { $this.ApplyCurrentObject(); });
+            pane.find("#debugConsoleClear").button({ icons: { primary: "ui-icon-trash" } })
+                .click(function() { $("#debugConsole").text(""); });
             // initialize color picker
             $.minicolors.init();
             // put the whole menu inside an accordion
@@ -223,6 +228,12 @@ Designer.prototype._createButtonpane = function () {
     });
 };
 
+/**
+ * Toogles visibility of the button pane if called without arguments.
+ * If the argument is given, visibility is set to the given value.
+ * @param {Boolean} visible
+ * @public
+ */
 Designer.prototype.ToggleButtonpane = function(visible) {
     if (arguments.length == 0) {
         this._buttonpane.toggle();
@@ -231,6 +242,10 @@ Designer.prototype.ToggleButtonpane = function(visible) {
     }
 };
 
+/**
+ * Initializes or refreshes the resizing element of the designer.
+ * @public
+ */
 Designer.prototype.RefreshResizer = function() {
     var $this = this;
     var grid = this._options.grid;
@@ -264,14 +279,16 @@ Designer.prototype.RefreshResizer = function() {
     toggleClass(".ui-resizable-se", "resizer-helper-e resizer-helper-s");
 };
 
-// ** Sizing
+/**
+ * Resizes the canvas to given size in grid-coordinates.
+ * @param {Size} size The size which should be applied.
+ * @return {Boolean} True if the size was adjusted, otherwise false, i.e. no changes needed.
+ * @public
+ */
 Designer.prototype.SetSize = function (size) {
-    switch (arguments.length) {
-        // use current dimensions if called without argument
-        case 0: size = new Size(this._options.width, this._options.height); break;
-        case 1: break;
-        // accept two arguments: width, height
-        case 2: size = new Size(arguments[0], arguments[1]); break;
+    // use current dimensions if called without argument
+    if (arguments.length == 0) {
+        size = new Size(this._options.width, this._options.height);
     }
     // remember size in grid units
     this._options.width = size.width;
@@ -295,6 +312,11 @@ Designer.prototype.SetSize = function (size) {
     return true;
 };
 
+/**
+ * Calculates the size needed for current layout and adjusts the canvas size accordingly.
+ * @return {Boolean} True if the size was adjusted, otherwise false, i.e. no changes needed.
+ * @public
+ */
 Designer.prototype.AutoSize = function () {
     // adjust canvas size, e.g. for changed grid-size
     // prevents collapsing to a single cell (width x height: 1x1)
@@ -317,10 +339,15 @@ Designer.prototype.AutoSize = function () {
     // **
     // apply correct size
     var space = 2 * this._options.spacing;
-    return this.SetSize(width + space, height + space);
+    return this.SetSize(new Size(width + space, height + space));
 };
 
-// ** Layout helper
+/**
+ * Searches for an object within the current layout which contains the given point.
+ * @param {Point} point The point in pixel-coordinates.
+ * @return {Building} The object at the given point or null if nothing is found.
+ * @private
+ */
 Designer.prototype._findObjectAtPosition = function(point) {
     var p = point.Copy().Scale(1/this._options.grid);
     for (var i = 0; i < this._objects.length; i++) {
@@ -331,6 +358,11 @@ Designer.prototype._findObjectAtPosition = function(point) {
     return null;
 };
 
+/**
+ * Resets the designer and parses the layout received from the server.
+ * @param layout The layout to be parsed.
+ * @private
+ */
 Designer.prototype._parseLayout = function (layout) {
     this.Reset();
     this._setCurrentLayout(layout);
@@ -347,12 +379,20 @@ Designer.prototype._parseLayout = function (layout) {
     this.Render();
 };
 
-// ** Layout I/O
+/**
+ * Resets the designer to create a new layout.
+ * @public
+ */
 Designer.prototype.New = function () {
     this.Reset();
     this.Render();
 };
 
+/**
+ * Loads the layout with the given ID from the server.
+ * @param id The id of the layout to load.
+ * @public
+ */
 Designer.prototype.Load = function (id) {
     // load file from url and parse as json
     var $this = this;
@@ -363,10 +403,18 @@ Designer.prototype.Load = function (id) {
     );
 };
 
+/**
+ * Saves modifications to the current layout to the server. Layout must already exist on the server to succeed.
+ * @public
+ */
 Designer.prototype.Save = function () {
     //TODO: implement Save()
 };
 
+/**
+ * Saves an independent copy of the current layout on the server.
+ * @public
+ */
 Designer.prototype.SaveAs = function () {
     // validation: empty layout
     if (this._objects == null || this._objects.length == 0) {
@@ -379,8 +427,7 @@ Designer.prototype.SaveAs = function () {
         alert("No name given.");
         return;
     }
-    // load file from url and parse as json
-    var $this = this;
+    // POST layout to webservice
     Rest("POST",this._options.serviceUrl + "layout",
         "data=" + JSON.stringify({
             name: name,
@@ -392,6 +439,10 @@ Designer.prototype.SaveAs = function () {
         });
 };
 
+/**
+ * Deletes the current layout from the server and clears the designer on success.
+ * @public
+ */
 Designer.prototype.Delete = function () {
     // delete the currently loaded layout
     if (this._layout == null) {
@@ -413,14 +464,22 @@ Designer.prototype.Delete = function () {
         });
 };
 
+/**
+ * Sets the information within the button pane and the current layout to the given data.
+ * @param layout Layout information received from webservice or null to clear the current layout.
+ * @private
+ */
 Designer.prototype._setCurrentLayout  = function(layout) {
     this._layout = layout;
+    var b = this._buttonpane;
+    if (b == null) {
+        return;
+    }
+    // default values to show when no layout is set
     if (layout == null) {
-        // default values to show when no layout is set
         layout = { name: "", author: "", width: 0, height: 0, created: "", edited: "" };
     }
     // set information
-    var b = this._buttonpane;
     b.find("#layoutName").val(layout.name);
     b.find("#layoutAuthor").html(layout.author);
     b.find("#layoutSize").html(layout.width + "x" + layout.height);
@@ -428,15 +487,25 @@ Designer.prototype._setCurrentLayout  = function(layout) {
     b.find("#layoutEdited").html(layout.edited);
 };
 
-//** Current object handling
+/**
+ * Retrieves current user input and sets the current object, if validation succeeds.
+ * @public
+ */
 Designer.prototype.ApplyCurrentObject = function() {
     this._currentObject = this._getCurrentProperties();
     if (!this._currentObject.IsValid()) {
+        //TODO: give nice validation feedback
         alert("object invalid");
         this._currentObject = null;
     }
 };
 
+/**
+ * Sets the user input within the button pane to the values of the given object.
+ * If the button pane is not initialized or the given object is null nothing is done.
+ * @param {Building} building The object whichs properties should be used.
+ * @private
+ */
 Designer.prototype._setCurrentProperties = function(building) {
     var b = this._buttonpane;
     if (b == null || building == null) {
@@ -452,6 +521,11 @@ Designer.prototype._setCurrentProperties = function(building) {
     $.minicolors.refresh();
 };
 
+/**
+ * Retrieves object properties from the user input through the button pane.
+ * @return {Building} An object with its properties set to the user input. Null if the button pane is not initialized.
+ * @private
+ */
 Designer.prototype._getCurrentProperties = function() {
     var bp = this._buttonpane;
     if (bp == null) {
@@ -469,6 +543,13 @@ Designer.prototype._getCurrentProperties = function() {
     return b;
 };
 
+/**
+ * Moves the current object to the current position of the mouse.
+ * The object is moved so that its center is nearest to the mouse.
+ * @return {Boolean} True, if the objects position was modified.
+ * Otherwise false, i.e. if the object is null or already at the correct position.
+ * @private
+ */
 Designer.prototype._moveCurrentObjectToMouse = function() {
     if (this._currentObject == null) {
         return false;
@@ -487,6 +568,12 @@ Designer.prototype._moveCurrentObjectToMouse = function() {
     return false;
 };
 
+/**
+ * Tries to place the current object at its current location.
+ * Applies collision detection to prevent invalid placement.
+ * @return {Boolean} True, if placement was successful. Otherwise false.
+ * @private
+ */
 Designer.prototype._tryPlaceCurrentObject = function() {
     if (this._currentObject != null) {
         // check for collisions
@@ -508,7 +595,11 @@ Designer.prototype._tryPlaceCurrentObject = function() {
     return false;
 };
 
-// ** Event handling
+/**
+ * Registers all events on the canvas.
+ * Any default behavior of the events used is prevented.
+ * @private
+ */
 Designer.prototype._registerEvents = function () {
     var $this = this;
     function overwriteEvent(eventName, handler) {
@@ -532,16 +623,35 @@ Designer.prototype._registerEvents = function () {
     overwriteEvent("keydown", this._onKeyDown);
 };
 
+/**
+ * Unregisters all events from the canvas.
+ * @private
+ */
 Designer.prototype._unregisterEvents = function () {
     // remove all events
     $(this._canvas).unbind(".designer")
 };
 
+/**
+ * Helper method for mouse event handlers.
+ * Keeps track of the current mouse position.
+ * @param e The mouse event object.
+ * @return {Point} The current mouse position.
+ * @private
+ */
 Designer.prototype._handleMousePosition = function (e) {
     this._mousePosition = new Point(e.offsetX, e.offsetY);
     return this._mousePosition;
 };
 
+/**
+ * Helper method for mouse event handlers.
+ * Keeps track of the current state of all mouse buttons.
+ * Needed because mouse events not always contain information about all buttons.
+ * @param e The mouse event object.
+ * @param {Boolean} pressed Specified whether the event is for mouse-down or -up.
+ * @private
+ */
 Designer.prototype._handleMouseButtons = function (e, pressed) {
     switch (e.which) {
         case MouseButton.Left: this._mouseButtons.left = pressed; break;
@@ -550,6 +660,11 @@ Designer.prototype._handleMouseButtons = function (e, pressed) {
     }
 };
 
+/**
+ * Handles mousedown events on the canvas.
+ * @param e The mousedown event object.
+ * @private
+ */
 Designer.prototype._onMouseDown = function (e) {
     // the canvas has to be focused, otherwise key events will not work
     this._canvas.focus();
@@ -571,7 +686,7 @@ Designer.prototype._onMouseDown = function (e) {
             // user clicked in empty space: start dragging selecion rectangle
             this._state = Designer.State.SelectionRectStart;
             render = true;
-        } else if (!e.ctrlKey && !e.shiftKey) {
+        } else if (!this._controlKeysPressed(e)) {
             // user clicked on object:
             // - if it is selected, start dragging all selected objects
             // - if it is not, start dragging just that single object
@@ -585,6 +700,11 @@ Designer.prototype._onMouseDown = function (e) {
     }
 };
 
+/**
+ * Handles mousemove events on the canvas.
+ * @param e The mousemove event object.
+ * @private
+ */
 Designer.prototype._onMouseMove = function (e) {
     var pos = this._handleMousePosition(e);
     var render = this._moveCurrentObjectToMouse();
@@ -623,22 +743,26 @@ Designer.prototype._onMouseMove = function (e) {
     var i, j, obj;
     switch (this._state) {
         default:
+            // highlight hovered object if not currently placing an object
             if (this._currentObject == null) {
                 obj = this._findObjectAtPosition(pos);
                 if (this._hoveredObject != obj) {
                     this._hoveredObject = obj;
                     render = true;
                 }
+            } else if (this._hoveredObject != null) {
+                this._hoveredObject = null;
+                render = true;
             }
+            // place objects when moving the mouse while the left button is pressed
             if (buttons.left && this._currentObject != null) {
-                // keep placing objects when moving the mouse while the left button is pressed
                 if (this._tryPlaceCurrentObject()) {
                     render = true;
                 }
             }
             break;
         case Designer.State.SelectionRect:
-            if (e.ctrlKey || e.shiftKey) {
+            if (this._controlKeysPressed(e)) {
                 // remove previously selected by the selection rect
                 // iterate backwards, because the array is modifed during the loop and indexes would shift
                 for (j = this._selectedObjects.length-1; j >= 0; j--) {
@@ -732,6 +856,11 @@ Designer.prototype._onMouseMove = function (e) {
     }
 };
 
+/**
+ * Handles mouseup events on the canvas.
+ * @param e The mouseup event object.
+ * @private
+ */
 Designer.prototype._onMouseUp = function (e) {
     var pos = this._handleMousePosition(e);
     this._handleMouseButtons(e, false);
@@ -749,7 +878,7 @@ Designer.prototype._onMouseUp = function (e) {
         switch (this._state) {
             default:
                 // clear selection of no control key is pressed
-                if (!e.ctrlKey && !e.shiftKey) {
+                if (!this._controlKeysPressed(e)) {
                     this._selectedObjects = [];
                 }
                 obj = this._findObjectAtPosition(pos);
@@ -774,7 +903,7 @@ Designer.prototype._onMouseUp = function (e) {
         if (this._currentObject == null) {
             obj = this._findObjectAtPosition(pos);
             if (obj == null) {
-                if (!e.ctrlKey && !e.shiftKey) {
+                if (!this._controlKeysPressed(e)) {
                     // use right clicked in empty space: clear selection
                     this._selectedObjects = [];
                 }
@@ -798,6 +927,11 @@ Designer.prototype._onMouseUp = function (e) {
     this.Render();
 };
 
+/**
+ * Handles doubleclick events on the canvas.
+ * @param e The dblclick event object.
+ * @private
+ */
 Designer.prototype._onMouseDblClick = function (e) {
     var pos = this._handleMousePosition(e);
     this.Trace("mousedblclick " + this._mouseButtons.toString());
@@ -808,6 +942,11 @@ Designer.prototype._onMouseDblClick = function (e) {
     }
 };
 
+/**
+ * Handles mousewheel events on the canvas.
+ * @param e The mousewheel event object.
+ * @private
+ */
 Designer.prototype._onMouseWheel = function(e) {
     this.Trace("mousewheel");
     var delta = event.wheelDelta/50 || -event.detail;
@@ -822,6 +961,11 @@ Designer.prototype._onMouseWheel = function(e) {
     this.Render();
 };
 
+/**
+ * Handles mouseout events on the canvas.
+ * @param e The mouseout event object.
+ * @private
+ */
 Designer.prototype._onMouseOut = function (e) {
     this.Trace("mouseout");
     this._hoveredObject = null;
@@ -829,6 +973,11 @@ Designer.prototype._onMouseOut = function (e) {
     this.Render();
 };
 
+/**
+ * Handles keydown events on the canvas.
+ * @param e The keydown event object.
+ * @private
+ */
 Designer.prototype._onKeyDown = function (e) {
     this.Trace("keydown [" + e.keyCode + "]");
     switch (e.keyCode) {
@@ -847,7 +996,20 @@ Designer.prototype._onKeyDown = function (e) {
     }
 };
 
-// ** Rendering
+/**
+ * Checks if any of the controls keys (ctrl or shift) is pressed for the given event.
+ * @param e The event object.
+ * @return {Boolean} True if ctrl, shift or both buttons are pressed. Otherwise false.
+ * @private
+ */
+Designer.prototype._controlKeysPressed = function (e) {
+    return e.ctrlKey || e.shiftKey;
+};
+
+/**
+ * Main rendering method. Clears the canvas and re-renders the whole frame.
+ * @public
+ */
 Designer.prototype.Render = function () {
     // shorthand definitions
     var o = this._options;
@@ -902,6 +1064,10 @@ Designer.prototype.Render = function () {
     $("#debugFrameCount").html(++this._framesRendered);
 };
 
+/**
+ * Renders the grid to the canvas, uses the grid-size set within the options.
+ * @private
+ */
 Designer.prototype._renderGrid = function () {
     var ctx = this._ctx;
     var grid = this._options.grid;
@@ -926,6 +1092,11 @@ Designer.prototype._renderGrid = function () {
     ctx.translate(-0.5, -0.5);
 };
 
+/**
+ * Renders the given object to the canvas.
+ * @param {Building} obj The object to render.
+ * @private
+ */
 Designer.prototype._renderObject = function (obj) {
     var ctx = this._ctx;
     ctx.lineWidth = 1;
@@ -940,6 +1111,13 @@ Designer.prototype._renderObject = function (obj) {
     this._renderText(obj.label, obj.Position(), obj.Size());
 };
 
+/**
+ * Renders a string centered within a rectangle to the canvas.
+ * @param {String} text The string to be rendered.
+ * @param {Point} point The point to render at, given in grid-coordinates.
+ * @param {Size} size The available space for rendering, given in grid-coordinates.
+ * @private
+ */
 Designer.prototype._renderText = function(text, point, size) {
     var ctx = this._ctx;
     ctx.textAlign = "center";
@@ -949,7 +1127,12 @@ Designer.prototype._renderText = function(text, point, size) {
     ctx.fillText(text, p.x + s.width/2, p.y + s.height/2, s.width);
 };
 
-// ** Render helpers
+/**
+ * Draws a stroke rectangle to the canvas, fixing blurry lines for odd line widths
+ * by translating half a pixel to the bottom right.
+ * @param {Rect} rect
+ * @private
+ */
 Designer.prototype._strokeRect = function (rect) {
     if (this._ctx.lineWidth % 2 == 0) {
         this._ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
@@ -961,11 +1144,27 @@ Designer.prototype._strokeRect = function (rect) {
     }
 };
 
+/**
+ * Draws a filled rectangle to the canvas.
+ * @param {Rect} rect
+ * @private
+ */
 Designer.prototype._fillRect = function (rect) {
     this._ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
 };
 
+/**
+ * Internal counter for the debugging console. Keeps track of how often the same message was repeated.
+ * @type {Number}
+ * @private
+ */
 Designer.prototype._traceCounter = 0;
+
+/**
+ * Appends a message to the debug console.
+ * @param {String} message
+ * @public
+ */
 Designer.prototype.Trace = function(message) {
 //    trace(message);
     var con = $("#debugConsole");
