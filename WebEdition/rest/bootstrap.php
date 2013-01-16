@@ -193,7 +193,9 @@ function SaveLayout() {
             throw new IksdehException(500, "commit transaction failed");
         }
         // return result
-        echo json_encode(array("success" => true, "ID" => $layoutID));
+        $layout = UniqueIdQuery("select * from layout where ID=_ID_", $layoutID)->fetch_assoc();
+        $layout["author"] = RetriveUser($layout["authorID"])["name"];
+        echo json_encode(array("success" => true, "ID" => $layoutID, "layout" => $layout));
     } catch(IksdehException $ex) {
         $db->query("ROLLBACK");
         $app->halt($ex->getCode(), $ex->getMessage());

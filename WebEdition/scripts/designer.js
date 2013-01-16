@@ -443,6 +443,8 @@ Designer.prototype.SaveAs = function () {
                 alert("save failed");
                 return;
             }
+            // update layout information
+            $this._setCurrentLayout(data.layout);
             // fire changed event
             $this._options.layoutChanged(data.ID);
         });
