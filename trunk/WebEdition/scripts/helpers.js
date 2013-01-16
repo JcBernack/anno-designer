@@ -20,6 +20,7 @@ var Convert = {
 };
 
 function Rest(method, url, data, success) {
+    //TODO: add error handler
     return $.ajax({
         url: url,
         type: method,

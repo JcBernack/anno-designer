@@ -14,6 +14,7 @@ error_reporting(E_ALL);
     <script src="lib/jquery-1.8.3.min.js"></script>
     <script src="lib/jquery-ui-1.9.2.min.js"></script>
     <script src="lib/jquery.dataTables.min.js"></script>
+    <script src="lib/jquery.dataTables.plugins.js"></script>
     <script src="lib/jquery.themeswitcher.min.js"></script>
     <script src="lib/jquery.miniColors.js"></script>
     <script src="lib/json2.js"></script>
@@ -69,24 +70,56 @@ error_reporting(E_ALL);
                 ],
                 aaSorting: [[4, 'desc', 0]],
                 fnInitComplete:function (oSettings, json) {
+                    //TODO: select first row in a nicer way
                     if (json.aaData.length > 0) {
                         $("#" + json.aaData[0].ID).click();
                     }
                 }
             });
+            // handler to select and load layouts based on the table row
+            function selectRowNode(node) {
+                // select row
+                if (!node.hasClass("row_selected")) {
+                    datatable.$("tr.row_selected").removeClass("row_selected");
+                    node.addClass("row_selected");
+                }
+                // load layout
+                designer.Load(node[0].id);
+            }
             // add a click handler to the rows
             $("#listTable tbody tr").live("click", function (event) {
-                if (!$(this).hasClass('row_selected')) {
-                    datatable.$('tr.row_selected').removeClass('row_selected');
-                    $(this).addClass('row_selected');
-                }
-                // load preview of clicked layout
-                designer.Load(event.target.nodeName == "TR" ? event.target.id : event.target.parentNode.id);
+                selectRowNode($(this));
             });
             // initialize layout rendering
             designer = new Designer({
+                layoutReset: function () {
+                    // unselect row
+                    datatable.$("tr.row_selected").removeClass("row_selected");
+                },
+                layoutChanged: function (id) {
+                    // reload data
+                    datatable.fnReloadAjax(null, function(){
+                        // re-select changed row, after reload completed
+                        datatable.$("#" + id).addClass("row_selected");
+                    });
+                },
                 layoutDeleted: function (id) {
-                    datatable.fnDeleteRow($("#" + id)[0]);
+                    // retrieve row to be deleted
+                    var row = datatable.$("#" + id);
+                    // check if row is currently selected
+                    if (row.hasClass("row_selected")) {
+                        // try to get next or previous row
+                        var tr = datatable.fnGetAdjacentTr(row[0], true);
+                        if (tr == null) {
+                            tr = datatable.fnGetAdjacentTr(row[0], false);
+                        }
+                        // select row if found
+                        if (tr != null) {
+                            selectRowNode($(tr));
+                        }
+                    }
+                    // remove deleted row
+                    datatable.fnDeleteRow(row[0]);
                 }
             });
             // prepare login and register forms

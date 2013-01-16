@@ -59,6 +59,8 @@ var Designer = function (options) {
 Designer.defaultOptions = {
     serviceUrl: "rest/",
     containerId: "editor",
+    layoutReset: $.noop,
+    layoutChanged: $.noop,
     layoutDeleted: $.noop,
     autoSize: true,
     enableEditing: true,
@@ -195,6 +197,7 @@ Designer.prototype._createButtonpane = function () {
             // find containing element
             var pane = $this._container.find(".buttonpane");
             // prepare buttons
+            //TODO: keep the buttons disabled state in sync with the possible operations
             pane.find("#new").button({ icons: { primary: "ui-icon-document" } })
                 .click(function() { $this.New(); });
             pane.find("#save").button({ icons: { primary: "ui-icon-pencil" }, disabled: true })
@@ -386,6 +389,7 @@ Designer.prototype._parseLayout = function (layout) {
 Designer.prototype.New = function () {
     this.Reset();
     this.Render();
+    this._options.layoutReset();
 };
 
 /**
@@ -428,14 +432,19 @@ Designer.prototype.SaveAs = function () {
         return;
     }
     // POST layout to webservice
+    var $this = this;
     Rest("POST",this._options.serviceUrl + "layout",
         "data=" + JSON.stringify({
             name: name,
             objects: this._objects
         }),
-        function () {
-            alert("successfully saved");
-            //TODO: refresh datatable
+        function (data) {
+            if (!data.success) {
+                alert("save failed");
+                return;
+            }
+            // fire changed event
+            $this._options.layoutChanged(data.ID);
         });
 };
 
@@ -446,6 +455,7 @@ Designer.prototype.SaveAs = function () {
 Designer.prototype.Delete = function () {
     // delete the currently loaded layout
     if (this._layout == null) {
+        alert("nothing to delete");
         return;
     }
     //TODO: add confirmation dialog
