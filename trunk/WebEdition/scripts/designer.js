@@ -931,10 +931,7 @@ Designer.prototype._onMouseUp = function (e) {
     }
     // rotate current object
     if (e.which == MouseButton.Middle && this._currentObject != null) {
-        obj = this._currentObject;
-        var tmp = obj.width;
-        obj.width = obj.height;
-        obj.height = tmp;
+        this._currentObject.FlipSize();
     }
     this.Render();
 };
@@ -1115,6 +1112,11 @@ Designer.prototype._renderObject = function (obj) {
     ctx.fillStyle = obj.color;
     ctx.strokeStyle = "#000000";
     var rect = obj.Rect().Scale(this._options.grid);
+	// fix to overlap adjacent lines of the grid on the bottom and right side
+	if (obj.borderless) {
+		rect.width++;
+		rect.height++;
+	}
     this._fillRect(rect);
     if (!obj.borderless) {
         this._strokeRect(rect);
