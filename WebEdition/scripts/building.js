@@ -47,3 +47,9 @@ Building.prototype.Rect = function () {
 Building.prototype.IsValid = function () {
     return !(this.width < 1 || this.height < 1 || this.color.length != 7);
 };
+
+Building.prototype.FlipSize = function() {
+    var tmp = this.width;
+    this.width = this.height;
+    this.height = tmp;
+};

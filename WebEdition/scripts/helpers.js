@@ -37,11 +37,9 @@ if (typeof Array.prototype.last != 'function') {
 }
 
 if (typeof Array.prototype.remove != 'function') {
-    Array.prototype.remove = function (element)
-    {
+    Array.prototype.remove = function (element) {
         var i = this.indexOf(element);
-        if (i == -1)
-        {
+        if (i == -1) {
             return this;
         }
         this.splice(i, 1);
