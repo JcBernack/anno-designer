@@ -1374,15 +1374,15 @@ namespace AnnoDesigner
         /// <param name="exportSelection">indicates whether selection and influence highlights should be rendered</param>
         private void RenderToFile(string filename, int border, bool exportZoom, bool exportSelection)
         {
+            // copy all objects
+            var allObjects = _placedObjects.Select(_ => new AnnoObject(_)).ToList();
             // copy selected objects
+            // note: should be references to the correct copied objects from allObjects
             var selectedObjects = _selectedObjects.Select(_ => new AnnoObject(_)).ToList();
-            // copy all not selected objects
-            var allObjects = _placedObjects.Where(_ => !_selectedObjects.Contains(_)).Select(_ => new AnnoObject(_)).ToList();
-            allObjects.AddRange(selectedObjects);
-            System.Diagnostics.Debug.WriteLine(string.Format("UI thread: {0}", Thread.CurrentThread.ManagedThreadId));
+            System.Diagnostics.Debug.WriteLine("UI thread: {0}", Thread.CurrentThread.ManagedThreadId);
             ThreadStart renderThread = delegate
             {
-                System.Diagnostics.Debug.WriteLine(string.Format("Render thread: {0}", Thread.CurrentThread.ManagedThreadId));
+                System.Diagnostics.Debug.WriteLine("Render thread: {0}", Thread.CurrentThread.ManagedThreadId);
                 // initialize output canvas
                 var target = new AnnoCanvas
                 {
@@ -1409,7 +1409,7 @@ namespace AnnoDesigner
                 var height = target.GridToScreen(_placedObjects.Max(_ => _.Position.Y + _.Size.Height) + border) + 1;
                 if (RenderStats)
                 {
-                    width += Constants.StatisticsMargin;
+                    width += Constants.StatisticsMargin - 0.5;
                 }
                 target.Width = width;
                 target.Height = height;
