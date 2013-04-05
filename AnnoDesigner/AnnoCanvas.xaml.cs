@@ -414,21 +414,18 @@ namespace AnnoDesigner
                     var filenameWithoutExt = Path.GetFileNameWithoutExtension(path);
                     if (!string.IsNullOrEmpty(filenameWithoutExt))
                     {
-                        // the default name which is displayed for icons should be the filename
-                        var displayName = filenameWithoutExt;
-                        // if loading of the icons names succeeded
+                        // try mapping to the icon translations
+                        Dictionary<string, string> localizations = null;
                         if (iconNameMap != null)
                         {
-                            // and there is a matching name
                             var map = iconNameMap.Find(_ => _.IconFilename == filenameWithExt);
                             if (map != null)
                             {
-                                // use it
-                                displayName = map.Localizations["eng"];
+                                localizations = map.Localizations.Dict;
                             }
                         }
                         // add the current icon
-                        icons.Add(filenameWithoutExt, new IconImage(filenameWithoutExt, displayName, new BitmapImage(new Uri(path))));
+                        icons.Add(filenameWithoutExt, new IconImage(filenameWithoutExt, localizations, new BitmapImage(new Uri(path))));
                     }
                 }
                 // sort icons by its DisplayName

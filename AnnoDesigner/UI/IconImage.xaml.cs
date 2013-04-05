@@ -1,9 +1,18 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System.Collections.Generic;
+using System.Windows.Media.Imaging;
 
 namespace AnnoDesigner.UI
 {
     public class IconImage
     {
+        private readonly Dictionary<string, string> _localizations;
+
+        public BitmapImage Icon
+        {
+            get;
+            private set;
+        }
+
         public string Name
         {
             get;
@@ -12,26 +21,22 @@ namespace AnnoDesigner.UI
 
         public string DisplayName
         {
-            get;
-            private set;
-        }
-
-        public BitmapImage Icon
-        {
-            get;
-            private set;
+            get
+            {
+                return _localizations == null ? Name : _localizations["eng"];
+            }
         }
 
         public IconImage(string name)
         {
+            _localizations = null;
             Name = name;
-            DisplayName = name;
         }
 
-        public IconImage(string name, string displayName, BitmapImage icon)
+        public IconImage(string name, Dictionary<string,string> localizations, BitmapImage icon)
         {
+            _localizations = localizations;
             Name = name;
-            DisplayName = displayName;
             Icon = icon;
         }
     }
