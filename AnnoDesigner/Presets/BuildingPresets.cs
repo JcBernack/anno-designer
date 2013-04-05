@@ -6,20 +6,16 @@ using System.Windows.Controls;
 namespace AnnoDesigner.Presets
 {
     /// <summary>
-    /// Notes for buildings list json:
-    /// capitalize "buildings" live everything else
-    /// some radii are missing, e.g. coffee plantation
+    /// Notes:
+    /// some radii are curiously missing, e.g. coffee plantation
     /// </summary>
     [DataContract]
     public class BuildingPresets
     {
-        [DataMember(Name = "_model")]
-        public string Model;
-
-        [DataMember(Name = "_version")]
+        [DataMember]
         public string Version;
 
-        [DataMember(Name = "buildings")]
+        [DataMember]
         public List<BuildingInfo> Buildings;
 
         public void AddToTree(TreeView treeView)

@@ -38,6 +38,10 @@ namespace AnnoDesigner
             {
                 return Dict.ContainsKey(key) ? Dict[key] : default(T);
             }
+            set
+            {
+                Dict[key] = value;
+            }
         }
     }  
 }

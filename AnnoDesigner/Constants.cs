@@ -29,6 +29,11 @@ namespace AnnoDesigner
         /// Json encoded file containing the building presets.
         /// </summary>
         public const string BuildingPresetsFile = "presets.json";
+        
+        /// <summary>
+        /// Json encoded file containing the localized names for the icons
+        /// </summary>
+        public const string IconNameFile = "icons.json";
 
         /// <summary>
         /// The minimal grid size to which the user can zoom out.

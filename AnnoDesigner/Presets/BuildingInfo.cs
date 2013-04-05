@@ -23,12 +23,10 @@ namespace AnnoDesigner.Presets
         [DataMember]
         public string IconFileName;
         [DataMember]
-        public string IconWikiaFile;
-        [DataMember]
         public int InfluenceRadius;
 
         [DataMember]
-        public SerializableDictionary<string> Localisation;
+        public SerializableDictionary<string> Localization;
 
         //[DataMember]
         //public SerializableDictionary<int> BuildCost;
@@ -53,7 +51,7 @@ namespace AnnoDesigner.Presets
         {
             return new AnnoObject
             {
-                Label = Localisation == null ? "" : Localisation["eng"],
+                Label = Localization == null ? "" : Localization["eng"],
                 Icon = IconFileName,
                 Radius = InfluenceRadius,
                 Size = BuildBlocker == null ? new Size() : new Size(BuildBlocker["x"], BuildBlocker["z"])
@@ -63,7 +61,7 @@ namespace AnnoDesigner.Presets
 
         public string GetOrderParameter()
         {
-            return Localisation["eng"];
+            return Localization["eng"];
         }
     }
 }
