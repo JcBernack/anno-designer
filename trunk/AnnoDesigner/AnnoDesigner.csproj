@@ -66,6 +66,7 @@
     <Compile Include="Presets\ColorPresets.cs" />
     <Compile Include="Presets\ColorScheme.cs" />
     <Compile Include="Presets\ColorTarget.cs" />
+    <Compile Include="Presets\IconNameMap.cs" />
     <Compile Include="SerializableColor.cs" />
     <Compile Include="DataIO.cs" />
     <Compile Include="SerializableDictionary.cs" />
@@ -103,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="colors.json" />
+    <None Include="icons.json" />
     <None Include="presets.json" />
     <None Include="Stuff\list_of_buildings_v0.3.json" />
     <None Include="Stuff\list_of_buildings_v0.4.json" />
@@ -125,7 +127,8 @@ del $(TargetDir)layouts /Q
 xcopy $(ProjectDir)icons\* $(TargetDir)icons\* /Y
 xcopy $(ProjectDir)layouts\* $(TargetDir)layouts\* /Y
 copy $(ProjectDir)presets.json $(TargetDir)
-copy $(ProjectDir)colors.json $(TargetDir)</PostBuildEvent>
+copy $(ProjectDir)colors.json $(TargetDir)
+copy $(ProjectDir)icons.json $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

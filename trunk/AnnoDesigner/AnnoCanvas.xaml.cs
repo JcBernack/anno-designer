@@ -397,6 +397,16 @@ namespace AnnoDesigner
                 {
                     MessageBox.Show(ex.Message, "Loading of the building presets failed");
                 }
+                // load icon name mapping
+                List<IconNameMap> iconNameMap = null;
+                try
+                {
+                    iconNameMap = DataIO.LoadFromFile<List<IconNameMap>>(Path.Combine(App.ApplicationPath, Constants.IconNameFile));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Loading of the icon names failed");
+                }
                 var icons = new Dictionary<string, IconImage>();
                 foreach (var path in Directory.GetFiles(Path.Combine(App.ApplicationPath, Constants.IconFolder), Constants.IconFolderFilter))
                 {
@@ -406,17 +416,15 @@ namespace AnnoDesigner
                     {
                         // the default name which is displayed for icons should be the filename
                         var displayName = filenameWithoutExt;
-                        // if loading of the presets succeeded
-                        if (BuildingPresets != null && BuildingPresets.Buildings != null)
+                        // if loading of the icons names succeeded
+                        if (iconNameMap != null)
                         {
-                            // and there is a matching preset
-                            var matchedWikiaNames = BuildingPresets.Buildings.FindAll(_ => _.IconFileName == filenameWithExt)
-                                .Select(_ => Path.GetFileNameWithoutExtension(_.IconWikiaFile))
-                                .Where(_ => !string.IsNullOrEmpty(_)).ToList();
-                            if (matchedWikiaNames.Any())
+                            // and there is a matching name
+                            var map = iconNameMap.Find(_ => _.IconFilename == filenameWithExt);
+                            if (map != null)
                             {
-                                // use the WikiaFileName without its extension for this icon
-                                displayName = Path.GetFileNameWithoutExtension(matchedWikiaNames.First());
+                                // use it
+                                displayName = map.Localizations["eng"];
                             }
                         }
                         // add the current icon
@@ -978,7 +986,7 @@ namespace AnnoDesigner
                             }
                             var unselected = _placedObjects.FindAll(_ => !_selectedObjects.Contains(_));
                             var collisionsExist = false;
-                            // temporary move each object and check if collisions with unselected objects exist
+                            // temporarily move each object and check if collisions with unselected objects exist
                             foreach (var obj in _selectedObjects)
                             {
                                 var originalPosition = obj.Position;
