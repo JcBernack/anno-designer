@@ -19,12 +19,6 @@ namespace PresetParser
 
         public static void Main(string[] args)
         {
-            // find buildings node in assets.xml
-            var assetsDocument = new XmlDocument();
-            assetsDocument.Load("data/config/assets.xml");
-            var buildingNodes = assetsDocument.SelectNodes("/AssetList/Groups/Group/Groups/Group")
-                .Cast<XmlNode>().Single(_ => _["Name"].InnerText == "Buildings");
-
             // prepare localizations
             var localizations = GetLocalizations();
 
@@ -38,62 +32,85 @@ namespace PresetParser
             WriteIconNameMapping(iconNodes, localizations);
 
             // parse buildings
-            Console.WriteLine("Parsing buildings:");
             var buildings = new List<BuildingInfo>();
-            foreach (var buildingNode in buildingNodes.SelectNodes("Groups/Group/Groups/Group/Assets/Asset").Cast<XmlNode>())
-            {
-                var values = buildingNode["Values"];
-                // skip invalid elements
-                if (buildingNode["Template"] == null)
-                {
-                    continue;
-                }
-                // parse stuff
-                var b = new BuildingInfo
-                {
-                    Faction = buildingNode.ParentNode.ParentNode.ParentNode.ParentNode["Name"].InnerText,
-                    Group = buildingNode.ParentNode.ParentNode["Name"].InnerText,
-                    Template = buildingNode["Template"].InnerText,
-                    Identifier = values["Standard"]["Name"].InnerText
-                };
-                // print progress
-                //Console.WriteLine("Faction: {0} - Group: {1} - Name: {2}", b.Faction, b.Group, b.Identifier);
-                Console.WriteLine(b.Identifier);
-                // parse building blocker
-                if (!RetrieveBuildingBlocker(b, values["Object"]["Variations"].FirstChild["Filename"].InnerText))
-                {
-                    continue;
-                }
-                // find icon node based on guid match
-                var buildingGuid = values["Standard"]["GUID"].InnerText;
-                var icon = iconNodes.SingleOrDefault(_ => _["GUID"].InnerText == buildingGuid);
-                if (icon != null)
-                {
-                    b.IconFileName = GetIconFilename(icon["Icons"].FirstChild);
-                }
-                // read influence radius if existing
-                try
-                {
-                    b.InfluenceRadius = Convert.ToInt32(values["Influence"]["InfluenceRadius"].InnerText);
-                }
-                catch (NullReferenceException ex) { }
-                // find localization
-                if (localizations.ContainsKey(buildingGuid))
-                {
-                    b.Localization = localizations[buildingGuid];
-                }
-                // add building to the list
-                buildings.Add(b);
-            }
+
+            // find buildings in assets.xml
+            Console.WriteLine();
+            Console.WriteLine("Parsing assets.xml:");
+            ParseAssetsFile("data/config/assets.xml", "/AssetList/Groups/Group/Groups/Group", buildings, iconNodes, localizations);
+            
+            // find buildings in addon_01_assets.xml
+            Console.WriteLine();
+            Console.WriteLine("Parsing addon_01_assets.xml:");
+            ParseAssetsFile("data/config/addon_01_assets.xml", "/Group/Groups/Group", buildings, iconNodes, localizations);
 
             // serialize presets to json file
             var presets = new BuildingPresets { Version = "0.5", Buildings = buildings };
             Console.WriteLine("Writing buildings to presets.json");
             DataIO.SaveToFile(presets, "presets.json");
+            
             // wait for keypress before exiting
             Console.WriteLine();
             Console.WriteLine("DONE - press enter to exit");
             Console.ReadLine();
+        }
+
+        private static void ParseAssetsFile(string filename, string xPathToBuildingsNode, List<BuildingInfo> buildings,
+            IEnumerable<XmlNode> iconNodes, Dictionary<string, SerializableDictionary<string>> localizations)
+        {
+            var assetsDocument = new XmlDocument();
+            assetsDocument.Load(filename);
+            var buildingNodes = assetsDocument.SelectNodes(xPathToBuildingsNode)
+                .Cast<XmlNode>().Single(_ => _["Name"].InnerText == "Buildings");
+            foreach (var buildingNode in buildingNodes.SelectNodes("Groups/Group/Groups/Group/Assets/Asset").Cast<XmlNode>())
+            {
+                ParseBuilding(buildings, buildingNode, iconNodes, localizations);
+            }
+        }
+
+        private static void ParseBuilding(List<BuildingInfo> buildings, XmlNode buildingNode, IEnumerable<XmlNode> iconNodes, Dictionary<string, SerializableDictionary<string>> localizations)
+        {
+            var values = buildingNode["Values"];
+            // skip invalid elements
+            if (buildingNode["Template"] == null)
+            {
+                return;
+            }
+            // parse stuff
+            var b = new BuildingInfo
+            {
+                Faction = buildingNode.ParentNode.ParentNode.ParentNode.ParentNode["Name"].InnerText,
+                Group = buildingNode.ParentNode.ParentNode["Name"].InnerText,
+                Template = buildingNode["Template"].InnerText,
+                Identifier = values["Standard"]["Name"].InnerText
+            };
+            // print progress
+            Console.WriteLine(b.Identifier);
+            // parse building blocker
+            if (!RetrieveBuildingBlocker(b, values["Object"]["Variations"].FirstChild["Filename"].InnerText))
+            {
+                return;
+            }
+            // find icon node based on guid match
+            var buildingGuid = values["Standard"]["GUID"].InnerText;
+            var icon = iconNodes.SingleOrDefault(_ => _["GUID"].InnerText == buildingGuid);
+            if (icon != null)
+            {
+                b.IconFileName = GetIconFilename(icon["Icons"].FirstChild);
+            }
+            // read influence radius if existing
+            try
+            {
+                b.InfluenceRadius = Convert.ToInt32(values["Influence"]["InfluenceRadius"].InnerText);
+            }
+            catch (NullReferenceException ex) { }
+            // find localization
+            if (localizations.ContainsKey(buildingGuid))
+            {
+                b.Localization = localizations[buildingGuid];
+            }
+            // add building to the list
+            buildings.Add(b);
         }
 
         private static bool RetrieveBuildingBlocker(BuildingInfo building, string variationFilename)
@@ -124,14 +141,16 @@ namespace PresetParser
 
         private static Dictionary<string, SerializableDictionary<string>> GetLocalizations()
         {
-            string[] files = { "icons.txt", "guids.txt" };
+            string[] files = { "icons.txt", "guids.txt", "addon/texts.txt" };
             var localizations = new Dictionary<string, SerializableDictionary<string>>();
             var references = new List<GuidRef>();
             foreach (var language in Languages)
             {
-                var path = Path.Combine("data/languages/", language);
-                foreach (var reader in files.Select(_ => new StreamReader(Path.Combine(path, _))))
+                var basePath = Path.Combine("data/languages", language, "txt");
+                foreach (var path in files.Select(_ => Path.Combine(basePath, _)))
                 {
+                    if (!File.Exists(path)) continue;
+                    var reader = new StreamReader(path);
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
